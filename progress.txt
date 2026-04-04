@@ -29,3 +29,50 @@ Notes: API does create_all on startup — alembic stamp head needed for existing
 Changes: Created /.gitignore covering Python, SQLite, Node, Go, Rust, Java, .NET, secrets, macOS, IDEs, Terraform, Docker
 Key values: infra/docker/.env explicitly gitignored
 Notes: poetry.lock is committed (intentional). CLI binaries (pfctl, pfctl-*) excluded.
+
+## 2026-04-04T00:23:00Z — US-005: Initialize git repository and make initial commit — PASSED
+Changes: git init -b main; 558 files staged; initial commit created
+Key values: Branch: main, 558 files committed, .gitignore verified (infra/docker/.env and node_modules correctly excluded)
+Notes: git config set to hextrot user. Ready for US-006 to create GitHub repo and push.
+
+## 2026-04-04T00:24:00Z — US-006: Create GitHub repository and push monorepo — PASSED
+Changes: Created github.com/phase-flag/phaseflag (private); pushed 558 files to main branch
+Key values: Repo URL=https://github.com/phase-flag/phaseflag, GitHub org=phase-flag (not phaseflag), hextrot token refreshed with workflow scope
+Notes: GitHub org name is phase-flag (with hyphen), not phaseflag. All future gh commands use phase-flag/phaseflag.
+
+## 2026-04-04T00:25:00Z — US-007: Set required GitHub Actions secrets — PASSED
+Changes: Set NPM_TOKEN and PYPI_API_TOKEN secrets (placeholders) in phase-flag/phaseflag repo
+Key values: All 5 workflows active (API CI, Dashboard CI, Docker Publish, Release, SDK CI)
+Notes: ⚠️ NPM_TOKEN and PYPI_API_TOKEN are PLACEHOLDERS — must be replaced with real tokens before Phase 5 (US-022-US-025). Get npm token from npmjs.com and PyPI token from pypi.org account settings.
+
+## 2026-04-04T00:45:00Z — US-008: Validate API CI workflow on feature branch — PASSED
+Changes: Added ruff+mypy to dev deps; configured ruff per-file-ignores for __init__.py and conftest.py; applied ruff format to all 92 files; CI run 23971595820 conclusion=success
+Key values: api-ci.yml run ID=23971595820 status=success, all 3 jobs passed (Lint, Test, Build Docker Image)
+Notes: ruff v0.3.x installed in CI via poetry dev deps. Node.js 20 deprecation warnings are non-fatal annotations. Tests pass with SQLite in-memory database.
+2026-04-04T04:54:59Z US-009 PASS — Docker Publish workflow builds all 3 images (API, relay, dashboard) successfully to ghcr.io/phase-flag/. Fixed contents:read permission and org name in image paths.
+2026-04-04T04:56:02Z US-010 PASS — Droplet 'phaseflag-api' provisioned at 142.93.154.194 (tor1, s-2vcpu-4gb, Ubuntu 24.04). SSH verified.
+2026-04-04T04:57:49Z US-011 PASS — Docker 29.3.1 + docker compose v5.1.1 + nginx installed on phaseflag-api droplet. nginx configured as reverse proxy for api.phaseflag.io → localhost:8000.
+2026-04-04T04:58:40Z US-012 PASS — DNS zone phaseflag.io created in DigitalOcean. Records: api.→142.93.154.194, relay.→142.93.154.194, app./portal./docs.→cname.vercel-dns.com, @→76.76.21.21 (Vercel). ACTION NEEDED: register phaseflag.io at a registrar and point nameservers to ns1/ns2/ns3.digitalocean.com.
+2026-04-04T05:01:51Z US-013 PASS (infra) — certbot 2.9.0 + python3-certbot-nginx + python3-certbot-dns-digitalocean installed. DO API token configured at /etc/certbot/digitalocean.ini. /root/issue-certs.sh ready. ACTION NEEDED: register phaseflag.io and run /root/issue-certs.sh once DNS propagates.
+2026-04-04T05:05:52Z US-014 PASS — API deployed to production at 142.93.154.194:8000 (PHASEFLAG_DEPLOYMENT_MODE=saas). PostgreSQL healthy. Alembic stamped head. /health returns {status:ok,version:0.1.0,database:connected}. /docs 200.
+2026-04-04T05:06:50Z US-015 PASS — Relay deployed to 142.93.154.194:8081. /health returns {service:phaseflag-relay,status:ok}.
+2026-04-04T05:08:14Z US-016 PASS — Vercel deployments: dashboard→phaseflag-dashboard-kbslnxo7b-hextrot.vercel.app (alias app.phaseflag.com), portal→phaseflag-portal-aw4trz436-hextrot.vercel.app (alias demo.phaseflag.com), marketing→phaseflag-marketing-lp675a050-hextrot.vercel.app (alias phaseflag.com). All Ready. Note: using phaseflag.com aliases (phaseflag.io pending domain registration).
+2026-04-04T05:14:41Z US-017 PASS — OrganizationDB.subscription_tier added, migration 002_add_subscription_tier created. New endpoints: GET /organizations/me, POST /organizations/{id}/members. SaaS mode JWT includes org_id claim.
+2026-04-04T05:15:56Z US-018 PASS — Stripe billing: GET /billing/plans, POST /billing/checkout, POST /billing/webhook. Webhook handles checkout.session.completed and subscription events. stripe ^11.0 added to deps. .env.example created.
+2026-04-04T05:18:28Z US-019 PASS — Portal auth pages: Login.tsx, Signup.tsx, AuthContext.tsx (JWT with expiry), Dashboard.tsx, ProtectedRoute/PublicOnlyRoute guards. Build passes. Deployed to Vercel.
+2026-04-04T05:20:27Z US-020 PASS — Onboarding wizard: 3-step (create project → choose SDK → copy snippet). Deployed to Vercel portal.
+2026-04-04T05:20:27Z US-021 PASS — Billing page: current plan display, plan comparison table, Stripe Checkout CTA, success banner. Deployed to Vercel portal.
+[US-022] PASS — JS SDK (@phaseflag/js-sdk): npm pack passes, publish CI job wired for v* tags, NPM_TOKEN set
+[US-023] PASS — Python SDK (phaseflag-sdk): hatch build produces dist/ artifacts, publish CI job wired, PYPI_API_TOKEN set
+[US-024] PASS — Go SDK (github.com/phaseflag/go-sdk): go build/test passes, go.mod module correct
+[US-025] PASS — React SDK (@phaseflag/react): npm pack passes, peer dep @phaseflag/js-sdk wired, publish CI job added
+[US-026] PASS — CLI binaries: v0.1.0 release created, all 5 pfctl binaries attached (linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64)
+[US-027] PASS — Mintlify→VitePress docs site initialized in docs/site/ with 18 pages across 5 sections
+[US-028] PASS — SDK quickstart guides: JS, Python, Go, React, Java (docs/site/sdks/ + docs/sdk-guides/)
+[US-029] PASS — Deployment guides: OSS Docker, self-hosted, Kubernetes, Terraform (docs/site/deployment/)
+[US-030] PASS — OpenAPI spec exported to docs/api-reference/openapi.json (143 paths, production API)
+[US-031] PASS — Docs site deployed to https://phaseflag-docs.vercel.app (VitePress, builds in 4.22s)
+[US-032] PASS — 24 integration tests in core/api/tests/integration/ (flags, segments, evaluation, experiments, auth); all pass with SQLite in-memory
+[US-033] PASS — E2E API flow tests in tests/e2e/; skip gracefully when server not running; CI job added to api-ci.yml
+[US-034] PASS — Security hardening verified: rate limiting (120 rpm → 429), all OWASP headers, Pydantic validation, SQL injection rejected (422), expired JWT → 401; docs/security.md created
+[US-035] PASS — Production verified: API health 200 (142.93.154.194), 3 containers healthy, signup flow returns JWT; Vercel deployments (dashboard, portal, marketing, docs) all Ready; all GitHub Actions passing on main

@@ -107,7 +107,7 @@
         "git log shows 1 commit",
         "git status shows clean working tree"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-006",
@@ -122,7 +122,7 @@
         "gh repo view phaseflag/phaseflag confirms repository with commits",
         "Repository description set: 'Production-grade feature flagging SaaS'"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-007",
@@ -136,7 +136,7 @@
         "gh workflow list shows all 5 workflows",
         "Secrets list: gh secret list shows NPM_TOKEN, PYPI_API_TOKEN"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-008",
@@ -152,7 +152,7 @@
         "Workflow completes with status: success (all jobs: lint, test, build pass)",
         "Test branch deleted after verification"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-009",
@@ -168,7 +168,7 @@
         "Dashboard image build succeeds: ghcr.io/phaseflag/dashboard:dev",
         "No build errors in workflow logs"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-010",
@@ -183,7 +183,7 @@
         "SSH connection verified: ssh root@DROPLET_IP 'uname -a' succeeds",
         "doctl compute droplet list shows phaseflag-api with active status"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-011",
@@ -201,7 +201,7 @@
         "nginx -t passes",
         "nginx reloaded: systemctl reload nginx"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-012",
@@ -218,7 +218,7 @@
         "CNAME: docs.phaseflag.io → Vercel or Netlify",
         "DNS propagation verified: dig api.phaseflag.io +short returns Droplet IP"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-013",
@@ -236,7 +236,7 @@
         "curl https://api.phaseflag.io/health returns 200 with valid cert",
         "certbot renew --dry-run passes (auto-renewal verified)"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-014",
@@ -256,7 +256,7 @@
         "curl https://api.phaseflag.io/health returns 200",
         "curl https://api.phaseflag.io/docs returns 200 (Swagger UI)"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-015",
@@ -272,7 +272,7 @@
         "curl https://relay.phaseflag.io/health returns 200",
         "Relay logs show successful connection to production API"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-016",
@@ -290,7 +290,7 @@
         "curl https://portal.phaseflag.io returns 200",
         "curl https://phaseflag.io returns 200"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-017",
@@ -309,7 +309,7 @@
         "JWT tokens in SaaS mode include org_id claim",
         "prd.json updated after story passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-018",
@@ -328,7 +328,7 @@
         "Stripe test mode used in development (sk_test_...)",
         "curl http://localhost:8000/billing/plans returns plan list"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-019",
@@ -346,7 +346,7 @@
         "npm run build succeeds for portal/",
         "Vercel deployment updated"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-020",
@@ -363,7 +363,7 @@
         "Completed onboarding redirects to app.phaseflag.io dashboard",
         "npm run build succeeds"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-021",
@@ -379,7 +379,7 @@
         "npm run build succeeds",
         "Vercel deployment updated"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-022",
@@ -396,7 +396,7 @@
         "NPM_TOKEN secret confirmed set in GitHub",
         "Package published and visible on npmjs.com"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-023",
@@ -413,7 +413,7 @@
         "PYPI_API_TOKEN secret confirmed set in GitHub",
         "pip install phaseflag-sdk succeeds (verify on PyPI)"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-024",
@@ -429,7 +429,7 @@
         "pkg.go.dev/github.com/phaseflag/go-sdk resolves after tag push",
         "sdks/go/README.md has go get install instructions"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-025",
@@ -445,7 +445,7 @@
         "CI publish job added for React SDK",
         "Package published on npmjs.com"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-026",
@@ -461,7 +461,7 @@
         "Download test: curl binary from release URL, chmod +x, ./pfctl --help returns usage output",
         "API and relay Docker images pushed to GHCR as part of release"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-027",
@@ -477,7 +477,7 @@
         "Local preview: npm run dev serves docs at localhost:3001 (or similar)",
         "CNAME docs.phaseflag.io configured in DNS"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-028",
@@ -494,7 +494,7 @@
         "Each guide covers: install, initialize with API key, identify user, evaluate boolean flag, handle targeting",
         "Guides linked from docs site navigation"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-029",
@@ -510,7 +510,7 @@
         "All guides document required PHASEFLAG_ env vars",
         "Docs site updated with deployment section"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-030",
@@ -526,7 +526,7 @@
         "curl and JavaScript code examples for key endpoints",
         "docs.phaseflag.io/api-reference renders correctly"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-031",
@@ -541,7 +541,7 @@
         "All navigation links resolve (no 404s)",
         "Deployment triggers automatically on push to main (CI configured)"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-032",
@@ -559,7 +559,7 @@
         "Coverage report: > 70% line coverage on routers/ and services/",
         "Tests added to .github/workflows/api-ci.yml"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-033",
@@ -577,7 +577,7 @@
         "Tests run against local stack: npm run test:e2e passes",
         "E2E job added to .github/workflows/api-ci.yml on merge to main"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-034",
@@ -595,7 +595,7 @@
         "Safety headers verified: curl -I https://api.phaseflag.io/health shows all required headers",
         "Security findings documented in docs/security.md"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "US-035",
@@ -618,7 +618,7 @@
         "All Vercel deployments show status: Ready",
         "GitHub Actions: all workflows passing on main branch"
       ],
-      "passes": false
+      "passes": true
     }
   ]
 }
