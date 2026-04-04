@@ -278,9 +278,7 @@ async def pause_experiment(key: str, session: AsyncSession = Depends(get_session
     status_code=201,
     dependencies=[require_role("editor")],
 )
-async def record_result(
-    key: str, body: RecordResultRequest, session: AsyncSession = Depends(get_session)
-):
+async def record_result(key: str, body: RecordResultRequest, session: AsyncSession = Depends(get_session)):
     exp = await experiment_service.get_experiment_by_key(session, key)
     if not exp:
         raise HTTPException(status_code=404, detail="Experiment not found")
@@ -356,18 +354,12 @@ async def power_analysis(body: PowerAnalysisRequest):
 
 
 @router.post("/experiments/interactions")
-async def detect_interactions(
-    body: InteractionsRequest, session: AsyncSession = Depends(get_session)
-):
-    return await experiment_service.detect_experiment_interactions(
-        session, body.experiment_keys
-    )
+async def detect_interactions(body: InteractionsRequest, session: AsyncSession = Depends(get_session)):
+    return await experiment_service.detect_experiment_interactions(session, body.experiment_keys)
 
 
 @router.post("/experiments/holdout-groups", status_code=201)
-async def create_holdout_group(
-    body: HoldoutGroupRequest, session: AsyncSession = Depends(get_session)
-):
+async def create_holdout_group(body: HoldoutGroupRequest, session: AsyncSession = Depends(get_session)):
     return await experiment_service.create_holdout_group(
         session,
         body.name,

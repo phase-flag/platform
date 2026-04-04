@@ -72,12 +72,8 @@ def _config_to_out(c) -> ConfigOut:
     )
 
 
-@router.post(
-    "", response_model=ConfigOut, status_code=201, dependencies=[require_role("editor")]
-)
-async def create_config(
-    body: ConfigCreate, session: AsyncSession = Depends(get_session)
-):
+@router.post("", response_model=ConfigOut, status_code=201, dependencies=[require_role("editor")])
+async def create_config(body: ConfigCreate, session: AsyncSession = Depends(get_session)):
     config = await remote_config_service.create_config(
         session,
         key=body.key,
@@ -114,18 +110,12 @@ async def get_config(config_id: str, session: AsyncSession = Depends(get_session
     return _config_to_out(config)
 
 
-@router.put(
-    "/{config_id}", response_model=ConfigOut, dependencies=[require_role("editor")]
-)
-async def update_config(
-    config_id: str, body: ConfigUpdate, session: AsyncSession = Depends(get_session)
-):
+@router.put("/{config_id}", response_model=ConfigOut, dependencies=[require_role("editor")])
+async def update_config(config_id: str, body: ConfigUpdate, session: AsyncSession = Depends(get_session)):
     config = await remote_config_service.get_config_by_id(session, config_id)
     if not config:
         raise HTTPException(status_code=404, detail="Config not found")
-    updated = await remote_config_service.update_config(
-        session, config, body.model_dump(exclude_unset=True)
-    )
+    updated = await remote_config_service.update_config(session, config, body.model_dump(exclude_unset=True))
     return _config_to_out(updated)
 
 
@@ -144,9 +134,7 @@ async def get_config_history(
     session: AsyncSession = Depends(get_session),
 ):
     """Return version history for a config entry."""
-    return await remote_config_service.get_config_history(
-        session, config_id, limit=limit
-    )
+    return await remote_config_service.get_config_history(session, config_id, limit=limit)
 
 
 class ValidateRequest(BaseModel):
@@ -160,14 +148,10 @@ async def validate_config_value(
     session: AsyncSession = Depends(get_session),
 ):
     """Validate a value against the config's JSON schema definition."""
-    return await remote_config_service.validate_config_value(
-        session, config_id, body.value
-    )
+    return await remote_config_service.validate_config_value(session, config_id, body.value)
 
 
 @router.get("/client/{environment}")
-async def get_client_configs(
-    environment: str, session: AsyncSession = Depends(get_session)
-):
+async def get_client_configs(environment: str, session: AsyncSession = Depends(get_session)):
     """Return all client-safe configs for an environment (for SDK consumption)."""
     return await remote_config_service.get_client_configs(session, environment)

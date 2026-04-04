@@ -47,9 +47,7 @@ def get_forced_treatment(flag_key: str, user_id: str) -> str | None:
     return _forced_treatments.get(flag_key, {}).get(user_id)
 
 
-def clear_forced_treatments(
-    flag_key: str | None = None, user_id: str | None = None
-) -> None:
+def clear_forced_treatments(flag_key: str | None = None, user_id: str | None = None) -> None:
     if flag_key and user_id:
         _forced_treatments.get(flag_key, {}).pop(user_id, None)
     elif flag_key:
@@ -78,9 +76,7 @@ def simulate_rollout(flag_key: str, total_users: int, percentage: int) -> dict:
         "total_users": total_users,
         "percentage": percentage,
         "affected_count": affected,
-        "actual_percentage": round(affected / total_users * 100, 2)
-        if total_users > 0
-        else 0,
+        "actual_percentage": round(affected / total_users * 100, 2) if total_users > 0 else 0,
     }
 
 

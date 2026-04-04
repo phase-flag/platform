@@ -9,9 +9,7 @@ from tests.conftest import make_flag_payload
 @pytest.mark.asyncio
 async def test_create_experiment(client: AsyncClient, auth_headers: dict):
     """Creating an experiment returns the experiment data."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="exp-flag"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="exp-flag"), headers=auth_headers)
 
     resp = await client.post(
         "/api/v1/experiments",
@@ -87,9 +85,7 @@ async def test_start_experiment(client: AsyncClient, auth_headers: dict):
 
     if create_resp.status_code in (200, 201):
         exp_id = create_resp.json().get("id", create_resp.json().get("key"))
-        resp = await client.post(
-            f"/api/v1/experiments/{exp_id}/start", headers=auth_headers
-        )
+        resp = await client.post(f"/api/v1/experiments/{exp_id}/start", headers=auth_headers)
         assert resp.status_code in (200, 400, 404)
 
 
@@ -115,9 +111,7 @@ async def test_stop_experiment(client: AsyncClient, auth_headers: dict):
 
     if create_resp.status_code in (200, 201):
         exp_id = create_resp.json().get("id", create_resp.json().get("key"))
-        resp = await client.post(
-            f"/api/v1/experiments/{exp_id}/stop", headers=auth_headers
-        )
+        resp = await client.post(f"/api/v1/experiments/{exp_id}/stop", headers=auth_headers)
         assert resp.status_code in (200, 400, 404)
 
 

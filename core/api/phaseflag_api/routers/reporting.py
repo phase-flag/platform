@@ -26,16 +26,12 @@ async def environment_drift(session: AsyncSession = Depends(get_session)):
 
 
 @router.get("/reports/change-timeline")
-async def change_timeline(
-    days: int = Query(30, ge=1, le=365), session: AsyncSession = Depends(get_session)
-):
+async def change_timeline(days: int = Query(30, ge=1, le=365), session: AsyncSession = Depends(get_session)):
     return await analytics_service.get_change_activity_timeline(session, days)
 
 
 @router.get("/reports/top-flags")
-async def top_flags(
-    limit: int = Query(20, ge=1, le=100), session: AsyncSession = Depends(get_session)
-):
+async def top_flags(limit: int = Query(20, ge=1, le=100), session: AsyncSession = Depends(get_session)):
     return await analytics_service.get_top_flags(session, limit)
 
 

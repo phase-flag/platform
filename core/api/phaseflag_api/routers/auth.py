@@ -44,9 +44,7 @@ class UserResponse(BaseModel):
 async def register(body: RegisterRequest, session: AsyncSession = Depends(get_session)):
     existing = await session.execute(select(UserDB).where(UserDB.email == body.email))
     if existing.scalar_one_or_none():
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="Email already registered."
-        )
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered.")
 
     count_result = await session.execute(select(func.count()).select_from(UserDB))
     user_count = count_result.scalar() or 0

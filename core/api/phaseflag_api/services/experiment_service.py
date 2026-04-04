@@ -33,9 +33,7 @@ async def create_experiment(
 ) -> ExperimentDB:
     existing = await get_experiment_by_key(session, key)
     if existing:
-        raise HTTPException(
-            status_code=409, detail=f"Experiment '{key}' already exists"
-        )
+        raise HTTPException(status_code=409, detail=f"Experiment '{key}' already exists")
 
     exp = ExperimentDB(
         key=key,
@@ -70,9 +68,7 @@ async def create_experiment(
 
 async def start_experiment(session: AsyncSession, exp: ExperimentDB) -> ExperimentDB:
     if exp.status not in ("draft", "paused"):
-        raise HTTPException(
-            status_code=400, detail=f"Cannot start a '{exp.status}' experiment"
-        )
+        raise HTTPException(status_code=400, detail=f"Cannot start a '{exp.status}' experiment")
     exp.status = "running"
     exp.start_date = exp.start_date or datetime.now(UTC)
     exp.updated_at = datetime.now(UTC)
@@ -83,9 +79,7 @@ async def start_experiment(session: AsyncSession, exp: ExperimentDB) -> Experime
 
 async def stop_experiment(session: AsyncSession, exp: ExperimentDB) -> ExperimentDB:
     if exp.status != "running":
-        raise HTTPException(
-            status_code=400, detail="Can only stop a running experiment"
-        )
+        raise HTTPException(status_code=400, detail="Can only stop a running experiment")
     exp.status = "completed"
     exp.end_date = datetime.now(UTC)
     exp.updated_at = datetime.now(UTC)
@@ -96,9 +90,7 @@ async def stop_experiment(session: AsyncSession, exp: ExperimentDB) -> Experimen
 
 async def pause_experiment(session: AsyncSession, exp: ExperimentDB) -> ExperimentDB:
     if exp.status != "running":
-        raise HTTPException(
-            status_code=400, detail="Can only pause a running experiment"
-        )
+        raise HTTPException(status_code=400, detail="Can only pause a running experiment")
     exp.status = "paused"
     exp.updated_at = datetime.now(UTC)
     await session.flush()
@@ -111,12 +103,8 @@ async def get_experiment_by_key(session: AsyncSession, key: str) -> ExperimentDB
     return result.scalar_one_or_none()
 
 
-async def get_experiment_by_id(
-    session: AsyncSession, exp_id: str
-) -> ExperimentDB | None:
-    result = await session.execute(
-        select(ExperimentDB).where(ExperimentDB.id == exp_id)
-    )
+async def get_experiment_by_id(session: AsyncSession, exp_id: str) -> ExperimentDB | None:
+    result = await session.execute(select(ExperimentDB).where(ExperimentDB.id == exp_id))
     return result.scalar_one_or_none()
 
 
@@ -133,17 +121,9 @@ async def list_experiments(
         base = base.where(ExperimentDB.status == status_filter)
     if flag_key:
         base = base.where(ExperimentDB.flag_key == flag_key)
-    total = (
-        await session.execute(select(func.count()).select_from(base.subquery()))
-    ).scalar() or 0
+    total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
     items = (
-        (
-            await session.execute(
-                base.order_by(ExperimentDB.created_at.desc())
-                .limit(limit)
-                .offset(offset)
-            )
-        )
+        (await session.execute(base.order_by(ExperimentDB.created_at.desc()).limit(limit).offset(offset)))
         .scalars()
         .all()
     )
@@ -187,9 +167,7 @@ def calculate_significance(
 
     p_c = control_conversions / control_size
     p_t = treatment_conversions / treatment_size
-    p_pool = (control_conversions + treatment_conversions) / (
-        control_size + treatment_size
-    )
+    p_pool = (control_conversions + treatment_conversions) / (control_size + treatment_size)
 
     if p_pool == 0 or p_pool == 1:
         return {"significant": False, "p_value": 1.0, "lift": 0.0, "confidence": 0.0}
@@ -245,13 +223,7 @@ def calculate_sample_size(
     p2 = baseline_rate * (1 + min_detectable_effect)
     if p1 <= 0 or p1 >= 1 or p2 <= 0 or p2 >= 1:
         return 0
-    n = (
-        (
-            z_alpha * math.sqrt(2 * p1 * (1 - p1))
-            + z_beta * math.sqrt(p1 * (1 - p1) + p2 * (1 - p2))
-        )
-        / (p2 - p1)
-    ) ** 2
+    n = ((z_alpha * math.sqrt(2 * p1 * (1 - p1)) + z_beta * math.sqrt(p1 * (1 - p1) + p2 * (1 - p2))) / (p2 - p1)) ** 2
     return int(math.ceil(n))
 
 
@@ -345,14 +317,12 @@ def sequential_test(conversions_over_time: list[dict]) -> dict:
                 cumulative["treatment_conv"],
                 cumulative["treatment_total"],
             )
-            info_fraction = (
-                cumulative["control_total"] + cumulative["treatment_total"]
-            ) / (2 * max(entry.get("planned_total", 1000), 1))
+            info_fraction = (cumulative["control_total"] + cumulative["treatment_total"]) / (
+                2 * max(entry.get("planned_total", 1000), 1)
+            )
             # O'Brien-Fleming boundary
             if info_fraction > 0:
-                boundary = (
-                    2.796 / math.sqrt(info_fraction) if info_fraction < 1 else 1.96
-                )
+                boundary = 2.796 / math.sqrt(info_fraction) if info_fraction < 1 else 1.96
             else:
                 boundary = 999
 
@@ -361,12 +331,9 @@ def sequential_test(conversions_over_time: list[dict]) -> dict:
                 "z_statistic": round(z, 4),
                 "boundary": round(boundary, 4),
                 "significant": abs(z) > boundary,
-                "cumulative_control_rate": round(
-                    cumulative["control_conv"] / max(cumulative["control_total"], 1), 4
-                ),
+                "cumulative_control_rate": round(cumulative["control_conv"] / max(cumulative["control_total"], 1), 4),
                 "cumulative_treatment_rate": round(
-                    cumulative["treatment_conv"]
-                    / max(cumulative["treatment_total"], 1),
+                    cumulative["treatment_conv"] / max(cumulative["treatment_total"], 1),
                     4,
                 ),
                 "info_fraction": round(info_fraction, 4),
@@ -390,11 +357,7 @@ def z_test_statistic(c_conv, c_total, t_conv, t_total):
     p1 = c_conv / max(c_total, 1)
     p2 = t_conv / max(t_total, 1)
     p_pool = (c_conv + t_conv) / max(c_total + t_total, 1)
-    se = (
-        math.sqrt(p_pool * (1 - p_pool) * (1 / max(c_total, 1) + 1 / max(t_total, 1)))
-        if 0 < p_pool < 1
-        else 1
-    )
+    se = math.sqrt(p_pool * (1 - p_pool) * (1 / max(c_total, 1) + 1 / max(t_total, 1))) if 0 < p_pool < 1 else 1
     return (p2 - p1) / se if se > 0 else 0
 
 
@@ -407,23 +370,12 @@ def power_analysis(
     """Calculate required sample size for given power."""
     # Using normal approximation
     z_alpha = 1.96 if alpha == 0.05 else 2.576 if alpha == 0.01 else 1.645
-    z_beta = (
-        0.842
-        if power == 0.8
-        else 1.282
-        if power == 0.9
-        else 1.645
-        if power == 0.95
-        else 0.842
-    )
+    z_beta = 0.842 if power == 0.8 else 1.282 if power == 0.9 else 1.645 if power == 0.95 else 0.842
 
     p1 = baseline_rate
     p2 = baseline_rate * (1 + minimum_detectable_effect)
 
-    numerator = (
-        z_alpha * math.sqrt(2 * p1 * (1 - p1))
-        + z_beta * math.sqrt(p1 * (1 - p1) + p2 * (1 - p2))
-    ) ** 2
+    numerator = (z_alpha * math.sqrt(2 * p1 * (1 - p1)) + z_beta * math.sqrt(p1 * (1 - p1) + p2 * (1 - p2))) ** 2
     denominator = (p2 - p1) ** 2
 
     n_per_group = math.ceil(numerator / denominator) if denominator > 0 else 0
@@ -435,15 +387,11 @@ def power_analysis(
         "power": power,
         "sample_size_per_group": n_per_group,
         "total_sample_size": n_per_group * 2,
-        "estimated_duration_days": math.ceil(
-            n_per_group * 2 / 1000
-        ),  # Assuming 1000 users/day
+        "estimated_duration_days": math.ceil(n_per_group * 2 / 1000),  # Assuming 1000 users/day
     }
 
 
-async def detect_experiment_interactions(
-    session: AsyncSession, experiment_keys: list[str]
-) -> list[dict]:
+async def detect_experiment_interactions(session: AsyncSession, experiment_keys: list[str]) -> list[dict]:
     """Detect potential interactions between concurrent experiments."""
     from phaseflag_api.models.experiments import ExperimentDB as _ExperimentDB
 
@@ -465,11 +413,7 @@ async def detect_experiment_interactions(
                         "experiment_1": exp1.key,
                         "experiment_2": exp2.key,
                         "traffic_overlap_percentage": overlap,
-                        "risk_level": "high"
-                        if overlap > 50
-                        else "medium"
-                        if overlap > 20
-                        else "low",
+                        "risk_level": "high" if overlap > 50 else "medium" if overlap > 20 else "low",
                         "recommendation": "Consider using mutual exclusion groups"
                         if overlap > 50
                         else "Monitor for interaction effects",
@@ -478,9 +422,7 @@ async def detect_experiment_interactions(
     return interactions
 
 
-async def create_holdout_group(
-    session: AsyncSession, name: str, percentage: int, experiment_keys: list[str]
-) -> dict:
+async def create_holdout_group(session: AsyncSession, name: str, percentage: int, experiment_keys: list[str]) -> dict:
     """Create a holdout group that excludes users from experiments."""
     return {
         "name": name,

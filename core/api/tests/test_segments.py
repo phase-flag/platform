@@ -132,9 +132,7 @@ async def test_delete_segment(client: AsyncClient, auth_headers: dict):
 
 
 @pytest.mark.asyncio
-async def test_segment_with_multiple_conditions(
-    client: AsyncClient, auth_headers: dict
-):
+async def test_segment_with_multiple_conditions(client: AsyncClient, auth_headers: dict):
     """Creating a segment with multiple AND conditions works."""
     resp = await client.post(
         "/api/v1/segments",

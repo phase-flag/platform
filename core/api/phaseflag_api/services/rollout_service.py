@@ -24,10 +24,7 @@ PIPELINE_TEMPLATES = {
         {"name": "Green (New)", "rollout_percentage": 0, "duration_minutes": 10},
         {"name": "Switch", "rollout_percentage": 100, "duration_minutes": None},
     ],
-    "linear": [
-        {"name": f"{p}%", "rollout_percentage": p, "duration_minutes": 60}
-        for p in [10, 25, 50, 75, 100]
-    ],
+    "linear": [{"name": f"{p}%", "rollout_percentage": p, "duration_minutes": 60} for p in [10, 25, 50, 75, 100]],
 }
 
 
@@ -45,9 +42,7 @@ async def create_pipeline(
     if template and template in PIPELINE_TEMPLATES:
         stages = PIPELINE_TEMPLATES[template]
     elif not stages:
-        raise HTTPException(
-            status_code=400, detail="Provide either a template or custom stages"
-        )
+        raise HTTPException(status_code=400, detail="Provide either a template or custom stages")
 
     pipeline = PipelineDB(
         flag_key=flag_key,
@@ -88,9 +83,7 @@ async def create_pipeline(
 
 async def advance_pipeline(session: AsyncSession, pipeline: PipelineDB) -> PipelineDB:
     if pipeline.status not in ("pending", "running"):
-        raise HTTPException(
-            status_code=400, detail=f"Cannot advance a '{pipeline.status}' pipeline"
-        )
+        raise HTTPException(status_code=400, detail=f"Cannot advance a '{pipeline.status}' pipeline")
 
     stages = sorted(pipeline.stages, key=lambda s: s.stage_order)
     current_idx = pipeline.current_stage_index
@@ -139,9 +132,7 @@ async def resume_pipeline(session: AsyncSession, pipeline: PipelineDB) -> Pipeli
 
 async def rollback_pipeline(session: AsyncSession, pipeline: PipelineDB) -> PipelineDB:
     if pipeline.status in ("completed", "rolled_back"):
-        raise HTTPException(
-            status_code=400, detail=f"Cannot rollback a '{pipeline.status}' pipeline"
-        )
+        raise HTTPException(status_code=400, detail=f"Cannot rollback a '{pipeline.status}' pipeline")
     pipeline.status = "rolled_back"
     pipeline.updated_at = datetime.now(UTC)
     # Mark remaining stages as skipped
@@ -154,9 +145,7 @@ async def rollback_pipeline(session: AsyncSession, pipeline: PipelineDB) -> Pipe
 
 
 async def get_pipeline(session: AsyncSession, pipeline_id: str) -> PipelineDB | None:
-    result = await session.execute(
-        select(PipelineDB).where(PipelineDB.id == pipeline_id)
-    )
+    result = await session.execute(select(PipelineDB).where(PipelineDB.id == pipeline_id))
     return result.scalar_one_or_none()
 
 
@@ -172,17 +161,9 @@ async def list_pipelines(
     base = select(PipelineDB)
     if flag_key:
         base = base.where(PipelineDB.flag_key == flag_key)
-    total = (
-        await session.execute(select(func.count()).select_from(base.subquery()))
-    ).scalar() or 0
+    total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
     items = (
-        (
-            await session.execute(
-                base.order_by(PipelineDB.created_at.desc()).limit(limit).offset(offset)
-            )
-        )
-        .scalars()
-        .all()
+        (await session.execute(base.order_by(PipelineDB.created_at.desc()).limit(limit).offset(offset))).scalars().all()
     )
     return list(items), total
 
@@ -214,13 +195,9 @@ async def create_rollback_rule(
     return rule
 
 
-async def list_rollback_rules(
-    session: AsyncSession, flag_key: str
-) -> list[RollbackRuleDB]:
+async def list_rollback_rules(session: AsyncSession, flag_key: str) -> list[RollbackRuleDB]:
     result = await session.execute(
-        select(RollbackRuleDB)
-        .where(RollbackRuleDB.flag_key == flag_key)
-        .order_by(RollbackRuleDB.created_at.desc())
+        select(RollbackRuleDB).where(RollbackRuleDB.flag_key == flag_key).order_by(RollbackRuleDB.created_at.desc())
     )
     return list(result.scalars().all())
 
@@ -230,9 +207,7 @@ async def list_rollback_rules(
 # ---------------------------------------------------------------------------
 
 
-async def auto_advance_pipeline(
-    session: AsyncSession, pipeline_id: str
-) -> dict[str, Any]:
+async def auto_advance_pipeline(session: AsyncSession, pipeline_id: str) -> dict[str, Any]:
     """Check if current stage duration has elapsed, advance to next stage if so.
 
     Returns a dict describing the action taken.

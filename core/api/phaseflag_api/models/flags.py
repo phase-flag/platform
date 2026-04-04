@@ -100,9 +100,7 @@ class VariationDB(Base):
     __tablename__ = "variations"
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    flag_id = Column(
-        String(36), ForeignKey("feature_flags.id", ondelete="CASCADE"), nullable=False
-    )
+    flag_id = Column(String(36), ForeignKey("feature_flags.id", ondelete="CASCADE"), nullable=False)
     key = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
     value = Column(Text, nullable=False)

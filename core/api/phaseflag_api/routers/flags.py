@@ -56,9 +56,7 @@ class TargetingConditionIn(BaseModel):
     @classmethod
     def validate_operator(cls, v: str) -> str:
         if v not in _VALID_OPERATORS:
-            raise ValueError(
-                f"operator must be one of: {', '.join(sorted(_VALID_OPERATORS))}"
-            )
+            raise ValueError(f"operator must be one of: {', '.join(sorted(_VALID_OPERATORS))}")
         return v
 
     @field_validator("value")
@@ -106,27 +104,21 @@ class FlagCreate(BaseModel):
     @classmethod
     def validate_key(cls, v: str) -> str:
         if not _KEY_PATTERN.match(v):
-            raise ValueError(
-                "Key must be lowercase alphanumeric with hyphens/dots/underscores (max 128 chars)"
-            )
+            raise ValueError("Key must be lowercase alphanumeric with hyphens/dots/underscores (max 128 chars)")
         return v
 
     @field_validator("flag_type")
     @classmethod
     def validate_flag_type(cls, v: str) -> str:
         if v not in _VALID_FLAG_TYPES:
-            raise ValueError(
-                f"flag_type must be one of: {', '.join(sorted(_VALID_FLAG_TYPES))}"
-            )
+            raise ValueError(f"flag_type must be one of: {', '.join(sorted(_VALID_FLAG_TYPES))}")
         return v
 
     @field_validator("environment")
     @classmethod
     def validate_environment(cls, v: str) -> str:
         if v not in _VALID_ENVIRONMENTS:
-            raise ValueError(
-                f"environment must be one of: {', '.join(sorted(_VALID_ENVIRONMENTS))}"
-            )
+            raise ValueError(f"environment must be one of: {', '.join(sorted(_VALID_ENVIRONMENTS))}")
         return v
 
     @field_validator("flag_classification")
@@ -134,9 +126,7 @@ class FlagCreate(BaseModel):
     def validate_classification(cls, v: str) -> str:
         valid = {"release", "experiment", "ops_killswitch", "permission", "migration"}
         if v not in valid:
-            raise ValueError(
-                f"flag_classification must be one of: {', '.join(sorted(valid))}"
-            )
+            raise ValueError(f"flag_classification must be one of: {', '.join(sorted(valid))}")
         return v
 
 
@@ -167,12 +157,8 @@ class FlagUpdate(BaseModel):
 
 
 class ScheduleRequest(BaseModel):
-    scheduled_on: str = Field(
-        ..., examples=["2026-03-15T00:00:00Z"], description="ISO 8601 UTC datetime"
-    )
-    scheduled_status: str = Field(
-        ..., examples=["active"], description="Target status: active or inactive"
-    )
+    scheduled_on: str = Field(..., examples=["2026-03-15T00:00:00Z"], description="ISO 8601 UTC datetime")
+    scheduled_status: str = Field(..., examples=["active"], description="Target status: active or inactive")
 
 
 class VariationOut(BaseModel):
@@ -249,32 +235,21 @@ def _flag_to_out(flag) -> FlagOut:
         ],
         targeting_rules=flag.get_targeting_rules(),
         tags=flag.get_tags(),
-        prerequisites=[
-            PrerequisiteOut(flag_key=p["flag_key"], variation_key=p["variation_key"])
-            for p in prereqs
-        ],
-        lifecycle_stage=getattr(flag, "lifecycle_stage", "development")
-        or "development",
-        flag_classification=getattr(flag, "flag_classification", "release")
-        or "release",
+        prerequisites=[PrerequisiteOut(flag_key=p["flag_key"], variation_key=p["variation_key"]) for p in prereqs],
+        lifecycle_stage=getattr(flag, "lifecycle_stage", "development") or "development",
+        flag_classification=getattr(flag, "flag_classification", "release") or "release",
         is_permanent=getattr(flag, "is_permanent", False) or False,
-        expires_at=flag.expires_at.isoformat()
-        if getattr(flag, "expires_at", None)
-        else None,
+        expires_at=flag.expires_at.isoformat() if getattr(flag, "expires_at", None) else None,
         ticket_url=getattr(flag, "ticket_url", None),
         runbook_url=getattr(flag, "runbook_url", None),
         owner_team=getattr(flag, "owner_team", None),
         namespace=getattr(flag, "namespace", None),
-        scheduled_on=flag.scheduled_on.isoformat()
-        if getattr(flag, "scheduled_on", None)
-        else None,
+        scheduled_on=flag.scheduled_on.isoformat() if getattr(flag, "scheduled_on", None) else None,
         scheduled_status=getattr(flag, "scheduled_status", None),
         created_by=flag.created_by,
         owner=flag.owner,
         evaluation_count=flag.evaluation_count or 0,
-        last_evaluated_at=flag.last_evaluated_at.isoformat()
-        if flag.last_evaluated_at
-        else None,
+        last_evaluated_at=flag.last_evaluated_at.isoformat() if flag.last_evaluated_at else None,
         created_at=flag.created_at.isoformat(),
         updated_at=flag.updated_at.isoformat(),
     )
@@ -358,9 +333,7 @@ class FlagImportInput(BaseModel):
     status_code=status.HTTP_200_OK,
     dependencies=[require_role("admin")],
 )
-async def import_flags(
-    body: FlagImportInput, session: AsyncSession = Depends(get_session)
-):
+async def import_flags(body: FlagImportInput, session: AsyncSession = Depends(get_session)):
     created = 0
     skipped = 0
     for flag_data in body.flags:
@@ -369,9 +342,7 @@ async def import_flags(
             if not body.overwrite:
                 skipped += 1
                 continue
-            await flag_service.update_flag(
-                session, existing, flag_data.model_dump(exclude_unset=True)
-            )
+            await flag_service.update_flag(session, existing, flag_data.model_dump(exclude_unset=True))
             created += 1
         else:
             await flag_service.create_flag(session, flag_data.model_dump())
@@ -383,9 +354,7 @@ async def import_flags(
 async def get_flag(key: str, session: AsyncSession = Depends(get_session)):
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
     return _flag_to_out(flag)
 
 
@@ -406,31 +375,21 @@ async def create_flag(body: FlagCreate, session: AsyncSession = Depends(get_sess
     return _flag_to_out(flag)
 
 
-@router.put(
-    "/flags/{key}", response_model=FlagOut, dependencies=[require_role("editor")]
-)
-async def update_flag(
-    key: str, body: FlagUpdate, session: AsyncSession = Depends(get_session)
-):
+@router.put("/flags/{key}", response_model=FlagOut, dependencies=[require_role("editor")])
+async def update_flag(key: str, body: FlagUpdate, session: AsyncSession = Depends(get_session)):
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
     data = body.model_dump(exclude_unset=True)
     updated = await flag_service.update_flag(session, flag, data)
     return _flag_to_out(updated)
 
 
-@router.post(
-    "/flags/{key}/toggle", response_model=FlagOut, dependencies=[require_role("editor")]
-)
+@router.post("/flags/{key}/toggle", response_model=FlagOut, dependencies=[require_role("editor")])
 async def toggle_flag(key: str, session: AsyncSession = Depends(get_session)):
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
     if flag.status == "archived":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -448,13 +407,9 @@ async def toggle_flag(key: str, session: AsyncSession = Depends(get_session)):
 async def archive_flag(key: str, session: AsyncSession = Depends(get_session)):
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
     if flag.status == "archived":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Flag is already archived"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Flag is already archived")
     archived = await flag_service.archive_flag(session, flag)
     return _flag_to_out(archived)
 
@@ -467,9 +422,7 @@ async def archive_flag(key: str, session: AsyncSession = Depends(get_session)):
 async def restore_flag(key: str, session: AsyncSession = Depends(get_session)):
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
     if flag.status != "archived":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -488,9 +441,7 @@ async def restore_flag(key: str, session: AsyncSession = Depends(get_session)):
 async def clone_flag(key: str, session: AsyncSession = Depends(get_session)):
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
     cloned = await flag_service.clone_flag(session, flag)
     return _flag_to_out(cloned)
 
@@ -503,9 +454,7 @@ async def clone_flag(key: str, session: AsyncSession = Depends(get_session)):
 async def delete_flag(key: str, session: AsyncSession = Depends(get_session)):
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
     if flag.status != "archived":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -519,16 +468,12 @@ async def delete_flag(key: str, session: AsyncSession = Depends(get_session)):
     response_model=FlagOut,
     dependencies=[require_role("editor")],
 )
-async def schedule_flag(
-    key: str, body: ScheduleRequest, session: AsyncSession = Depends(get_session)
-):
+async def schedule_flag(key: str, body: ScheduleRequest, session: AsyncSession = Depends(get_session)):
     from datetime import UTC, datetime as dt
 
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
     if flag.status == "archived":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -587,9 +532,7 @@ async def cancel_schedule(key: str, session: AsyncSession = Depends(get_session)
 
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
     if flag.scheduled_on is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

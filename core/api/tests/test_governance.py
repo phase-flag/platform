@@ -9,9 +9,7 @@ from tests.conftest import make_flag_payload
 @pytest.mark.asyncio
 async def test_create_change_request(client: AsyncClient, auth_headers: dict):
     """Creating a change request returns the change request data."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="gov-flag"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="gov-flag"), headers=auth_headers)
 
     resp = await client.post(
         "/api/v1/changes",
@@ -39,9 +37,7 @@ async def test_list_change_requests(client: AsyncClient, auth_headers: dict):
 
 
 @pytest.mark.asyncio
-async def test_approve_change_request(
-    client: AsyncClient, admin_headers: dict, auth_headers: dict
-):
+async def test_approve_change_request(client: AsyncClient, admin_headers: dict, auth_headers: dict):
     """Approving a change request updates its status."""
     await client.post(
         "/api/v1/flags",
@@ -76,13 +72,9 @@ async def test_approve_change_request(
 
 
 @pytest.mark.asyncio
-async def test_reject_change_request(
-    client: AsyncClient, admin_headers: dict, auth_headers: dict
-):
+async def test_reject_change_request(client: AsyncClient, admin_headers: dict, auth_headers: dict):
     """Rejecting a change request updates its status."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="reject-flag"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="reject-flag"), headers=auth_headers)
 
     create_resp = await client.post(
         "/api/v1/changes",
@@ -144,13 +136,9 @@ async def test_create_service_account(client: AsyncClient, admin_headers: dict):
 
 
 @pytest.mark.asyncio
-async def test_break_glass(
-    client: AsyncClient, admin_headers: dict, auth_headers: dict
-):
+async def test_break_glass(client: AsyncClient, admin_headers: dict, auth_headers: dict):
     """Break-glass allows emergency changes bypassing freeze windows."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="bg-flag"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="bg-flag"), headers=auth_headers)
 
     resp = await client.post(
         "/api/v1/governance/break-glass",

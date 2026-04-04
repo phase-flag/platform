@@ -61,16 +61,12 @@ async def get_flag_health(flag_key: str, session: AsyncSession = Depends(get_ses
 
 
 @router.get("/flags/{flag_key}/rollout-timeline")
-async def get_rollout_timeline(
-    flag_key: str, session: AsyncSession = Depends(get_session)
-):
+async def get_rollout_timeline(flag_key: str, session: AsyncSession = Depends(get_session)):
     """Get the rollout progression timeline for a flag."""
     return await observability_service.get_rollout_timeline(session, flag_key)
 
 
-@router.post(
-    "/incidents/correlate", status_code=201, dependencies=[require_role("editor")]
-)
+@router.post("/incidents/correlate", status_code=201, dependencies=[require_role("editor")])
 async def correlate_incident(body: IncidentCorrelation):
     """Correlate a flag change with an incident for root-cause analysis."""
     return observability_service.correlate_incident(
@@ -88,9 +84,7 @@ async def list_incidents(flag_key: str | None = Query(None)):
 
 
 @router.get("/users/{user_id}/flags")
-async def inspect_user_flags(
-    user_id: str, session: AsyncSession = Depends(get_session)
-):
+async def inspect_user_flags(user_id: str, session: AsyncSession = Depends(get_session)):
     """Inspect all flag evaluations for a specific user."""
     return await observability_service.inspect_user_flags(session, user_id)
 

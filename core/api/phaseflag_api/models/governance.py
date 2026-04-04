@@ -22,19 +22,11 @@ class ChangeRequestDB(Base):
     id = Column(String(36), primary_key=True, default=_uuid)
     title = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
-    entity_type = Column(
-        String(50), nullable=False, default="flag"
-    )  # flag, segment, environment
+    entity_type = Column(String(50), nullable=False, default="flag")  # flag, segment, environment
     entity_key = Column(String(255), nullable=False)
-    change_type = Column(
-        String(20), nullable=False
-    )  # create, update, toggle, archive, delete
-    payload = Column(
-        Text, nullable=False, default="{}"
-    )  # JSON blob of the proposed change
-    status = Column(
-        String(20), nullable=False, default="pending"
-    )  # pending, approved, rejected, applied, cancelled
+    change_type = Column(String(20), nullable=False)  # create, update, toggle, archive, delete
+    payload = Column(Text, nullable=False, default="{}")  # JSON blob of the proposed change
+    status = Column(String(20), nullable=False, default="pending")  # pending, approved, rejected, applied, cancelled
     requested_by = Column(String(255), nullable=False)
     reviewed_by = Column(String(255), nullable=True)
     review_comment = Column(Text, nullable=True)
@@ -67,9 +59,7 @@ class ServiceAccountDB(Base):
     description = Column(Text, nullable=True)
     api_key = Column(String(255), nullable=False, unique=True, index=True)
     role = Column(String(20), nullable=False, default="viewer")
-    scopes = Column(
-        Text, nullable=False, default="[]"
-    )  # JSON array of scoped permissions
+    scopes = Column(Text, nullable=False, default="[]")  # JSON array of scoped permissions
     active = Column(Boolean, nullable=False, default=True)
     created_by = Column(String(255), nullable=False)
     last_used_at = Column(DateTime, nullable=True)

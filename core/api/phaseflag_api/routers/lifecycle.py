@@ -56,9 +56,7 @@ async def transition_flag_lifecycle(
     """Transition a flag to a new lifecycle stage."""
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
 
     old_stage = flag.lifecycle_stage or "development"
     updated = await lifecycle_service.transition_lifecycle(

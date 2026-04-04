@@ -26,9 +26,7 @@ def _flag_summary(flag: FeatureFlagDB) -> dict[str, Any]:
     }
 
 
-async def _check_circular_prerequisites(
-    session: AsyncSession, flag_key: str, prereqs: list[dict[str, str]]
-) -> None:
+async def _check_circular_prerequisites(session: AsyncSession, flag_key: str, prereqs: list[dict[str, str]]) -> None:
     from fastapi import HTTPException, status
 
     visited: set[str] = {flag_key}
@@ -50,9 +48,7 @@ async def _check_circular_prerequisites(
                 to_check.append(dp["flag_key"])
 
 
-async def _notify_flag_change(
-    event_type: str, flag: FeatureFlagDB, session: AsyncSession
-) -> None:
+async def _notify_flag_change(event_type: str, flag: FeatureFlagDB, session: AsyncSession) -> None:
     summary = _flag_summary(flag)
     await webhook_service.fire_webhooks(session, event_type, flag.key, summary)
     await sse_manager.broadcast(
@@ -190,9 +186,7 @@ async def update_flag(
         if data["expires_at"]:
             from datetime import datetime as dt
 
-            existing.expires_at = dt.fromisoformat(
-                data["expires_at"].replace("Z", "+00:00")
-            )
+            existing.expires_at = dt.fromisoformat(data["expires_at"].replace("Z", "+00:00"))
         else:
             existing.expires_at = None
         changes["expires_at"] = {"updated": True}

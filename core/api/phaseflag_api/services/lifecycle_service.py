@@ -136,9 +136,7 @@ async def check_stale_flags(
         {
             "key": f.key,
             "name": f.name,
-            "last_evaluated_at": f.last_evaluated_at.isoformat()
-            if f.last_evaluated_at
-            else None,
+            "last_evaluated_at": f.last_evaluated_at.isoformat() if f.last_evaluated_at else None,
             "owner": f.owner,
             "owner_team": getattr(f, "owner_team", None),
         }
@@ -255,18 +253,14 @@ async def run_cleanup_scorecard(session: AsyncSession) -> list[dict[str, Any]]:
 
     stmt = select(
         FeatureFlagDB.owner_team,
-        func.count()
-        .filter(FeatureFlagDB.lifecycle_stage == "stale")
-        .label("stale_count"),
+        func.count().filter(FeatureFlagDB.lifecycle_stage == "stale").label("stale_count"),
         func.count()
         .filter(
             (FeatureFlagDB.expires_at != None)  # noqa: E711
             & (FeatureFlagDB.expires_at <= datetime.now(UTC))
         )
         .label("expired_count"),
-        func.count()
-        .filter(FeatureFlagDB.lifecycle_stage == "archived")
-        .label("archived_count"),
+        func.count().filter(FeatureFlagDB.lifecycle_stage == "archived").label("archived_count"),
         func.count().label("total_count"),
     ).group_by(FeatureFlagDB.owner_team)
     result = await session.execute(stmt)

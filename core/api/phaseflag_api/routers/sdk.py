@@ -112,9 +112,7 @@ async def get_ruleset(request: Request, session: AsyncSession = Depends(get_sess
 
 
 @router.get("/sdk/stream")
-async def stream_flag_updates(
-    request: Request, session: AsyncSession = Depends(get_session)
-):
+async def stream_flag_updates(request: Request, session: AsyncSession = Depends(get_session)):
     if sse_manager.client_count >= MAX_SSE_CONNECTIONS:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -154,9 +152,7 @@ async def stream_flag_updates(
 
 @router.get("/sdk/stream/status", response_model=SSEStatusResponse)
 async def stream_status():
-    return SSEStatusResponse(
-        connected_clients=sse_manager.client_count, streaming_enabled=True
-    )
+    return SSEStatusResponse(connected_clients=sse_manager.client_count, streaming_enabled=True)
 
 
 @router.get("/sdk/bootstrap")
@@ -172,13 +168,8 @@ async def get_bootstrap(session: AsyncSession = Depends(get_session)):
     version = str(hash(tuple(f["id"] for f in flags)) & 0xFFFFFFFF)
 
     # Include segment definitions for local resolution
-    segments_list, _ = await segment_repository.list_segments(
-        session, limit=10000, offset=0
-    )
-    segments = [
-        {"id": s.id, "key": s.key, "name": s.name, "conditions": s.get_conditions()}
-        for s in segments_list
-    ]
+    segments_list, _ = await segment_repository.list_segments(session, limit=10000, offset=0)
+    segments = [{"id": s.id, "key": s.key, "name": s.name, "conditions": s.get_conditions()} for s in segments_list]
 
     payload = {
         "flags": flags,
@@ -211,26 +202,19 @@ async def _compile_flag(flag_db, session: AsyncSession) -> dict[str, Any]:
             if seg:
                 rule.setdefault("conditions", []).extend(seg.get_conditions())
 
-    prerequisites = (
-        flag_db.get_prerequisites() if hasattr(flag_db, "get_prerequisites") else []
-    )
+    prerequisites = flag_db.get_prerequisites() if hasattr(flag_db, "get_prerequisites") else []
     return {
         "id": flag_db.id,
         "key": flag_db.key,
         "flag_type": flag_db.flag_type,
         "default_variation_id": flag_db.default_variation_id,
-        "variations": [
-            {"id": v.id, "key": v.key, "name": v.name, "value": v.get_value()}
-            for v in flag_db.variations
-        ],
+        "variations": [{"id": v.id, "key": v.key, "name": v.name, "value": v.get_value()} for v in flag_db.variations],
         "targeting_rules": targeting_rules,
         "prerequisites": prerequisites,
     }
 
 
-async def _build_flags_map(
-    session: AsyncSession, target_key: str
-) -> dict[str, dict[str, Any]]:
+async def _build_flags_map(session: AsyncSession, target_key: str) -> dict[str, dict[str, Any]]:
     """Build a flags map including all prerequisite chains for a target flag."""
     visited: set[str] = set()
     flags_map: dict[str, dict[str, Any]] = {}
@@ -252,9 +236,7 @@ async def _build_flags_map(
 
 
 @router.post("/sdk/evaluate", response_model=EvaluateResponse)
-async def evaluate_flag(
-    body: EvaluateRequest, session: AsyncSession = Depends(get_session)
-):
+async def evaluate_flag(body: EvaluateRequest, session: AsyncSession = Depends(get_session)):
     flag_db = await flag_repository.get_flag_by_key(session, body.flag_key)
     if flag_db is None:
         raise HTTPException(
@@ -332,9 +314,7 @@ async def evaluate_all_flags(
 
 
 @router.post("/sdk/events", status_code=status.HTTP_202_ACCEPTED)
-async def ingest_events(
-    batch: EventBatch, session: AsyncSession = Depends(get_session)
-):
+async def ingest_events(batch: EventBatch, session: AsyncSession = Depends(get_session)):
     import json as _json
 
     for ev in batch.events:

@@ -18,22 +18,10 @@ async def get_user_by_email(session: AsyncSession, email: str) -> UserDB | None:
     return result.scalar_one_or_none()
 
 
-async def list_users(
-    session: AsyncSession, *, limit: int = 50, offset: int = 0
-) -> tuple[Sequence[UserDB], int]:
+async def list_users(session: AsyncSession, *, limit: int = 50, offset: int = 0) -> tuple[Sequence[UserDB], int]:
     base = select(UserDB)
-    total = (
-        await session.execute(select(func.count()).select_from(base.subquery()))
-    ).scalar() or 0
-    items = (
-        (
-            await session.execute(
-                base.order_by(UserDB.created_at.desc()).limit(limit).offset(offset)
-            )
-        )
-        .scalars()
-        .all()
-    )
+    total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
+    items = (await session.execute(base.order_by(UserDB.created_at.desc()).limit(limit).offset(offset))).scalars().all()
     return items, total
 
 

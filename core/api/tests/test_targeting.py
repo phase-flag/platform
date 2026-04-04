@@ -9,9 +9,7 @@ from tests.conftest import make_flag_payload
 @pytest.mark.asyncio
 async def test_add_targeting_rule(client: AsyncClient, auth_headers: dict):
     """Adding a targeting rule to a flag succeeds."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="target-flag"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="target-flag"), headers=auth_headers)
 
     resp = await client.post(
         "/api/v1/targeting/target-flag/rules",
@@ -31,9 +29,7 @@ async def test_add_targeting_rule(client: AsyncClient, auth_headers: dict):
 @pytest.mark.asyncio
 async def test_list_targeting_rules(client: AsyncClient, auth_headers: dict):
     """Listing targeting rules for a flag returns the rules."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="target-list"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="target-list"), headers=auth_headers)
 
     resp = await client.get("/api/v1/targeting/target-list/rules", headers=auth_headers)
     assert resp.status_code in (200, 404)
@@ -86,13 +82,9 @@ async def test_update_targeting_rules(client: AsyncClient, auth_headers: dict):
 @pytest.mark.asyncio
 async def test_delete_targeting_rule(client: AsyncClient, auth_headers: dict):
     """Deleting a targeting rule from a flag."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="target-del"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="target-del"), headers=auth_headers)
 
-    resp = await client.delete(
-        "/api/v1/targeting/target-del/rules/0", headers=auth_headers
-    )
+    resp = await client.delete("/api/v1/targeting/target-del/rules/0", headers=auth_headers)
     assert resp.status_code in (200, 204, 404)
 
 

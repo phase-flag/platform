@@ -57,12 +57,8 @@ async def list_webhooks(
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
-    webhooks, total = await webhook_service.list_webhooks(
-        session, limit=limit, offset=offset
-    )
-    return PaginatedWebhooks(
-        items=[_to_out(w) for w in webhooks], total=total, limit=limit, offset=offset
-    )
+    webhooks, total = await webhook_service.list_webhooks(session, limit=limit, offset=offset)
+    return PaginatedWebhooks(items=[_to_out(w) for w in webhooks], total=total, limit=limit, offset=offset)
 
 
 @router.post(
@@ -71,18 +67,12 @@ async def list_webhooks(
     status_code=status.HTTP_201_CREATED,
     dependencies=[require_role("editor")],
 )
-async def create_webhook(
-    body: WebhookCreateInput, session: AsyncSession = Depends(get_session)
-):
-    webhook = await webhook_service.create_webhook(
-        session, body.url, body.events, body.secret
-    )
+async def create_webhook(body: WebhookCreateInput, session: AsyncSession = Depends(get_session)):
+    webhook = await webhook_service.create_webhook(session, body.url, body.events, body.secret)
     return _to_out(webhook)
 
 
-@router.put(
-    "/{webhook_id}", response_model=WebhookOut, dependencies=[require_role("editor")]
-)
+@router.put("/{webhook_id}", response_model=WebhookOut, dependencies=[require_role("editor")])
 async def update_webhook(
     webhook_id: str,
     body: WebhookUpdateInput,
@@ -90,12 +80,8 @@ async def update_webhook(
 ):
     webhook = await webhook_service.get_webhook(session, webhook_id)
     if not webhook:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Webhook not found"
-        )
-    updated = await webhook_service.update_webhook(
-        session, webhook, body.model_dump(exclude_unset=True)
-    )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Webhook not found")
+    updated = await webhook_service.update_webhook(session, webhook, body.model_dump(exclude_unset=True))
     return _to_out(updated)
 
 
@@ -107,7 +93,5 @@ async def update_webhook(
 async def delete_webhook(webhook_id: str, session: AsyncSession = Depends(get_session)):
     webhook = await webhook_service.get_webhook(session, webhook_id)
     if not webhook:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Webhook not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Webhook not found")
     await webhook_service.delete_webhook(session, webhook)

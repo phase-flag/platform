@@ -32,9 +32,7 @@ async def list_flags(
     count_stmt = select(func.count()).select_from(base.subquery())
     total = (await session.execute(count_stmt)).scalar() or 0
 
-    items_stmt = (
-        base.order_by(FeatureFlagDB.created_at.desc()).limit(limit).offset(offset)
-    )
+    items_stmt = base.order_by(FeatureFlagDB.created_at.desc()).limit(limit).offset(offset)
     result = await session.execute(items_stmt)
     return result.scalars().all(), total
 
@@ -70,10 +68,6 @@ async def delete_flag(session: AsyncSession, flag: FeatureFlagDB) -> None:
 
 
 async def list_active_flags(session: AsyncSession) -> Sequence[FeatureFlagDB]:
-    stmt = (
-        select(FeatureFlagDB)
-        .where(FeatureFlagDB.status == "active")
-        .order_by(FeatureFlagDB.key)
-    )
+    stmt = select(FeatureFlagDB).where(FeatureFlagDB.status == "active").order_by(FeatureFlagDB.key)
     result = await session.execute(stmt)
     return result.scalars().all()

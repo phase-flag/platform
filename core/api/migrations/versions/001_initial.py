@@ -107,9 +107,7 @@ def upgrade() -> None:
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("flag_type", sa.String(20), nullable=False, server_default="boolean"),
         sa.Column("status", sa.String(20), nullable=False, server_default="inactive"),
-        sa.Column(
-            "environment", sa.String(20), nullable=False, server_default="development"
-        ),
+        sa.Column("environment", sa.String(20), nullable=False, server_default="development"),
         sa.Column("default_variation_id", sa.String(36), nullable=False),
         sa.Column("tags", sa.Text(), nullable=False, server_default="[]"),
         sa.Column("scheduled_on", sa.DateTime(), nullable=True),
@@ -133,9 +131,7 @@ def upgrade() -> None:
         sa.Column("runbook_url", sa.String(2048), nullable=True),
         sa.Column("owner_team", sa.String(255), nullable=True),
         sa.Column("namespace", sa.String(255), nullable=True, index=True),
-        sa.Column(
-            "created_by", sa.String(255), nullable=False, server_default="system"
-        ),
+        sa.Column("created_by", sa.String(255), nullable=False, server_default="system"),
         sa.Column("owner", sa.String(255), nullable=False, server_default="system"),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
@@ -168,9 +164,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("conditions", sa.Text(), nullable=False, server_default="[]"),
-        sa.Column(
-            "created_by", sa.String(255), nullable=False, server_default="system"
-        ),
+        sa.Column("created_by", sa.String(255), nullable=False, server_default="system"),
         sa.Column("created_at", sa.DateTime(), nullable=False),
     )
 
@@ -233,9 +227,7 @@ def upgrade() -> None:
         sa.Column("reviewed_by", sa.String(255), nullable=True),
         sa.Column("review_comment", sa.Text(), nullable=True),
         sa.Column("environment", sa.String(255), nullable=True),
-        sa.Column(
-            "requires_approval_count", sa.Integer(), nullable=False, server_default="1"
-        ),
+        sa.Column("requires_approval_count", sa.Integer(), nullable=False, server_default="1"),
         sa.Column("approval_count", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
@@ -296,14 +288,10 @@ def upgrade() -> None:
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("status", sa.String(20), nullable=False, server_default="pending"),
-        sa.Column(
-            "current_stage_index", sa.Integer(), nullable=False, server_default="0"
-        ),
+        sa.Column("current_stage_index", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("environment", sa.String(255), nullable=True),
         sa.Column("template", sa.String(50), nullable=True),
-        sa.Column(
-            "created_by", sa.String(255), nullable=False, server_default="system"
-        ),
+        sa.Column("created_by", sa.String(255), nullable=False, server_default="system"),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.Column("completed_at", sa.DateTime(), nullable=True),
@@ -326,9 +314,7 @@ def upgrade() -> None:
         sa.Column("status", sa.String(20), nullable=False, server_default="pending"),
         sa.Column("started_at", sa.DateTime(), nullable=True),
         sa.Column("completed_at", sa.DateTime(), nullable=True),
-        sa.Column(
-            "rollback_on_failure", sa.Boolean(), nullable=False, server_default="1"
-        ),
+        sa.Column("rollback_on_failure", sa.Boolean(), nullable=False, server_default="1"),
         sa.Column("health_check_url", sa.String(2048), nullable=True),
         sa.Column("success_threshold", sa.Float(), nullable=True),
     )
@@ -358,9 +344,7 @@ def upgrade() -> None:
         sa.Column("value_type", sa.String(20), nullable=False, server_default="string"),
         sa.Column("value", sa.Text(), nullable=False),
         sa.Column("schema_json", sa.Text(), nullable=True),
-        sa.Column(
-            "environment", sa.String(255), nullable=False, server_default="development"
-        ),
+        sa.Column("environment", sa.String(255), nullable=False, server_default="development"),
         sa.Column("version", sa.Integer(), nullable=False, server_default="1"),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
@@ -376,18 +360,12 @@ def upgrade() -> None:
         sa.Column("flag_key", sa.String(255), nullable=False, index=True),
         sa.Column("hypothesis", sa.Text(), nullable=True),
         sa.Column("status", sa.String(20), nullable=False, server_default="draft"),
-        sa.Column(
-            "experiment_type", sa.String(20), nullable=False, server_default="ab"
-        ),
-        sa.Column(
-            "traffic_percentage", sa.Integer(), nullable=False, server_default="100"
-        ),
+        sa.Column("experiment_type", sa.String(20), nullable=False, server_default="ab"),
+        sa.Column("traffic_percentage", sa.Integer(), nullable=False, server_default="100"),
         sa.Column("start_date", sa.DateTime(), nullable=True),
         sa.Column("end_date", sa.DateTime(), nullable=True),
         sa.Column("winner_variation_id", sa.String(36), nullable=True),
-        sa.Column(
-            "created_by", sa.String(255), nullable=False, server_default="system"
-        ),
+        sa.Column("created_by", sa.String(255), nullable=False, server_default="system"),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
     )
@@ -405,9 +383,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("metric_key", sa.String(255), nullable=False),
-        sa.Column(
-            "goal_type", sa.String(20), nullable=False, server_default="conversion"
-        ),
+        sa.Column("goal_type", sa.String(20), nullable=False, server_default="conversion"),
         sa.Column("is_primary", sa.Boolean(), nullable=False, server_default="0"),
         sa.Column("min_sample_size", sa.Integer(), nullable=True),
     )

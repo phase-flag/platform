@@ -33,12 +33,8 @@ class ExperimentDB(Base):
     description = Column(Text, nullable=True)
     flag_key = Column(String(255), nullable=False, index=True)
     hypothesis = Column(Text, nullable=True)
-    status = Column(
-        String(20), nullable=False, default="draft"
-    )  # draft, running, paused, completed, cancelled
-    experiment_type = Column(
-        String(20), nullable=False, default="ab"
-    )  # ab, multivariate
+    status = Column(String(20), nullable=False, default="draft")  # draft, running, paused, completed, cancelled
+    experiment_type = Column(String(20), nullable=False, default="ab")  # ab, multivariate
     traffic_percentage = Column(Integer, nullable=False, default=100)
     start_date = Column(DateTime, nullable=True)
     end_date = Column(DateTime, nullable=True)
@@ -72,15 +68,11 @@ class ExperimentGoalDB(Base):
     __tablename__ = "experiment_goals"
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    experiment_id = Column(
-        String(36), ForeignKey("experiments.id", ondelete="CASCADE"), nullable=False
-    )
+    experiment_id = Column(String(36), ForeignKey("experiments.id", ondelete="CASCADE"), nullable=False)
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     metric_key = Column(String(255), nullable=False)
-    goal_type = Column(
-        String(20), nullable=False, default="conversion"
-    )  # conversion, revenue, numeric
+    goal_type = Column(String(20), nullable=False, default="conversion")  # conversion, revenue, numeric
     is_primary = Column(Boolean, nullable=False, default=False)
     min_sample_size = Column(Integer, nullable=True)
 
@@ -93,9 +85,7 @@ class ExperimentResultDB(Base):
     __tablename__ = "experiment_results"
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    experiment_id = Column(
-        String(36), ForeignKey("experiments.id", ondelete="CASCADE"), nullable=False
-    )
+    experiment_id = Column(String(36), ForeignKey("experiments.id", ondelete="CASCADE"), nullable=False)
     variation_key = Column(String(255), nullable=False)
     goal_id = Column(String(36), nullable=True)
     sample_size = Column(Integer, nullable=False, default=0)

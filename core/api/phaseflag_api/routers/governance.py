@@ -222,9 +222,7 @@ async def approve_change_request(
 
     # Enforce two-person rule
     try:
-        await governance_service.enforce_two_person_rule(
-            session, cr_id, user.get("email", "system")
-        )
+        await governance_service.enforce_two_person_rule(session, cr_id, user.get("email", "system"))
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
@@ -295,18 +293,12 @@ async def list_service_accounts(session: AsyncSession = Depends(get_session)):
     return [_sa_to_out(sa) for sa in accounts]
 
 
-@router.delete(
-    "/service-accounts/{sa_id}", status_code=204, dependencies=[require_role("admin")]
-)
-async def revoke_service_account(
-    sa_id: str, session: AsyncSession = Depends(get_session)
-):
+@router.delete("/service-accounts/{sa_id}", status_code=204, dependencies=[require_role("admin")])
+async def revoke_service_account(sa_id: str, session: AsyncSession = Depends(get_session)):
     from sqlalchemy import select
     from phaseflag_api.models.governance import ServiceAccountDB
 
-    result = await session.execute(
-        select(ServiceAccountDB).where(ServiceAccountDB.id == sa_id)
-    )
+    result = await session.execute(select(ServiceAccountDB).where(ServiceAccountDB.id == sa_id))
     sa = result.scalar_one_or_none()
     if not sa:
         raise HTTPException(status_code=404, detail="Service account not found")
@@ -344,9 +336,7 @@ async def list_freeze_windows(
     active_only: bool = Query(True),
     session: AsyncSession = Depends(get_session),
 ):
-    windows = await governance_service.list_freeze_windows(
-        session, active_only=active_only
-    )
+    windows = await governance_service.list_freeze_windows(session, active_only=active_only)
     return [_fw_to_out(fw) for fw in windows]
 
 
@@ -429,9 +419,7 @@ async def list_break_glass_events(
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
-    items, total = await governance_service.list_break_glass_events(
-        session, limit=limit, offset=offset
-    )
+    items, total = await governance_service.list_break_glass_events(session, limit=limit, offset=offset)
     return PaginatedBreakGlass(items=[_bg_to_out(e) for e in items], total=total)
 
 
@@ -474,9 +462,7 @@ async def evaluate_policy(
     session: AsyncSession = Depends(get_session),
 ):
     """Evaluate an access control policy for the current user."""
-    allowed, reason = await PolicyEngine.evaluate_policy(
-        session, body.action, user, body.resource
-    )
+    allowed, reason = await PolicyEngine.evaluate_policy(session, body.action, user, body.resource)
     return PolicyEvaluateResponse(allowed=allowed, reason=reason)
 
 

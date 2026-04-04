@@ -102,12 +102,8 @@ async def list_organizations(
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
-    orgs, total = await project_repository.list_organizations(
-        session, limit=limit, offset=offset
-    )
-    return PaginatedOrgs(
-        items=[_org_to_out(o) for o in orgs], total=total, limit=limit, offset=offset
-    )
+    orgs, total = await project_repository.list_organizations(session, limit=limit, offset=offset)
+    return PaginatedOrgs(items=[_org_to_out(o) for o in orgs], total=total, limit=limit, offset=offset)
 
 
 @router.post(
@@ -116,14 +112,10 @@ async def list_organizations(
     status_code=201,
     dependencies=[require_role("admin")],
 )
-async def create_organization(
-    body: OrgCreate, session: AsyncSession = Depends(get_session)
-):
+async def create_organization(body: OrgCreate, session: AsyncSession = Depends(get_session)):
     existing = await project_repository.get_org_by_slug(session, body.slug)
     if existing:
-        raise HTTPException(
-            status_code=409, detail=f"Organization '{body.slug}' already exists"
-        )
+        raise HTTPException(status_code=409, detail=f"Organization '{body.slug}' already exists")
     org = OrganizationDB(slug=body.slug, name=body.name, description=body.description)
     created = await project_repository.create_organization(session, org)
     return _org_to_out(created)
@@ -137,12 +129,8 @@ async def get_organization(slug: str, session: AsyncSession = Depends(get_sessio
     return _org_to_out(org)
 
 
-@router.put(
-    "/organizations/{slug}", response_model=OrgOut, dependencies=[require_role("admin")]
-)
-async def update_organization(
-    slug: str, body: OrgUpdate, session: AsyncSession = Depends(get_session)
-):
+@router.put("/organizations/{slug}", response_model=OrgOut, dependencies=[require_role("admin")])
+async def update_organization(slug: str, body: OrgUpdate, session: AsyncSession = Depends(get_session)):
     org = await project_repository.get_org_by_slug(session, slug)
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
@@ -154,9 +142,7 @@ async def update_organization(
     return _org_to_out(updated)
 
 
-@router.delete(
-    "/organizations/{slug}", status_code=204, dependencies=[require_role("admin")]
-)
+@router.delete("/organizations/{slug}", status_code=204, dependencies=[require_role("admin")])
 async def delete_organization(slug: str, session: AsyncSession = Depends(get_session)):
     org = await project_repository.get_org_by_slug(session, slug)
     if not org:
@@ -177,9 +163,7 @@ async def list_projects(
     org = await project_repository.get_org_by_slug(session, org_slug)
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
-    projects, total = await project_repository.list_projects(
-        session, org.id, limit=limit, offset=offset
-    )
+    projects, total = await project_repository.list_projects(session, org.id, limit=limit, offset=offset)
     return PaginatedProjects(
         items=[_project_to_out(p) for p in projects],
         total=total,
@@ -194,17 +178,13 @@ async def list_projects(
     status_code=201,
     dependencies=[require_role("admin")],
 )
-async def create_project(
-    org_slug: str, body: ProjectCreate, session: AsyncSession = Depends(get_session)
-):
+async def create_project(org_slug: str, body: ProjectCreate, session: AsyncSession = Depends(get_session)):
     org = await project_repository.get_org_by_slug(session, org_slug)
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
     existing = await project_repository.get_project_by_slug(session, org.id, body.slug)
     if existing:
-        raise HTTPException(
-            status_code=409, detail=f"Project '{body.slug}' already exists in this org"
-        )
+        raise HTTPException(status_code=409, detail=f"Project '{body.slug}' already exists in this org")
     project = ProjectDB(
         organization_id=org.id,
         slug=body.slug,
@@ -228,9 +208,7 @@ async def get_project(project_id: str, session: AsyncSession = Depends(get_sessi
     response_model=ProjectOut,
     dependencies=[require_role("admin")],
 )
-async def update_project(
-    project_id: str, body: ProjectUpdate, session: AsyncSession = Depends(get_session)
-):
+async def update_project(project_id: str, body: ProjectUpdate, session: AsyncSession = Depends(get_session)):
     project = await project_repository.get_project_by_id(session, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -242,9 +220,7 @@ async def update_project(
     return _project_to_out(updated)
 
 
-@router.delete(
-    "/projects/{project_id}", status_code=204, dependencies=[require_role("admin")]
-)
+@router.delete("/projects/{project_id}", status_code=204, dependencies=[require_role("admin")])
 async def delete_project(project_id: str, session: AsyncSession = Depends(get_session)):
     project = await project_repository.get_project_by_id(session, project_id)
     if not project:

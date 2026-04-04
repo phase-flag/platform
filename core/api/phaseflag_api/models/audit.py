@@ -36,7 +36,5 @@ class EvaluationEventDB(Base):
     flag_key = Column(String(255), nullable=False, index=True)
     variation_key = Column(String(255), nullable=True)
     user_id = Column(String(255), nullable=True)
-    timestamp = Column(
-        DateTime, nullable=False, default=lambda: datetime.now(UTC), index=True
-    )
+    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), index=True)
     event_metadata = Column("metadata", Text, nullable=False, default="{}")

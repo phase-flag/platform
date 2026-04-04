@@ -103,9 +103,7 @@ async def list_migrations(
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
-    items, total = await migration_service.list_migrations(
-        session, limit=limit, offset=offset
-    )
+    items, total = await migration_service.list_migrations(session, limit=limit, offset=offset)
     return PaginatedMigrations(items=[_mig_to_out(m) for m in items], total=total)
 
 
@@ -148,9 +146,7 @@ async def rollback_stage(flag_key: str, session: AsyncSession = Depends(get_sess
     response_model=MigrationOut,
     dependencies=[require_role("editor")],
 )
-async def update_metrics(
-    flag_key: str, body: MetricsUpdate, session: AsyncSession = Depends(get_session)
-):
+async def update_metrics(flag_key: str, body: MetricsUpdate, session: AsyncSession = Depends(get_session)):
     mig = await migration_service.get_migration_by_key(session, flag_key)
     if not mig:
         raise HTTPException(status_code=404, detail="Migration not found")

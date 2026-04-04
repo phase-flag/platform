@@ -76,13 +76,9 @@ async def approve_change_request(
     comment: str | None = None,
 ) -> ChangeRequestDB:
     if cr.status != "pending":
-        raise HTTPException(
-            status_code=400, detail=f"Cannot approve a '{cr.status}' change request"
-        )
+        raise HTTPException(status_code=400, detail=f"Cannot approve a '{cr.status}' change request")
     if cr.requested_by == reviewer:
-        raise HTTPException(
-            status_code=400, detail="Cannot approve your own change request"
-        )
+        raise HTTPException(status_code=400, detail="Cannot approve your own change request")
 
     cr.approval_count += 1
     cr.reviewed_by = reviewer
@@ -116,9 +112,7 @@ async def reject_change_request(
     comment: str | None = None,
 ) -> ChangeRequestDB:
     if cr.status != "pending":
-        raise HTTPException(
-            status_code=400, detail=f"Cannot reject a '{cr.status}' change request"
-        )
+        raise HTTPException(status_code=400, detail=f"Cannot reject a '{cr.status}' change request")
 
     cr.status = "rejected"
     cr.reviewed_by = reviewer
@@ -144,17 +138,9 @@ async def list_change_requests(
     if status_filter:
         base = base.where(ChangeRequestDB.status == status_filter)
 
-    total = (
-        await session.execute(select(func.count()).select_from(base.subquery()))
-    ).scalar() or 0
+    total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
     items = (
-        (
-            await session.execute(
-                base.order_by(ChangeRequestDB.created_at.desc())
-                .limit(limit)
-                .offset(offset)
-            )
-        )
+        (await session.execute(base.order_by(ChangeRequestDB.created_at.desc()).limit(limit).offset(offset)))
         .scalars()
         .all()
     )
@@ -162,12 +148,8 @@ async def list_change_requests(
     return list(items), total
 
 
-async def get_change_request(
-    session: AsyncSession, cr_id: str
-) -> ChangeRequestDB | None:
-    result = await session.execute(
-        select(ChangeRequestDB).where(ChangeRequestDB.id == cr_id)
-    )
+async def get_change_request(session: AsyncSession, cr_id: str) -> ChangeRequestDB | None:
+    result = await session.execute(select(ChangeRequestDB).where(ChangeRequestDB.id == cr_id))
     return result.scalar_one_or_none()
 
 
@@ -206,37 +188,23 @@ async def list_service_accounts(
     from sqlalchemy import func
 
     base = select(ServiceAccountDB)
-    total = (
-        await session.execute(select(func.count()).select_from(base.subquery()))
-    ).scalar() or 0
+    total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
     items = (
-        (
-            await session.execute(
-                base.order_by(ServiceAccountDB.created_at.desc())
-                .limit(limit)
-                .offset(offset)
-            )
-        )
+        (await session.execute(base.order_by(ServiceAccountDB.created_at.desc()).limit(limit).offset(offset)))
         .scalars()
         .all()
     )
     return list(items), total
 
 
-async def get_service_account_by_key(
-    session: AsyncSession, api_key: str
-) -> ServiceAccountDB | None:
+async def get_service_account_by_key(session: AsyncSession, api_key: str) -> ServiceAccountDB | None:
     result = await session.execute(
-        select(ServiceAccountDB).where(
-            ServiceAccountDB.api_key == api_key, ServiceAccountDB.active == True
-        )  # noqa: E712
+        select(ServiceAccountDB).where(ServiceAccountDB.api_key == api_key, ServiceAccountDB.active == True)  # noqa: E712
     )
     return result.scalar_one_or_none()
 
 
-async def revoke_service_account(
-    session: AsyncSession, sa: ServiceAccountDB
-) -> ServiceAccountDB:
+async def revoke_service_account(session: AsyncSession, sa: ServiceAccountDB) -> ServiceAccountDB:
     sa.active = False
     await session.flush()
     await session.refresh(sa)
@@ -290,9 +258,7 @@ async def create_freeze_window(
     return fw
 
 
-async def list_freeze_windows(
-    session: AsyncSession, *, active_only: bool = True
-) -> list[FreezeWindowDB]:
+async def list_freeze_windows(session: AsyncSession, *, active_only: bool = True) -> list[FreezeWindowDB]:
     stmt = select(FreezeWindowDB).order_by(FreezeWindowDB.starts_at.desc())
     if active_only:
         stmt = stmt.where(FreezeWindowDB.active == True)  # noqa: E712
@@ -303,23 +269,17 @@ async def list_freeze_windows(
 # --- Two-Person Rule ---
 
 
-async def enforce_two_person_rule(
-    session: AsyncSession, change_request_id: str, approver_id: str
-) -> bool:
+async def enforce_two_person_rule(session: AsyncSession, change_request_id: str, approver_id: str) -> bool:
     """Ensure the approver is not the same person who created the change request."""
     cr = await session.get(ChangeRequestDB, change_request_id)
     if not cr:
         return False
     if cr.requested_by == approver_id:
-        raise ValueError(
-            "Two-person rule: creator cannot approve their own change request"
-        )
+        raise ValueError("Two-person rule: creator cannot approve their own change request")
     return True
 
 
-async def check_required_approvals(
-    session: AsyncSession, change_request_id: str, required_count: int = 1
-) -> bool:
+async def check_required_approvals(session: AsyncSession, change_request_id: str, required_count: int = 1) -> bool:
     """Check if a change request has enough approvals."""
     cr = await session.get(ChangeRequestDB, change_request_id)
     if not cr:
@@ -378,17 +338,9 @@ async def list_break_glass_events(
 ) -> tuple[list[BreakGlassEventDB], int]:
     """List break-glass events with pagination."""
     base = select(BreakGlassEventDB)
-    total = (
-        await session.execute(select(func.count()).select_from(base.subquery()))
-    ).scalar() or 0
+    total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
     items = (
-        (
-            await session.execute(
-                base.order_by(BreakGlassEventDB.created_at.desc())
-                .limit(limit)
-                .offset(offset)
-            )
-        )
+        (await session.execute(base.order_by(BreakGlassEventDB.created_at.desc()).limit(limit).offset(offset)))
         .scalars()
         .all()
     )
@@ -439,9 +391,7 @@ async def rotate_service_account_key(session: AsyncSession, sa_id: str) -> dict:
     }
 
 
-async def set_key_expiry(
-    session: AsyncSession, sa_id: str, expires_at: datetime
-) -> dict:
+async def set_key_expiry(session: AsyncSession, sa_id: str, expires_at: datetime) -> dict:
     """Set expiration date for a service account key."""
     sa = await session.get(ServiceAccountDB, sa_id)
     if not sa:

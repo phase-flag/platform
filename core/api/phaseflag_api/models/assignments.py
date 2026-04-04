@@ -22,8 +22,4 @@ class StickyAssignmentDB(Base):
     environment = Column(String(50), nullable=False, default="production")
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
 
-    __table_args__ = (
-        UniqueConstraint(
-            "user_id", "flag_key", "environment", name="uq_sticky_user_flag_env"
-        ),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "flag_key", "environment", name="uq_sticky_user_flag_env"),)

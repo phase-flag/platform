@@ -43,9 +43,7 @@ def _rule_to_out(r) -> RollbackRuleOut:
         window_minutes=r.window_minutes,
         action=r.action,
         active=r.active,
-        last_triggered_at=r.last_triggered_at.isoformat()
-        if r.last_triggered_at
-        else None,
+        last_triggered_at=r.last_triggered_at.isoformat() if r.last_triggered_at else None,
         created_at=r.created_at.isoformat(),
     )
 
@@ -56,9 +54,7 @@ def _rule_to_out(r) -> RollbackRuleOut:
     status_code=201,
     dependencies=[require_role("editor")],
 )
-async def create_rollback_rule(
-    body: RollbackRuleCreate, session: AsyncSession = Depends(get_session)
-):
+async def create_rollback_rule(body: RollbackRuleCreate, session: AsyncSession = Depends(get_session)):
     rule = await rollout_service.create_rollback_rule(
         session,
         flag_key=body.flag_key,
@@ -72,8 +68,6 @@ async def create_rollback_rule(
 
 
 @router.get("/rollback-rules/{flag_key}", response_model=list[RollbackRuleOut])
-async def list_rollback_rules(
-    flag_key: str, session: AsyncSession = Depends(get_session)
-):
+async def list_rollback_rules(flag_key: str, session: AsyncSession = Depends(get_session)):
     rules = await rollout_service.list_rollback_rules(session, flag_key)
     return [_rule_to_out(r) for r in rules]

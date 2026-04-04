@@ -85,12 +85,8 @@ async def list_environments(
     project = await project_repository.get_project_by_id(session, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-    envs, total = await environment_repository.list_environments(
-        session, project_id, limit=limit, offset=offset
-    )
-    return PaginatedEnvs(
-        items=[_env_to_out(e) for e in envs], total=total, limit=limit, offset=offset
-    )
+    envs, total = await environment_repository.list_environments(session, project_id, limit=limit, offset=offset)
+    return PaginatedEnvs(items=[_env_to_out(e) for e in envs], total=total, limit=limit, offset=offset)
 
 
 @router.post(
@@ -99,19 +95,13 @@ async def list_environments(
     status_code=201,
     dependencies=[require_role("admin")],
 )
-async def create_environment(
-    project_id: str, body: EnvCreate, session: AsyncSession = Depends(get_session)
-):
+async def create_environment(project_id: str, body: EnvCreate, session: AsyncSession = Depends(get_session)):
     project = await project_repository.get_project_by_id(session, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-    existing = await environment_repository.get_env_by_slug(
-        session, project_id, body.slug
-    )
+    existing = await environment_repository.get_env_by_slug(session, project_id, body.slug)
     if existing:
-        raise HTTPException(
-            status_code=409, detail=f"Environment '{body.slug}' already exists"
-        )
+        raise HTTPException(status_code=409, detail=f"Environment '{body.slug}' already exists")
     env = EnvironmentDB(
         project_id=project_id,
         slug=body.slug,
@@ -137,9 +127,7 @@ async def get_environment(env_id: str, session: AsyncSession = Depends(get_sessi
     response_model=EnvOut,
     dependencies=[require_role("admin")],
 )
-async def update_environment(
-    env_id: str, body: EnvUpdate, session: AsyncSession = Depends(get_session)
-):
+async def update_environment(env_id: str, body: EnvUpdate, session: AsyncSession = Depends(get_session)):
     env = await environment_repository.get_env_by_id(session, env_id)
     if not env:
         raise HTTPException(status_code=404, detail="Environment not found")
@@ -155,9 +143,7 @@ async def update_environment(
     return _env_to_out(updated)
 
 
-@router.delete(
-    "/environments/{env_id}", status_code=204, dependencies=[require_role("admin")]
-)
+@router.delete("/environments/{env_id}", status_code=204, dependencies=[require_role("admin")])
 async def delete_environment(env_id: str, session: AsyncSession = Depends(get_session)):
     env = await environment_repository.get_env_by_id(session, env_id)
     if not env:
@@ -171,22 +157,14 @@ async def delete_environment(env_id: str, session: AsyncSession = Depends(get_se
     status_code=201,
     dependencies=[require_role("admin")],
 )
-async def clone_environment(
-    env_id: str, body: CloneRequest, session: AsyncSession = Depends(get_session)
-):
+async def clone_environment(env_id: str, body: CloneRequest, session: AsyncSession = Depends(get_session)):
     source = await environment_repository.get_env_by_id(session, env_id)
     if not source:
         raise HTTPException(status_code=404, detail="Environment not found")
-    existing = await environment_repository.get_env_by_slug(
-        session, source.project_id, body.new_slug
-    )
+    existing = await environment_repository.get_env_by_slug(session, source.project_id, body.new_slug)
     if existing:
-        raise HTTPException(
-            status_code=409, detail=f"Environment '{body.new_slug}' already exists"
-        )
-    cloned = await environment_repository.clone_environment(
-        session, source, body.new_slug, body.new_name
-    )
+        raise HTTPException(status_code=409, detail=f"Environment '{body.new_slug}' already exists")
+    cloned = await environment_repository.clone_environment(session, source, body.new_slug, body.new_name)
     return _env_to_out(cloned)
 
 
@@ -195,9 +173,7 @@ async def clone_environment(
     response_model=EnvOut,
     dependencies=[require_role("admin")],
 )
-async def freeze_environment(
-    env_id: str, body: FreezeRequest, session: AsyncSession = Depends(get_session)
-):
+async def freeze_environment(env_id: str, body: FreezeRequest, session: AsyncSession = Depends(get_session)):
     env = await environment_repository.get_env_by_id(session, env_id)
     if not env:
         raise HTTPException(status_code=404, detail="Environment not found")
@@ -212,9 +188,7 @@ async def freeze_environment(
     response_model=EnvOut,
     dependencies=[require_role("admin")],
 )
-async def unfreeze_environment(
-    env_id: str, session: AsyncSession = Depends(get_session)
-):
+async def unfreeze_environment(env_id: str, session: AsyncSession = Depends(get_session)):
     env = await environment_repository.get_env_by_id(session, env_id)
     if not env:
         raise HTTPException(status_code=404, detail="Environment not found")

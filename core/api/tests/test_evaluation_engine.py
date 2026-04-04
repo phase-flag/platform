@@ -74,9 +74,7 @@ def test_evaluate_targeting_no_match():
         rules=[
             {
                 "priority": 1,
-                "conditions": [
-                    {"attribute": "plan", "operator": "is", "value": "enterprise"}
-                ],
+                "conditions": [{"attribute": "plan", "operator": "is", "value": "enterprise"}],
                 "variation_id": "v-on",
             }
         ]
@@ -121,9 +119,7 @@ def test_evaluate_priority_ordering():
         rules=[
             {
                 "priority": 2,
-                "conditions": [
-                    {"attribute": "country", "operator": "is", "value": "US"}
-                ],
+                "conditions": [{"attribute": "country", "operator": "is", "value": "US"}],
                 "variation_id": "v-off",
             },
             {

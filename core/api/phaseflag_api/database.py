@@ -14,9 +14,7 @@ from phaseflag_api.config import settings
 
 _is_sqlite = settings.DATABASE_URL.startswith("sqlite")
 
-_db_url = settings.DATABASE_URL.replace("?sslmode=", "?ssl=").replace(
-    "&sslmode=", "&ssl="
-)
+_db_url = settings.DATABASE_URL.replace("?sslmode=", "?ssl=").replace("&sslmode=", "&ssl=")
 
 _engine_kwargs: dict = {"echo": settings.LOG_LEVEL.upper() == "DEBUG"}
 if not _is_sqlite:

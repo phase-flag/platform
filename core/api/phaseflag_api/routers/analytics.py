@@ -61,12 +61,7 @@ async def get_flag_evaluations(
 
     result = await session.execute(stmt)
     rows = result.all()
-    return [
-        EvaluationBucket(
-            period=row.period, variation_key=row.variation_key, count=row.count
-        )
-        for row in rows
-    ]
+    return [EvaluationBucket(period=row.period, variation_key=row.variation_key, count=row.count) for row in rows]
 
 
 @router.get("/flags/{flag_key}/summary", response_model=AnalyticsSummary)

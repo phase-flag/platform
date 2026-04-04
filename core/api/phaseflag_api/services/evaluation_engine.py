@@ -149,9 +149,7 @@ def _evaluate_condition(condition: dict[str, Any], context: dict[str, Any]) -> b
     return False
 
 
-def _evaluate_conditions(
-    conditions: list[dict[str, Any]], context: dict[str, Any]
-) -> bool:
+def _evaluate_conditions(conditions: list[dict[str, Any]], context: dict[str, Any]) -> bool:
     """All conditions in a rule must match (AND logic)."""
     return all(_evaluate_condition(c, context) for c in conditions)
 
@@ -180,9 +178,7 @@ def evaluate(flag: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
 
     Returns a dict with variation_id, variation_key, value, reason.
     """
-    variations_by_id: dict[str, dict[str, Any]] = {
-        v["id"]: v for v in flag.get("variations", [])
-    }
+    variations_by_id: dict[str, dict[str, Any]] = {v["id"]: v for v in flag.get("variations", [])}
 
     def _make_result(variation_id: str, reason: str) -> dict[str, Any]:
         v = variations_by_id.get(variation_id, {})
@@ -380,17 +376,13 @@ def evaluate_with_prerequisites(
 # ---------------------------------------------------------------------------
 
 
-def evaluate_with_trace(
-    flag: dict[str, Any], context: dict[str, Any]
-) -> dict[str, Any]:
+def evaluate_with_trace(flag: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
     """Evaluate a flag and return a detailed trace of the evaluation.
 
     Returns the normal evaluation result plus a 'trace' key with details
     about each rule evaluated.
     """
-    variations_by_id: dict[str, dict[str, Any]] = {
-        v["id"]: v for v in flag.get("variations", [])
-    }
+    variations_by_id: dict[str, dict[str, Any]] = {v["id"]: v for v in flag.get("variations", [])}
 
     def _make_result(variation_id: str, reason: str) -> dict[str, Any]:
         v = variations_by_id.get(variation_id, {})
@@ -439,9 +431,7 @@ def evaluate_with_trace(
                 result = _make_result(rule["variation_id"], "targeting_match")
                 rule_trace["served_variation"] = result["variation_key"]
             elif rule.get("percentage_rollout"):
-                vid = _resolve_percentage_rollout(
-                    rule["percentage_rollout"], flag["key"], context
-                )
+                vid = _resolve_percentage_rollout(rule["percentage_rollout"], flag["key"], context)
                 if vid:
                     result = _make_result(vid, "percentage_rollout")
                     rule_trace["served_variation"] = result["variation_key"]
@@ -467,9 +457,7 @@ def evaluate_with_trace(
 # ---------------------------------------------------------------------------
 
 
-def merge_identity(
-    anonymous_id: str, authenticated_id: str, sticky_assignments: dict
-) -> dict:
+def merge_identity(anonymous_id: str, authenticated_id: str, sticky_assignments: dict) -> dict:
     """Merge anonymous user assignments to authenticated user.
 
     Returns updated sticky assignments dict with anonymous assignments transferred.

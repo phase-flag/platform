@@ -31,9 +31,7 @@ class PipelineDB(Base):
     flag_key = Column(String(255), nullable=False, index=True)
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
-    status = Column(
-        String(20), nullable=False, default="pending"
-    )  # pending, running, paused, completed, rolled_back
+    status = Column(String(20), nullable=False, default="pending")  # pending, running, paused, completed, rolled_back
     current_stage_index = Column(Integer, nullable=False, default=0)
     environment = Column(String(255), nullable=True)
     template = Column(String(50), nullable=True)  # canary, blue_green, linear, custom
@@ -62,18 +60,12 @@ class PipelineStageDB(Base):
     __tablename__ = "pipeline_stages"
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    pipeline_id = Column(
-        String(36), ForeignKey("pipelines.id", ondelete="CASCADE"), nullable=False
-    )
+    pipeline_id = Column(String(36), ForeignKey("pipelines.id", ondelete="CASCADE"), nullable=False)
     stage_order = Column(Integer, nullable=False)
     name = Column(String(255), nullable=False)
     rollout_percentage = Column(Integer, nullable=False)  # 0-100
-    duration_minutes = Column(
-        Integer, nullable=True
-    )  # How long to hold before auto-advance
-    status = Column(
-        String(20), nullable=False, default="pending"
-    )  # pending, active, completed, skipped
+    duration_minutes = Column(Integer, nullable=True)  # How long to hold before auto-advance
+    status = Column(String(20), nullable=False, default="pending")  # pending, active, completed, skipped
     started_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
     rollback_on_failure = Column(Boolean, nullable=False, default=True)
@@ -94,9 +86,7 @@ class RollbackRuleDB(Base):
     operator = Column(String(10), nullable=False)  # gt, lt, gte, lte
     threshold = Column(Float, nullable=False)
     window_minutes = Column(Integer, nullable=False, default=5)
-    action = Column(
-        String(20), nullable=False, default="disable"
-    )  # disable, rollback, alert
+    action = Column(String(20), nullable=False, default="disable")  # disable, rollback, alert
     active = Column(Boolean, nullable=False, default=True)
     last_triggered_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))

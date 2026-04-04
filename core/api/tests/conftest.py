@@ -27,9 +27,7 @@ from phaseflag_api.main import app
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
-test_session_factory = async_sessionmaker(
-    test_engine, class_=AsyncSession, expire_on_commit=False
-)
+test_session_factory = async_sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
 
 
 @pytest.fixture(scope="session")
@@ -112,9 +110,7 @@ async def auth_headers(client: AsyncClient) -> dict[str, str]:
 
 
 @pytest_asyncio.fixture
-async def admin_headers(
-    client: AsyncClient, db_session: AsyncSession
-) -> dict[str, str]:
+async def admin_headers(client: AsyncClient, db_session: AsyncSession) -> dict[str, str]:
     """Create an admin user and return auth headers."""
     from phaseflag_api.models.users import UserDB
 
@@ -134,9 +130,7 @@ async def admin_headers(
     from sqlalchemy import update
 
     async with test_session_factory() as session:
-        await session.execute(
-            update(UserDB).where(UserDB.email == email).values(role="admin")
-        )
+        await session.execute(update(UserDB).where(UserDB.email == email).values(role="admin"))
         await session.commit()
 
     resp = await client.post(

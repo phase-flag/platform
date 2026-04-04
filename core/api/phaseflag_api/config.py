@@ -41,8 +41,7 @@ class Settings(BaseSettings):
         if self.CORS_ORIGINS == "*":
             if self.DEPLOYMENT_MODE != DeploymentMode.OSS:
                 _logger.warning(
-                    "CORS wildcard '*' is not allowed in %s mode. "
-                    "Set PHASEFLAG_CORS_ORIGINS to specific origins.",
+                    "CORS wildcard '*' is not allowed in %s mode. Set PHASEFLAG_CORS_ORIGINS to specific origins.",
                     self.DEPLOYMENT_MODE.value,
                 )
                 return ["http://localhost:3000", "http://localhost:5173"]
@@ -79,9 +78,7 @@ def _check_secrets() -> None:
                 "Set PHASEFLAG_API_SECRET_KEY env var for stable auth across restarts."
             )
         else:
-            _logger.warning(
-                "Using default API_SECRET_KEY. Set PHASEFLAG_API_SECRET_KEY for production."
-            )
+            _logger.warning("Using default API_SECRET_KEY. Set PHASEFLAG_API_SECRET_KEY for production.")
 
     if settings.JWT_SECRET_KEY in _INSECURE_DEFAULTS:
         if is_production:
@@ -96,9 +93,7 @@ def _check_secrets() -> None:
                 "Set PHASEFLAG_JWT_SECRET_KEY env var for stable JWT signing across restarts."
             )
         else:
-            _logger.warning(
-                "Using default JWT_SECRET_KEY. Set PHASEFLAG_JWT_SECRET_KEY for production."
-            )
+            _logger.warning("Using default JWT_SECRET_KEY. Set PHASEFLAG_JWT_SECRET_KEY for production.")
 
 
 _check_secrets()

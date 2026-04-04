@@ -46,9 +46,7 @@ def record_sync(lag_ms: float) -> None:
     _sync_metrics["last_sync"] = datetime.now(UTC).isoformat()
     _sync_metrics["sync_count"] += 1
     _sync_metrics["total_lag_ms"] += lag_ms
-    _sync_metrics["avg_lag_ms"] = (
-        _sync_metrics["total_lag_ms"] / _sync_metrics["sync_count"]
-    )
+    _sync_metrics["avg_lag_ms"] = _sync_metrics["total_lag_ms"] / _sync_metrics["sync_count"]
 
 
 def get_sync_metrics() -> dict:
@@ -59,11 +57,7 @@ async def get_rollout_timeline(session: AsyncSession, flag_key: str) -> list[dic
     """Get the rollout progression timeline for a flag."""
     from phaseflag_api.models.pipelines import PipelineDB
 
-    stmt = (
-        select(PipelineDB)
-        .where(PipelineDB.flag_key == flag_key)
-        .order_by(PipelineDB.created_at.desc())
-    )
+    stmt = select(PipelineDB).where(PipelineDB.flag_key == flag_key).order_by(PipelineDB.created_at.desc())
     result = await session.execute(stmt)
     pipelines = result.scalars().all()
     timeline = []
@@ -76,9 +70,7 @@ async def get_rollout_timeline(session: AsyncSession, flag_key: str) -> list[dic
                     "percentage": s.rollout_percentage,
                     "status": s.status,
                     "started_at": s.started_at.isoformat() if s.started_at else None,
-                    "completed_at": s.completed_at.isoformat()
-                    if s.completed_at
-                    else None,
+                    "completed_at": s.completed_at.isoformat() if s.completed_at else None,
                 }
             )
         timeline.append(
@@ -92,9 +84,7 @@ async def get_rollout_timeline(session: AsyncSession, flag_key: str) -> list[dic
     return timeline
 
 
-def correlate_incident(
-    flag_key: str, incident_id: str, description: str, timestamp: str | None = None
-) -> dict:
+def correlate_incident(flag_key: str, incident_id: str, description: str, timestamp: str | None = None) -> dict:
     """Correlate a flag change with an incident."""
     entry = {
         "flag_key": flag_key,
@@ -137,41 +127,31 @@ async def get_system_metrics(session: AsyncSession) -> dict[str, Any]:
     # Flag counts by status
     flag_counts = {}
     for s in ("active", "inactive", "archived"):
-        count = (
-            await session.execute(select(func.count()).where(FeatureFlagDB.status == s))
-        ).scalar() or 0
+        count = (await session.execute(select(func.count()).where(FeatureFlagDB.status == s))).scalar() or 0
         flag_counts[s] = count
 
     # Total evaluations in last 24h
     since_24h = datetime.now(UTC) - timedelta(hours=24)
     eval_count_24h = (
-        await session.execute(
-            select(func.count()).where(EvaluationEventDB.timestamp >= since_24h)
-        )
+        await session.execute(select(func.count()).where(EvaluationEventDB.timestamp >= since_24h))
     ).scalar() or 0
 
     # Total evaluations in last 7d
     since_7d = datetime.now(UTC) - timedelta(days=7)
     eval_count_7d = (
-        await session.execute(
-            select(func.count()).where(EvaluationEventDB.timestamp >= since_7d)
-        )
+        await session.execute(select(func.count()).where(EvaluationEventDB.timestamp >= since_7d))
     ).scalar() or 0
 
     # Unique users in last 24h
     unique_users_24h = (
         await session.execute(
-            select(func.count(func.distinct(EvaluationEventDB.user_id))).where(
-                EvaluationEventDB.timestamp >= since_24h
-            )
+            select(func.count(func.distinct(EvaluationEventDB.user_id))).where(EvaluationEventDB.timestamp >= since_24h)
         )
     ).scalar() or 0
 
     # Audit log count in last 24h
     audit_count_24h = (
-        await session.execute(
-            select(func.count()).where(AuditLogDB.timestamp >= since_24h)
-        )
+        await session.execute(select(func.count()).where(AuditLogDB.timestamp >= since_24h))
     ).scalar() or 0
 
     # Top evaluated flags (last 24h)
@@ -198,9 +178,7 @@ async def get_system_metrics(session: AsyncSession) -> dict[str, Any]:
         "audit": {
             "changes_24h": audit_count_24h,
         },
-        "top_flags_24h": [
-            {"flag_key": row.flag_key, "count": row.count} for row in top_flags
-        ],
+        "top_flags_24h": [{"flag_key": row.flag_key, "count": row.count} for row in top_flags],
     }
 
 
@@ -255,11 +233,8 @@ async def get_flag_health(session: AsyncSession, flag_key: str) -> dict[str, Any
             "last_24h": eval_24h,
             "last_7d": eval_7d,
         },
-        "variation_distribution_24h": {
-            (row.variation_key or "unknown"): row.count for row in var_rows
-        },
+        "variation_distribution_24h": {(row.variation_key or "unknown"): row.count for row in var_rows},
         "recent_changes": [
-            {"action": c.action, "actor": c.actor, "timestamp": c.timestamp.isoformat()}
-            for c in changes
+            {"action": c.action, "actor": c.actor, "timestamp": c.timestamp.isoformat()} for c in changes
         ],
     }

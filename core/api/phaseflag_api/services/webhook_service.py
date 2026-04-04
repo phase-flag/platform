@@ -47,9 +47,7 @@ def _validate_webhook_url(url: str) -> None:
     parsed = urlparse(url)
 
     if parsed.scheme not in ("http", "https"):
-        raise ValueError(
-            f"Webhook URL must use http or https scheme, got '{parsed.scheme}'"
-        )
+        raise ValueError(f"Webhook URL must use http or https scheme, got '{parsed.scheme}'")
 
     hostname = (parsed.hostname or "").lower()
     if not hostname:
@@ -84,9 +82,7 @@ async def list_webhooks(
     return list(result.scalars().all()), total
 
 
-async def create_webhook(
-    session: AsyncSession, url: str, events: list[str], secret: str
-) -> WebhookDB:
+async def create_webhook(session: AsyncSession, url: str, events: list[str], secret: str) -> WebhookDB:
     _validate_webhook_url(url)
     webhook = WebhookDB(url=url, secret=secret)
     webhook.set_events(events)
@@ -122,14 +118,10 @@ async def update_webhook(
     return webhook
 
 
-async def fire_webhooks(
-    session: AsyncSession, event_type: str, flag_key: str, flag_data: dict[str, Any]
-) -> None:
+async def fire_webhooks(session: AsyncSession, event_type: str, flag_key: str, flag_data: dict[str, Any]) -> None:
     """Fire all matching active webhooks asynchronously."""
     result = await session.execute(
-        select(WebhookDB)
-        .where(WebhookDB.active == True)
-        .order_by(WebhookDB.created_at.desc())  # noqa: E712
+        select(WebhookDB).where(WebhookDB.active == True).order_by(WebhookDB.created_at.desc())  # noqa: E712
     )
     all_webhooks = list(result.scalars().all())
     active = [w for w in all_webhooks if event_type in w.get_events()]

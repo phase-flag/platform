@@ -337,7 +337,6 @@ if settings.DEPLOYMENT_MODE != DeploymentMode.OSS:
         logger.info("Enterprise routers mounted")
     except ImportError:
         logger.warning(
-            "Enterprise mode enabled but enterprise routers not found. "
-            "Enterprise API endpoints will not be available."
+            "Enterprise mode enabled but enterprise routers not found. Enterprise API endpoints will not be available."
         )
 # CI verification 2026-04-04T04:30:48Z

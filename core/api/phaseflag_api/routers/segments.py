@@ -78,9 +78,7 @@ async def list_segments(
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
-    segments, total = await segment_repository.list_segments(
-        session, limit=limit, offset=offset
-    )
+    segments, total = await segment_repository.list_segments(session, limit=limit, offset=offset)
     return PaginatedSegments(
         items=[_segment_to_out(s) for s in segments],
         total=total,
@@ -93,9 +91,7 @@ async def list_segments(
 async def get_segment(key: str, session: AsyncSession = Depends(get_session)):
     seg = await segment_repository.get_segment_by_key(session, key)
     if seg is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Segment not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Segment not found")
     return _segment_to_out(seg)
 
 
@@ -105,9 +101,7 @@ async def get_segment(key: str, session: AsyncSession = Depends(get_session)):
     status_code=status.HTTP_201_CREATED,
     dependencies=[require_role("editor")],
 )
-async def create_segment(
-    body: SegmentCreate, session: AsyncSession = Depends(get_session)
-):
+async def create_segment(body: SegmentCreate, session: AsyncSession = Depends(get_session)):
     existing = await segment_repository.get_segment_by_key(session, body.key)
     if existing is not None:
         raise HTTPException(
@@ -126,17 +120,11 @@ async def create_segment(
     return _segment_to_out(created)
 
 
-@router.put(
-    "/segments/{key}", response_model=SegmentOut, dependencies=[require_role("editor")]
-)
-async def update_segment(
-    key: str, body: SegmentUpdate, session: AsyncSession = Depends(get_session)
-):
+@router.put("/segments/{key}", response_model=SegmentOut, dependencies=[require_role("editor")])
+async def update_segment(key: str, body: SegmentUpdate, session: AsyncSession = Depends(get_session)):
     seg = await segment_repository.get_segment_by_key(session, key)
     if seg is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Segment not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Segment not found")
     if body.name is not None:
         seg.name = body.name
     if body.description is not None:
@@ -155,7 +143,5 @@ async def update_segment(
 async def delete_segment(key: str, session: AsyncSession = Depends(get_session)):
     seg = await segment_repository.get_segment_by_key(session, key)
     if seg is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Segment not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Segment not found")
     await segment_repository.delete_segment(session, seg)

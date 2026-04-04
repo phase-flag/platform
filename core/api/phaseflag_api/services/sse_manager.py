@@ -52,9 +52,7 @@ class SSEManager:
         for queue in disconnected:
             self._clients.discard(queue)
 
-    def _format_sse(
-        self, event: str, data: dict[str, Any], event_id: str | None = None
-    ) -> str:
+    def _format_sse(self, event: str, data: dict[str, Any], event_id: str | None = None) -> str:
         lines: list[str] = []
         if event_id:
             lines.append(f"id: {event_id}")

@@ -122,9 +122,7 @@ async def list_pipelines(
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
-    items, total = await rollout_service.list_pipelines(
-        session, flag_key, limit=limit, offset=offset
-    )
+    items, total = await rollout_service.list_pipelines(session, flag_key, limit=limit, offset=offset)
     return PaginatedPipelines(items=[_pipeline_to_out(p) for p in items], total=total)
 
 
@@ -147,9 +145,7 @@ async def get_pipeline(pipeline_id: str, session: AsyncSession = Depends(get_ses
     response_model=PipelineOut,
     dependencies=[require_role("editor")],
 )
-async def advance_pipeline(
-    pipeline_id: str, session: AsyncSession = Depends(get_session)
-):
+async def advance_pipeline(pipeline_id: str, session: AsyncSession = Depends(get_session)):
     p = await rollout_service.get_pipeline(session, pipeline_id)
     if not p:
         raise HTTPException(status_code=404, detail="Pipeline not found")
@@ -162,9 +158,7 @@ async def advance_pipeline(
     response_model=PipelineOut,
     dependencies=[require_role("editor")],
 )
-async def pause_pipeline(
-    pipeline_id: str, session: AsyncSession = Depends(get_session)
-):
+async def pause_pipeline(pipeline_id: str, session: AsyncSession = Depends(get_session)):
     p = await rollout_service.get_pipeline(session, pipeline_id)
     if not p:
         raise HTTPException(status_code=404, detail="Pipeline not found")
@@ -177,9 +171,7 @@ async def pause_pipeline(
     response_model=PipelineOut,
     dependencies=[require_role("editor")],
 )
-async def resume_pipeline(
-    pipeline_id: str, session: AsyncSession = Depends(get_session)
-):
+async def resume_pipeline(pipeline_id: str, session: AsyncSession = Depends(get_session)):
     p = await rollout_service.get_pipeline(session, pipeline_id)
     if not p:
         raise HTTPException(status_code=404, detail="Pipeline not found")
@@ -192,9 +184,7 @@ async def resume_pipeline(
     response_model=PipelineOut,
     dependencies=[require_role("editor")],
 )
-async def rollback_pipeline(
-    pipeline_id: str, session: AsyncSession = Depends(get_session)
-):
+async def rollback_pipeline(pipeline_id: str, session: AsyncSession = Depends(get_session)):
     p = await rollout_service.get_pipeline(session, pipeline_id)
     if not p:
         raise HTTPException(status_code=404, detail="Pipeline not found")
@@ -202,9 +192,7 @@ async def rollback_pipeline(
     return _pipeline_to_out(updated)
 
 
-@router.post(
-    "/rollouts/{pipeline_id}/auto-advance", dependencies=[require_role("editor")]
-)
+@router.post("/rollouts/{pipeline_id}/auto-advance", dependencies=[require_role("editor")])
 async def auto_advance(pipeline_id: str, session: AsyncSession = Depends(get_session)):
     """Check if the current stage duration has elapsed and auto-advance if so."""
     result = await rollout_service.auto_advance_pipeline(session, pipeline_id)
@@ -212,9 +200,7 @@ async def auto_advance(pipeline_id: str, session: AsyncSession = Depends(get_ses
 
 
 class RollbackTriggersBody(BaseModel):
-    metrics: dict[str, float] = Field(
-        ..., examples=[{"error_rate": 0.05, "latency_p99": 1200}]
-    )
+    metrics: dict[str, float] = Field(..., examples=[{"error_rate": 0.05, "latency_p99": 1200}])
 
 
 @router.post("/rollouts/{pipeline_id}/check-triggers")
@@ -224,7 +210,5 @@ async def check_rollback_triggers(
     session: AsyncSession = Depends(get_session),
 ):
     """Check rollback triggers against provided metrics."""
-    result = await rollout_service.check_rollback_triggers(
-        session, pipeline_id, body.metrics
-    )
+    result = await rollout_service.check_rollback_triggers(session, pipeline_id, body.metrics)
     return result

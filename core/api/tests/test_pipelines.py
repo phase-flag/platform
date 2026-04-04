@@ -9,9 +9,7 @@ from tests.conftest import make_flag_payload
 @pytest.mark.asyncio
 async def test_create_pipeline(client: AsyncClient, auth_headers: dict):
     """Creating a rollout pipeline returns the pipeline data."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="pipe-flag"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="pipe-flag"), headers=auth_headers)
 
     resp = await client.post(
         "/api/v1/rollouts",
@@ -48,9 +46,7 @@ async def test_list_pipelines(client: AsyncClient, auth_headers: dict):
 @pytest.mark.asyncio
 async def test_advance_pipeline(client: AsyncClient, auth_headers: dict):
     """Advancing a pipeline moves to the next stage."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="adv-flag"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="adv-flag"), headers=auth_headers)
 
     create_resp = await client.post(
         "/api/v1/rollouts",
@@ -68,18 +64,14 @@ async def test_advance_pipeline(client: AsyncClient, auth_headers: dict):
     if create_resp.status_code in (200, 201):
         pipeline_id = create_resp.json().get("id")
         if pipeline_id:
-            resp = await client.post(
-                f"/api/v1/rollouts/{pipeline_id}/advance", headers=auth_headers
-            )
+            resp = await client.post(f"/api/v1/rollouts/{pipeline_id}/advance", headers=auth_headers)
             assert resp.status_code in (200, 400)
 
 
 @pytest.mark.asyncio
 async def test_pause_pipeline(client: AsyncClient, auth_headers: dict):
     """Pausing a running pipeline sets status to paused."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="pause-flag"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="pause-flag"), headers=auth_headers)
 
     create_resp = await client.post(
         "/api/v1/rollouts",
@@ -97,18 +89,14 @@ async def test_pause_pipeline(client: AsyncClient, auth_headers: dict):
     if create_resp.status_code in (200, 201):
         pipeline_id = create_resp.json().get("id")
         if pipeline_id:
-            resp = await client.post(
-                f"/api/v1/rollouts/{pipeline_id}/pause", headers=auth_headers
-            )
+            resp = await client.post(f"/api/v1/rollouts/{pipeline_id}/pause", headers=auth_headers)
             assert resp.status_code in (200, 400)
 
 
 @pytest.mark.asyncio
 async def test_rollback_pipeline(client: AsyncClient, auth_headers: dict):
     """Rolling back a pipeline sets status to rolled_back."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="rb-flag"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="rb-flag"), headers=auth_headers)
 
     create_resp = await client.post(
         "/api/v1/rollouts",
@@ -126,18 +114,14 @@ async def test_rollback_pipeline(client: AsyncClient, auth_headers: dict):
     if create_resp.status_code in (200, 201):
         pipeline_id = create_resp.json().get("id")
         if pipeline_id:
-            resp = await client.post(
-                f"/api/v1/rollouts/{pipeline_id}/rollback", headers=auth_headers
-            )
+            resp = await client.post(f"/api/v1/rollouts/{pipeline_id}/rollback", headers=auth_headers)
             assert resp.status_code in (200, 400)
 
 
 @pytest.mark.asyncio
 async def test_create_rollback_rule(client: AsyncClient, auth_headers: dict):
     """Creating a rollback rule for a flag."""
-    await client.post(
-        "/api/v1/flags", json=make_flag_payload(key="rr-flag"), headers=auth_headers
-    )
+    await client.post("/api/v1/flags", json=make_flag_payload(key="rr-flag"), headers=auth_headers)
 
     resp = await client.post(
         "/api/v1/rollback/rules",

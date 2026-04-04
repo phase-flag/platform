@@ -12,17 +12,9 @@ async def list_organizations(
     session: AsyncSession, *, limit: int = 50, offset: int = 0
 ) -> tuple[Sequence[OrganizationDB], int]:
     base = select(OrganizationDB)
-    total = (
-        await session.execute(select(func.count()).select_from(base.subquery()))
-    ).scalar() or 0
+    total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
     items = (
-        (
-            await session.execute(
-                base.order_by(OrganizationDB.created_at.desc())
-                .limit(limit)
-                .offset(offset)
-            )
-        )
+        (await session.execute(base.order_by(OrganizationDB.created_at.desc()).limit(limit).offset(offset)))
         .scalars()
         .all()
     )
@@ -30,31 +22,23 @@ async def list_organizations(
 
 
 async def get_org_by_slug(session: AsyncSession, slug: str) -> OrganizationDB | None:
-    result = await session.execute(
-        select(OrganizationDB).where(OrganizationDB.slug == slug)
-    )
+    result = await session.execute(select(OrganizationDB).where(OrganizationDB.slug == slug))
     return result.scalar_one_or_none()
 
 
 async def get_org_by_id(session: AsyncSession, org_id: str) -> OrganizationDB | None:
-    result = await session.execute(
-        select(OrganizationDB).where(OrganizationDB.id == org_id)
-    )
+    result = await session.execute(select(OrganizationDB).where(OrganizationDB.id == org_id))
     return result.scalar_one_or_none()
 
 
-async def create_organization(
-    session: AsyncSession, org: OrganizationDB
-) -> OrganizationDB:
+async def create_organization(session: AsyncSession, org: OrganizationDB) -> OrganizationDB:
     session.add(org)
     await session.flush()
     await session.refresh(org)
     return org
 
 
-async def update_organization(
-    session: AsyncSession, org: OrganizationDB
-) -> OrganizationDB:
+async def update_organization(session: AsyncSession, org: OrganizationDB) -> OrganizationDB:
     await session.flush()
     await session.refresh(org)
     return org
@@ -69,17 +53,9 @@ async def list_projects(
     session: AsyncSession, org_id: str, *, limit: int = 50, offset: int = 0
 ) -> tuple[Sequence[ProjectDB], int]:
     base = select(ProjectDB).where(ProjectDB.organization_id == org_id)
-    total = (
-        await session.execute(select(func.count()).select_from(base.subquery()))
-    ).scalar() or 0
+    total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
     items = (
-        (
-            await session.execute(
-                base.order_by(ProjectDB.created_at.desc()).limit(limit).offset(offset)
-            )
-        )
-        .scalars()
-        .all()
+        (await session.execute(base.order_by(ProjectDB.created_at.desc()).limit(limit).offset(offset))).scalars().all()
     )
     return items, total
 
@@ -89,14 +65,8 @@ async def get_project_by_id(session: AsyncSession, project_id: str) -> ProjectDB
     return result.scalar_one_or_none()
 
 
-async def get_project_by_slug(
-    session: AsyncSession, org_id: str, slug: str
-) -> ProjectDB | None:
-    result = await session.execute(
-        select(ProjectDB).where(
-            ProjectDB.organization_id == org_id, ProjectDB.slug == slug
-        )
-    )
+async def get_project_by_slug(session: AsyncSession, org_id: str, slug: str) -> ProjectDB | None:
+    result = await session.execute(select(ProjectDB).where(ProjectDB.organization_id == org_id, ProjectDB.slug == slug))
     return result.scalar_one_or_none()
 
 
@@ -124,13 +94,9 @@ async def add_member(session: AsyncSession, member: OrgMemberDB) -> OrgMemberDB:
     return member
 
 
-async def get_member(
-    session: AsyncSession, org_id: str, user_id: str
-) -> OrgMemberDB | None:
+async def get_member(session: AsyncSession, org_id: str, user_id: str) -> OrgMemberDB | None:
     result = await session.execute(
-        select(OrgMemberDB).where(
-            OrgMemberDB.organization_id == org_id, OrgMemberDB.user_id == user_id
-        )
+        select(OrgMemberDB).where(OrgMemberDB.organization_id == org_id, OrgMemberDB.user_id == user_id)
     )
     return result.scalar_one_or_none()
 
@@ -144,9 +110,7 @@ async def ensure_default_project(session: AsyncSession) -> ProjectDB:
 
     project = await get_project_by_slug(session, org.id, "default")
     if project is None:
-        project = ProjectDB(
-            organization_id=org.id, slug="default", name="Default Project"
-        )
+        project = ProjectDB(organization_id=org.id, slug="default", name="Default Project")
         project = await create_project(session, project)
 
     return project

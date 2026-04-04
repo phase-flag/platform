@@ -16,27 +16,23 @@ logger = logging.getLogger(__name__)
 async def get_flag_inventory(session: AsyncSession) -> dict[str, Any]:
     """Return a summary of all flags organized by type, status, and lifecycle."""
     # By status
-    status_stmt = select(FeatureFlagDB.status, func.count().label("count")).group_by(
-        FeatureFlagDB.status
-    )
+    status_stmt = select(FeatureFlagDB.status, func.count().label("count")).group_by(FeatureFlagDB.status)
     status_rows = (await session.execute(status_stmt)).all()
 
     # By lifecycle stage
-    lifecycle_stmt = select(
-        FeatureFlagDB.lifecycle_stage, func.count().label("count")
-    ).group_by(FeatureFlagDB.lifecycle_stage)
+    lifecycle_stmt = select(FeatureFlagDB.lifecycle_stage, func.count().label("count")).group_by(
+        FeatureFlagDB.lifecycle_stage
+    )
     lifecycle_rows = (await session.execute(lifecycle_stmt)).all()
 
     # By environment
-    env_stmt = select(FeatureFlagDB.environment, func.count().label("count")).group_by(
-        FeatureFlagDB.environment
-    )
+    env_stmt = select(FeatureFlagDB.environment, func.count().label("count")).group_by(FeatureFlagDB.environment)
     env_rows = (await session.execute(env_stmt)).all()
 
     # By classification
-    class_stmt = select(
-        FeatureFlagDB.flag_classification, func.count().label("count")
-    ).group_by(FeatureFlagDB.flag_classification)
+    class_stmt = select(FeatureFlagDB.flag_classification, func.count().label("count")).group_by(
+        FeatureFlagDB.flag_classification
+    )
     class_rows = (await session.execute(class_stmt)).all()
 
     # Flags without owners
@@ -64,13 +60,9 @@ async def get_flag_inventory(session: AsyncSession) -> dict[str, Any]:
     return {
         "total_flags": total,
         "by_status": {row.status: row.count for row in status_rows},
-        "by_lifecycle": {
-            (row.lifecycle_stage or "unknown"): row.count for row in lifecycle_rows
-        },
+        "by_lifecycle": {(row.lifecycle_stage or "unknown"): row.count for row in lifecycle_rows},
         "by_environment": {row.environment: row.count for row in env_rows},
-        "by_classification": {
-            (row.flag_classification or "release"): row.count for row in class_rows
-        },
+        "by_classification": {(row.flag_classification or "release"): row.count for row in class_rows},
         "flags_without_owner": no_owner,
         "expired_flags": expired,
     }
@@ -112,9 +104,7 @@ async def get_stale_flag_report(session: AsyncSession) -> dict:
         if team not in by_team:
             by_team[team] = {"count": 0, "flags": []}
         by_team[team]["count"] += 1
-        by_team[team]["flags"].append(
-            {"key": f.key, "name": f.name, "updated_at": f.updated_at.isoformat()}
-        )
+        by_team[team]["flags"].append({"key": f.key, "name": f.name, "updated_at": f.updated_at.isoformat()})
 
     return {"total_stale": len(flags), "by_team": by_team}
 
@@ -160,11 +150,7 @@ async def get_release_dashboard(session: AsyncSession) -> dict:
 
 async def get_environment_drift(session: AsyncSession) -> list[dict]:
     """Detect flag configuration differences between environments."""
-    stmt = (
-        select(FeatureFlagDB)
-        .where(FeatureFlagDB.status != "archived")
-        .order_by(FeatureFlagDB.key)
-    )
+    stmt = select(FeatureFlagDB).where(FeatureFlagDB.status != "archived").order_by(FeatureFlagDB.key)
     result = await session.execute(stmt)
     flags = result.scalars().all()
 
@@ -180,25 +166,17 @@ async def get_environment_drift(session: AsyncSession) -> list[dict]:
         if len(envs) > 1:
             statuses = set(e["status"] for e in envs.values())
             if len(statuses) > 1:
-                drifts.append(
-                    {"flag_key": key, "environments": envs, "drift_type": "status"}
-                )
+                drifts.append({"flag_key": key, "environments": envs, "drift_type": "status"})
 
     return drifts
 
 
-async def get_change_activity_timeline(
-    session: AsyncSession, days: int = 30
-) -> list[dict]:
+async def get_change_activity_timeline(session: AsyncSession, days: int = 30) -> list[dict]:
     """Timeline of flag changes over the past N days."""
     from phaseflag_api.models.audit import AuditLogDB
 
     cutoff = datetime.now(UTC) - timedelta(days=days)
-    stmt = (
-        select(AuditLogDB)
-        .where(AuditLogDB.timestamp >= cutoff)
-        .order_by(AuditLogDB.timestamp.desc())
-    )
+    stmt = select(AuditLogDB).where(AuditLogDB.timestamp >= cutoff).order_by(AuditLogDB.timestamp.desc())
     result = await session.execute(stmt)
     logs = result.scalars().all()
 
@@ -237,10 +215,7 @@ async def get_flags_without_owners(session: AsyncSession) -> list[dict]:
         or_(FeatureFlagDB.owner_team == None, FeatureFlagDB.owner_team == ""),  # noqa: E711
     )
     result = await session.execute(stmt)
-    return [
-        {"key": f.key, "name": f.name, "created_at": f.created_at.isoformat()}
-        for f in result.scalars().all()
-    ]
+    return [{"key": f.key, "name": f.name, "created_at": f.created_at.isoformat()} for f in result.scalars().all()]
 
 
 async def get_expired_flags(session: AsyncSession) -> list[dict]:
@@ -275,14 +250,10 @@ async def get_segment_usage(session: AsyncSession) -> list[dict]:
     for seg in segments:
         # Count flags referencing this segment (check targeting rules JSON)
         flag_stmt = (
-            select(func.count())
-            .select_from(FeatureFlagDB)
-            .where(FeatureFlagDB.targeting_rules.contains(seg.key))
+            select(func.count()).select_from(FeatureFlagDB).where(FeatureFlagDB.targeting_rules.contains(seg.key))
         )
         count_result = await session.execute(flag_stmt)
         count = count_result.scalar() or 0
-        usage.append(
-            {"segment_key": seg.key, "segment_name": seg.name, "flag_count": count}
-        )
+        usage.append({"segment_key": seg.key, "segment_name": seg.name, "flag_count": count})
 
     return sorted(usage, key=lambda x: x["flag_count"], reverse=True)
