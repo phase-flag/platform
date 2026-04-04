@@ -36,7 +36,9 @@ class SSEManager:
 
         self._event_counter += 1
         message = self._format_sse(
-            event=event_type, data=data, event_id=str(self._event_counter),
+            event=event_type,
+            data=data,
+            event_id=str(self._event_counter),
         )
 
         disconnected: list[asyncio.Queue[str]] = []
@@ -50,7 +52,9 @@ class SSEManager:
         for queue in disconnected:
             self._clients.discard(queue)
 
-    def _format_sse(self, event: str, data: dict[str, Any], event_id: str | None = None) -> str:
+    def _format_sse(
+        self, event: str, data: dict[str, Any], event_id: str | None = None
+    ) -> str:
         lines: list[str] = []
         if event_id:
             lines.append(f"id: {event_id}")

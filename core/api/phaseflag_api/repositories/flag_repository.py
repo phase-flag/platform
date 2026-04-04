@@ -32,7 +32,9 @@ async def list_flags(
     count_stmt = select(func.count()).select_from(base.subquery())
     total = (await session.execute(count_stmt)).scalar() or 0
 
-    items_stmt = base.order_by(FeatureFlagDB.created_at.desc()).limit(limit).offset(offset)
+    items_stmt = (
+        base.order_by(FeatureFlagDB.created_at.desc()).limit(limit).offset(offset)
+    )
     result = await session.execute(items_stmt)
     return result.scalars().all(), total
 

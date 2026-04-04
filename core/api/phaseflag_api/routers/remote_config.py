@@ -56,20 +56,38 @@ class PaginatedConfigs(BaseModel):
 
 def _config_to_out(c) -> ConfigOut:
     return ConfigOut(
-        id=c.id, key=c.key, name=c.name, description=c.description,
-        config_type=c.config_type, value=c.get_value(),
-        default_value=c.get_default_value(), environment=c.environment,
-        is_server_only=c.is_server_only, version=c.version, owner=c.owner,
-        created_at=c.created_at.isoformat(), updated_at=c.updated_at.isoformat(),
+        id=c.id,
+        key=c.key,
+        name=c.name,
+        description=c.description,
+        config_type=c.config_type,
+        value=c.get_value(),
+        default_value=c.get_default_value(),
+        environment=c.environment,
+        is_server_only=c.is_server_only,
+        version=c.version,
+        owner=c.owner,
+        created_at=c.created_at.isoformat(),
+        updated_at=c.updated_at.isoformat(),
     )
 
 
-@router.post("", response_model=ConfigOut, status_code=201, dependencies=[require_role("editor")])
-async def create_config(body: ConfigCreate, session: AsyncSession = Depends(get_session)):
+@router.post(
+    "", response_model=ConfigOut, status_code=201, dependencies=[require_role("editor")]
+)
+async def create_config(
+    body: ConfigCreate, session: AsyncSession = Depends(get_session)
+):
     config = await remote_config_service.create_config(
-        session, key=body.key, name=body.name, description=body.description,
-        config_type=body.config_type, value=body.value, default_value=body.default_value,
-        environment=body.environment, schema_definition=body.schema_definition,
+        session,
+        key=body.key,
+        name=body.name,
+        description=body.description,
+        config_type=body.config_type,
+        value=body.value,
+        default_value=body.default_value,
+        environment=body.environment,
+        schema_definition=body.schema_definition,
         is_server_only=body.is_server_only,
     )
     return _config_to_out(config)
@@ -78,10 +96,13 @@ async def create_config(body: ConfigCreate, session: AsyncSession = Depends(get_
 @router.get("", response_model=PaginatedConfigs)
 async def list_configs(
     environment: str | None = Query(None),
-    limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
-    items, total = await remote_config_service.list_configs(session, environment=environment, limit=limit, offset=offset)
+    items, total = await remote_config_service.list_configs(
+        session, environment=environment, limit=limit, offset=offset
+    )
     return PaginatedConfigs(items=[_config_to_out(c) for c in items], total=total)
 
 
@@ -93,12 +114,18 @@ async def get_config(config_id: str, session: AsyncSession = Depends(get_session
     return _config_to_out(config)
 
 
-@router.put("/{config_id}", response_model=ConfigOut, dependencies=[require_role("editor")])
-async def update_config(config_id: str, body: ConfigUpdate, session: AsyncSession = Depends(get_session)):
+@router.put(
+    "/{config_id}", response_model=ConfigOut, dependencies=[require_role("editor")]
+)
+async def update_config(
+    config_id: str, body: ConfigUpdate, session: AsyncSession = Depends(get_session)
+):
     config = await remote_config_service.get_config_by_id(session, config_id)
     if not config:
         raise HTTPException(status_code=404, detail="Config not found")
-    updated = await remote_config_service.update_config(session, config, body.model_dump(exclude_unset=True))
+    updated = await remote_config_service.update_config(
+        session, config, body.model_dump(exclude_unset=True)
+    )
     return _config_to_out(updated)
 
 
@@ -117,7 +144,9 @@ async def get_config_history(
     session: AsyncSession = Depends(get_session),
 ):
     """Return version history for a config entry."""
-    return await remote_config_service.get_config_history(session, config_id, limit=limit)
+    return await remote_config_service.get_config_history(
+        session, config_id, limit=limit
+    )
 
 
 class ValidateRequest(BaseModel):
@@ -131,10 +160,14 @@ async def validate_config_value(
     session: AsyncSession = Depends(get_session),
 ):
     """Validate a value against the config's JSON schema definition."""
-    return await remote_config_service.validate_config_value(session, config_id, body.value)
+    return await remote_config_service.validate_config_value(
+        session, config_id, body.value
+    )
 
 
 @router.get("/client/{environment}")
-async def get_client_configs(environment: str, session: AsyncSession = Depends(get_session)):
+async def get_client_configs(
+    environment: str, session: AsyncSession = Depends(get_session)
+):
     """Return all client-safe configs for an environment (for SDK consumption)."""
     return await remote_config_service.get_client_configs(session, environment)

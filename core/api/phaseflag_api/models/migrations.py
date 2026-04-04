@@ -23,11 +23,20 @@ class MigrationFlagDB(Base):
     description = Column(Text, nullable=True)
     source_system = Column(String(255), nullable=True)
     target_system = Column(String(255), nullable=True)
-    stage = Column(String(30), nullable=False, default="dual_read")  # dual_read, dual_write, shadow, cutover, cleanup
+    stage = Column(
+        String(30), nullable=False, default="dual_read"
+    )  # dual_read, dual_write, shadow, cutover, cleanup
     rollout_percentage = Column(Integer, nullable=False, default=0)
     error_count = Column(Integer, nullable=False, default=0)
     success_count = Column(Integer, nullable=False, default=0)
-    rollback_threshold = Column(Float, nullable=True)  # Error rate threshold for auto-rollback
+    rollback_threshold = Column(
+        Float, nullable=True
+    )  # Error rate threshold for auto-rollback
     created_by = Column(String(255), nullable=False, default="system")
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )

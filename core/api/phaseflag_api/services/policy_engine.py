@@ -13,7 +13,10 @@ class PolicyEngine:
 
     @staticmethod
     async def can_modify_flag(
-        session: AsyncSession, user: dict, flag_key: str, environment: str,
+        session: AsyncSession,
+        user: dict,
+        flag_key: str,
+        environment: str,
     ) -> tuple[bool, str]:
         """Check if user can modify a flag in the given environment.
 
@@ -41,7 +44,9 @@ class PolicyEngine:
 
     @staticmethod
     async def can_deploy_to_production(
-        session: AsyncSession, user: dict, flag_key: str,
+        session: AsyncSession,
+        user: dict,
+        flag_key: str,
     ) -> tuple[bool, str]:
         """Check if a flag change can be deployed to production."""
         role = user.get("role", "viewer")
@@ -51,7 +56,10 @@ class PolicyEngine:
 
     @staticmethod
     async def evaluate_policy(
-        session: AsyncSession, action: str, user: dict, resource: dict,
+        session: AsyncSession,
+        action: str,
+        user: dict,
+        resource: dict,
     ) -> tuple[bool, str]:
         """Generic policy evaluation.
 
@@ -71,19 +79,25 @@ class PolicyEngine:
 
     @staticmethod
     async def _handle_modify(
-        session: AsyncSession, user: dict, resource: dict,
+        session: AsyncSession,
+        user: dict,
+        resource: dict,
     ) -> tuple[bool, str]:
         return await PolicyEngine.can_modify_flag(
-            session, user,
+            session,
+            user,
             resource.get("flag_key", ""),
             resource.get("environment", "production"),
         )
 
     @staticmethod
     async def _handle_deploy_production(
-        session: AsyncSession, user: dict, resource: dict,
+        session: AsyncSession,
+        user: dict,
+        resource: dict,
     ) -> tuple[bool, str]:
         return await PolicyEngine.can_deploy_to_production(
-            session, user,
+            session,
+            user,
             resource.get("flag_key", ""),
         )

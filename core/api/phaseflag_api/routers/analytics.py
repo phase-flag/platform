@@ -48,7 +48,11 @@ async def get_flag_evaluations(
     bucket_expr = _date_trunc_expr(period, ts_col)
 
     stmt = (
-        select(bucket_expr.label("period"), EvaluationEventDB.variation_key, func.count().label("count"))
+        select(
+            bucket_expr.label("period"),
+            EvaluationEventDB.variation_key,
+            func.count().label("count"),
+        )
         .where(EvaluationEventDB.flag_key == flag_key)
         .where(ts_col >= since)
         .group_by(bucket_expr, EvaluationEventDB.variation_key)
@@ -57,7 +61,12 @@ async def get_flag_evaluations(
 
     result = await session.execute(stmt)
     rows = result.all()
-    return [EvaluationBucket(period=row.period, variation_key=row.variation_key, count=row.count) for row in rows]
+    return [
+        EvaluationBucket(
+            period=row.period, variation_key=row.variation_key, count=row.count
+        )
+        for row in rows
+    ]
 
 
 @router.get("/flags/{flag_key}/summary", response_model=AnalyticsSummary)
@@ -69,7 +78,10 @@ async def get_flag_summary(
     since = datetime.now(UTC) - timedelta(days=days)
 
     totals_stmt = (
-        select(func.count().label("total"), func.count(func.distinct(EvaluationEventDB.user_id)).label("unique_users"))
+        select(
+            func.count().label("total"),
+            func.count(func.distinct(EvaluationEventDB.user_id)).label("unique_users"),
+        )
         .where(EvaluationEventDB.flag_key == flag_key)
         .where(EvaluationEventDB.timestamp >= since)
     )
@@ -84,7 +96,9 @@ async def get_flag_summary(
     var_rows = (await session.execute(var_stmt)).all()
 
     return AnalyticsSummary(
-        flag_key=flag_key, total_evaluations=totals.total, unique_users=totals.unique_users,
+        flag_key=flag_key,
+        total_evaluations=totals.total,
+        unique_users=totals.unique_users,
         variations={row.variation_key or "unknown": row.count for row in var_rows},
     )
 
@@ -95,6 +109,7 @@ async def cleanup_old_events(
     session: AsyncSession = Depends(get_session),
 ):
     from sqlalchemy import delete
+
     cutoff = datetime.now(UTC) - timedelta(days=days)
     stmt = delete(EvaluationEventDB).where(EvaluationEventDB.timestamp < cutoff)
     result = await session.execute(stmt)

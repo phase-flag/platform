@@ -50,15 +50,20 @@ async def _check_circular_prerequisites(
                 to_check.append(dp["flag_key"])
 
 
-async def _notify_flag_change(event_type: str, flag: FeatureFlagDB, session: AsyncSession) -> None:
+async def _notify_flag_change(
+    event_type: str, flag: FeatureFlagDB, session: AsyncSession
+) -> None:
     summary = _flag_summary(flag)
     await webhook_service.fire_webhooks(session, event_type, flag.key, summary)
-    await sse_manager.broadcast(event_type, {
-        "flag_key": flag.key,
-        "event": event_type,
-        "timestamp": datetime.now(UTC).isoformat(),
-        **summary,
-    })
+    await sse_manager.broadcast(
+        event_type,
+        {
+            "flag_key": flag.key,
+            "event": event_type,
+            "timestamp": datetime.now(UTC).isoformat(),
+            **summary,
+        },
+    )
 
 
 async def create_flag(session: AsyncSession, data: dict[str, Any]) -> FeatureFlagDB:
@@ -69,9 +74,12 @@ async def create_flag(session: AsyncSession, data: dict[str, Any]) -> FeatureFla
     for v in data.get("variations", []):
         vid = str(uuid4())
         row = VariationDB(
-            id=vid, flag_id=flag_id,
-            key=v["key"], name=v.get("name") or v["key"],
-            value=json.dumps(v["value"]), description=v.get("description"),
+            id=vid,
+            flag_id=flag_id,
+            key=v["key"],
+            name=v.get("name") or v["key"],
+            value=json.dumps(v["value"]),
+            description=v.get("description"),
         )
         variation_rows.append(row)
         if v["key"] == data.get("default_variation_key"):
@@ -81,7 +89,9 @@ async def create_flag(session: AsyncSession, data: dict[str, Any]) -> FeatureFla
         default_variation_id = variation_rows[0].id
 
     flag = FeatureFlagDB(
-        id=flag_id, key=data["key"], name=data["name"],
+        id=flag_id,
+        key=data["key"],
+        name=data["name"],
         description=data.get("description"),
         flag_type=data.get("flag_type", "boolean"),
         status="inactive",
@@ -104,10 +114,17 @@ async def create_flag(session: AsyncSession, data: dict[str, Any]) -> FeatureFla
     result = await flag_repository.create_flag(session, flag)
 
     await audit_repository.create_log(
-        session, action="created", entity_type="flag",
-        entity_id=flag.id, entity_key=flag.key,
+        session,
+        action="created",
+        entity_type="flag",
+        entity_id=flag.id,
+        entity_key=flag.key,
         actor=data.get("created_by", "system"),
-        changes={"name": flag.name, "flag_type": flag.flag_type, "environment": flag.environment},
+        changes={
+            "name": flag.name,
+            "flag_type": flag.flag_type,
+            "environment": flag.environment,
+        },
     )
 
     await _notify_flag_change("flag.created", flag, session)
@@ -120,7 +137,18 @@ async def update_flag(
     data: dict[str, Any],
 ) -> FeatureFlagDB:
     changes: dict[str, Any] = {}
-    simple_fields = ("name", "description", "flag_type", "environment", "owner", "flag_classification", "ticket_url", "runbook_url", "owner_team", "namespace")
+    simple_fields = (
+        "name",
+        "description",
+        "flag_type",
+        "environment",
+        "owner",
+        "flag_classification",
+        "ticket_url",
+        "runbook_url",
+        "owner_team",
+        "namespace",
+    )
     for field in simple_fields:
         if field in data:
             old_val = getattr(existing, field)
@@ -141,7 +169,11 @@ async def update_flag(
     if "prerequisites" in data:
         prereq_data = data["prerequisites"]
         prereqs = [
-            p if isinstance(p, dict) else p.model_dump() if hasattr(p, 'model_dump') else {"flag_key": p.flag_key, "variation_key": p.variation_key}
+            p
+            if isinstance(p, dict)
+            else p.model_dump()
+            if hasattr(p, "model_dump")
+            else {"flag_key": p.flag_key, "variation_key": p.variation_key}
             for p in prereq_data
         ]
         await _check_circular_prerequisites(session, existing.key, prereqs)
@@ -149,7 +181,7 @@ async def update_flag(
         existing.set_prerequisites(prereqs)
 
     if "is_permanent" in data:
-        old_val = getattr(existing, 'is_permanent', False)
+        old_val = getattr(existing, "is_permanent", False)
         if old_val != data["is_permanent"]:
             changes["is_permanent"] = {"old": old_val, "new": data["is_permanent"]}
         existing.is_permanent = data["is_permanent"]
@@ -157,7 +189,10 @@ async def update_flag(
     if "expires_at" in data:
         if data["expires_at"]:
             from datetime import datetime as dt
-            existing.expires_at = dt.fromisoformat(data["expires_at"].replace("Z", "+00:00"))
+
+            existing.expires_at = dt.fromisoformat(
+                data["expires_at"].replace("Z", "+00:00")
+            )
         else:
             existing.expires_at = None
         changes["expires_at"] = {"updated": True}
@@ -167,7 +202,10 @@ async def update_flag(
         if data["lifecycle_stage"] in valid_stages:
             old_stage = existing.lifecycle_stage
             if old_stage != data["lifecycle_stage"]:
-                changes["lifecycle_stage"] = {"old": old_stage, "new": data["lifecycle_stage"]}
+                changes["lifecycle_stage"] = {
+                    "old": old_stage,
+                    "new": data["lifecycle_stage"],
+                }
             existing.lifecycle_stage = data["lifecycle_stage"]
 
     if "variations" in data:
@@ -177,9 +215,12 @@ async def update_flag(
         for v in data["variations"]:
             vid = str(uuid4())
             row = VariationDB(
-                id=vid, flag_id=existing.id,
-                key=v["key"], name=v.get("name") or v["key"],
-                value=json.dumps(v["value"]), description=v.get("description"),
+                id=vid,
+                flag_id=existing.id,
+                key=v["key"],
+                name=v.get("name") or v["key"],
+                value=json.dumps(v["value"]),
+                description=v.get("description"),
             )
             existing.variations.append(row)
             if v["key"] == data.get("default_variation_key"):
@@ -192,8 +233,12 @@ async def update_flag(
 
     if changes:
         await audit_repository.create_log(
-            session, action="updated", entity_type="flag",
-            entity_id=existing.id, entity_key=existing.key, changes=changes,
+            session,
+            action="updated",
+            entity_type="flag",
+            entity_id=existing.id,
+            entity_key=existing.key,
+            changes=changes,
         )
 
     await _notify_flag_change("flag.updated", existing, session)
@@ -212,8 +257,11 @@ async def toggle_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFlag
     result = await flag_repository.update_flag(session, flag)
 
     await audit_repository.create_log(
-        session, action="toggled", entity_type="flag",
-        entity_id=flag.id, entity_key=flag.key,
+        session,
+        action="toggled",
+        entity_type="flag",
+        entity_id=flag.id,
+        entity_key=flag.key,
         changes={"status": {"old": old_status, "new": flag.status}},
     )
     await _notify_flag_change("flag.toggled", flag, session)
@@ -227,8 +275,11 @@ async def archive_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFla
     result = await flag_repository.update_flag(session, flag)
 
     await audit_repository.create_log(
-        session, action="archived", entity_type="flag",
-        entity_id=flag.id, entity_key=flag.key,
+        session,
+        action="archived",
+        entity_type="flag",
+        entity_id=flag.id,
+        entity_key=flag.key,
         changes={"status": {"old": old_status, "new": "archived"}},
     )
     await _notify_flag_change("flag.archived", flag, session)
@@ -242,8 +293,11 @@ async def restore_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFla
     result = await flag_repository.update_flag(session, flag)
 
     await audit_repository.create_log(
-        session, action="restored", entity_type="flag",
-        entity_id=flag.id, entity_key=flag.key,
+        session,
+        action="restored",
+        entity_type="flag",
+        entity_id=flag.id,
+        entity_key=flag.key,
         changes={"status": {"old": old_status, "new": "inactive"}},
     )
     await _notify_flag_change("flag.restored", flag, session)
@@ -264,8 +318,12 @@ async def clone_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFlagD
     for v in flag.variations:
         vid = str(uuid4())
         row = VariationDB(
-            id=vid, flag_id=new_flag_id,
-            key=v.key, name=v.name, value=v.value, description=v.description,
+            id=vid,
+            flag_id=new_flag_id,
+            key=v.key,
+            name=v.name,
+            value=v.value,
+            description=v.description,
         )
         variation_rows.append(row)
         if v.id == flag.default_variation_id:
@@ -275,20 +333,29 @@ async def clone_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFlagD
         default_variation_id = variation_rows[0].id
 
     new_flag = FeatureFlagDB(
-        id=new_flag_id, key=new_key, name=f"{flag.name} (Copy)",
-        description=flag.description, flag_type=flag.flag_type,
-        status="inactive", environment=flag.environment,
+        id=new_flag_id,
+        key=new_key,
+        name=f"{flag.name} (Copy)",
+        description=flag.description,
+        flag_type=flag.flag_type,
+        status="inactive",
+        environment=flag.environment,
         default_variation_id=default_variation_id or "",
-        tags=flag.tags, targeting_rules=flag.targeting_rules,
-        created_by=flag.created_by, owner=flag.owner,
+        tags=flag.tags,
+        targeting_rules=flag.targeting_rules,
+        created_by=flag.created_by,
+        owner=flag.owner,
         variations=variation_rows,
     )
 
     result = await flag_repository.create_flag(session, new_flag)
 
     await audit_repository.create_log(
-        session, action="cloned", entity_type="flag",
-        entity_id=new_flag.id, entity_key=new_flag.key,
+        session,
+        action="cloned",
+        entity_type="flag",
+        entity_id=new_flag.id,
+        entity_key=new_flag.key,
         changes={"cloned_from": flag.key},
     )
     await _notify_flag_change("flag.created", new_flag, session)
@@ -297,8 +364,11 @@ async def clone_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFlagD
 
 async def delete_flag(session: AsyncSession, flag: FeatureFlagDB) -> None:
     await audit_repository.create_log(
-        session, action="deleted", entity_type="flag",
-        entity_id=flag.id, entity_key=flag.key,
+        session,
+        action="deleted",
+        entity_type="flag",
+        entity_id=flag.id,
+        entity_key=flag.key,
         changes={"name": flag.name, "flag_type": flag.flag_type},
     )
     await _notify_flag_change("flag.deleted", flag, session)
@@ -311,17 +381,28 @@ async def compile_ruleset(session: AsyncSession) -> list[dict[str, Any]]:
 
     for flag in active_flags:
         variations = [
-            {"id": v.id, "key": v.key, "name": v.name, "value": v.get_value(), "description": v.description}
+            {
+                "id": v.id,
+                "key": v.key,
+                "name": v.name,
+                "value": v.get_value(),
+                "description": v.description,
+            }
             for v in flag.variations
         ]
-        ruleset.append({
-            "id": flag.id, "key": flag.key, "name": flag.name,
-            "flag_type": flag.flag_type, "status": flag.status,
-            "environment": flag.environment,
-            "default_variation_id": flag.default_variation_id,
-            "variations": variations,
-            "targeting_rules": flag.get_targeting_rules(),
-            "tags": flag.get_tags(),
-        })
+        ruleset.append(
+            {
+                "id": flag.id,
+                "key": flag.key,
+                "name": flag.name,
+                "flag_type": flag.flag_type,
+                "status": flag.status,
+                "environment": flag.environment,
+                "default_variation_id": flag.default_variation_id,
+                "variations": variations,
+                "targeting_rules": flag.get_targeting_rules(),
+                "tags": flag.get_tags(),
+            }
+        )
 
     return ruleset

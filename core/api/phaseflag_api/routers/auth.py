@@ -8,7 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from phaseflag_api.database import get_session
 from phaseflag_api.middleware.auth import get_current_user
 from phaseflag_api.models.users import UserDB
-from phaseflag_api.services.auth_service import create_token, hash_password, verify_password
+from phaseflag_api.services.auth_service import (
+    create_token,
+    hash_password,
+    verify_password,
+)
 
 router = APIRouter()
 
@@ -40,7 +44,9 @@ class UserResponse(BaseModel):
 async def register(body: RegisterRequest, session: AsyncSession = Depends(get_session)):
     existing = await session.execute(select(UserDB).where(UserDB.email == body.email))
     if existing.scalar_one_or_none():
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered.")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Email already registered."
+        )
 
     count_result = await session.execute(select(func.count()).select_from(UserDB))
     user_count = count_result.scalar() or 0
@@ -55,7 +61,15 @@ async def register(body: RegisterRequest, session: AsyncSession = Depends(get_se
     await session.flush()
 
     token = create_token(user)
-    return {"token": token, "user": {"id": user.id, "email": user.email, "name": user.name, "role": user.role}}
+    return {
+        "token": token,
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+            "role": user.role,
+        },
+    }
 
 
 @router.post("/auth/login", response_model=AuthResponse)
@@ -63,13 +77,24 @@ async def login(body: LoginRequest, session: AsyncSession = Depends(get_session)
     result = await session.execute(select(UserDB).where(UserDB.email == body.email))
     user = result.scalar_one_or_none()
     if not user or not verify_password(body.password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password.",
+        )
 
     if not user.password_hash.startswith(("$2b$", "$2a$", "$2y$")):
         user.password_hash = hash_password(body.password)
 
     token = create_token(user)
-    return {"token": token, "user": {"id": user.id, "email": user.email, "name": user.name, "role": user.role}}
+    return {
+        "token": token,
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+            "role": user.role,
+        },
+    }
 
 
 @router.get("/auth/me", response_model=UserResponse)

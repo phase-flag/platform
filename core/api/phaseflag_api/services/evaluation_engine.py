@@ -60,6 +60,7 @@ def _safe_regex_match(pattern: str, text: str) -> bool:
             except (OSError, ValueError):
                 pass
 
+
 from packaging.version import Version  # noqa: E402
 
 
@@ -148,7 +149,9 @@ def _evaluate_condition(condition: dict[str, Any], context: dict[str, Any]) -> b
     return False
 
 
-def _evaluate_conditions(conditions: list[dict[str, Any]], context: dict[str, Any]) -> bool:
+def _evaluate_conditions(
+    conditions: list[dict[str, Any]], context: dict[str, Any]
+) -> bool:
     """All conditions in a rule must match (AND logic)."""
     return all(_evaluate_condition(c, context) for c in conditions)
 
@@ -217,6 +220,7 @@ def evaluate(flag: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
 # Sticky assignment support
 # ---------------------------------------------------------------------------
 
+
 def get_sticky_variation(
     flag_key: str,
     user_id: str,
@@ -231,6 +235,7 @@ def get_sticky_variation(
 # ---------------------------------------------------------------------------
 # Group-based rollout
 # ---------------------------------------------------------------------------
+
 
 def _group_hash(flag_key: str, group_id: str) -> int:
     """Hash for group-level bucketing (account/team/tenant)."""
@@ -251,6 +256,7 @@ def evaluate_group_rollout(
 # ---------------------------------------------------------------------------
 # Weighted multivariate allocation
 # ---------------------------------------------------------------------------
+
 
 def allocate_weighted_variation(
     flag_key: str,
@@ -273,6 +279,7 @@ def allocate_weighted_variation(
 # ---------------------------------------------------------------------------
 # Prerequisite evaluation with topological sort
 # ---------------------------------------------------------------------------
+
 
 def topological_sort_prerequisites(
     flags: dict[str, dict[str, Any]],
@@ -317,12 +324,22 @@ def evaluate_with_prerequisites(
     """
     target_flag = flags.get(target_key)
     if not target_flag:
-        return {"variation_id": None, "variation_key": None, "value": None, "reason": "flag_not_found"}
+        return {
+            "variation_id": None,
+            "variation_key": None,
+            "value": None,
+            "reason": "flag_not_found",
+        }
 
     try:
         eval_order = topological_sort_prerequisites(flags, target_key)
     except ValueError:
-        return {"variation_id": None, "variation_key": None, "value": None, "reason": "circular_prerequisite"}
+        return {
+            "variation_id": None,
+            "variation_key": None,
+            "value": None,
+            "reason": "circular_prerequisite",
+        }
 
     # Evaluate prerequisites in order, collecting results
     results: dict[str, dict[str, Any]] = {}
@@ -347,14 +364,25 @@ def evaluate_with_prerequisites(
                     }
         results[key] = evaluate(flag, context)
 
-    return results.get(target_key, {"variation_id": None, "variation_key": None, "value": None, "reason": "default"})
+    return results.get(
+        target_key,
+        {
+            "variation_id": None,
+            "variation_key": None,
+            "value": None,
+            "reason": "default",
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
 # Evaluation with full trace (explainability)
 # ---------------------------------------------------------------------------
 
-def evaluate_with_trace(flag: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
+
+def evaluate_with_trace(
+    flag: dict[str, Any], context: dict[str, Any]
+) -> dict[str, Any]:
     """Evaluate a flag and return a detailed trace of the evaluation.
 
     Returns the normal evaluation result plus a 'trace' key with details
@@ -387,13 +415,15 @@ def evaluate_with_trace(flag: dict[str, Any], context: dict[str, Any]) -> dict[s
         condition_results = []
         for cond in conditions:
             matched = _evaluate_condition(cond, context)
-            condition_results.append({
-                "attribute": cond.get("attribute"),
-                "operator": cond.get("operator"),
-                "target_value": cond.get("value"),
-                "actual_value": context.get(cond.get("attribute", "")),
-                "matched": matched,
-            })
+            condition_results.append(
+                {
+                    "attribute": cond.get("attribute"),
+                    "operator": cond.get("operator"),
+                    "target_value": cond.get("value"),
+                    "actual_value": context.get(cond.get("attribute", "")),
+                    "matched": matched,
+                }
+            )
 
         all_matched = all(cr["matched"] for cr in condition_results)
         rule_trace: dict[str, Any] = {
@@ -409,7 +439,9 @@ def evaluate_with_trace(flag: dict[str, Any], context: dict[str, Any]) -> dict[s
                 result = _make_result(rule["variation_id"], "targeting_match")
                 rule_trace["served_variation"] = result["variation_key"]
             elif rule.get("percentage_rollout"):
-                vid = _resolve_percentage_rollout(rule["percentage_rollout"], flag["key"], context)
+                vid = _resolve_percentage_rollout(
+                    rule["percentage_rollout"], flag["key"], context
+                )
                 if vid:
                     result = _make_result(vid, "percentage_rollout")
                     rule_trace["served_variation"] = result["variation_key"]
@@ -434,7 +466,10 @@ def evaluate_with_trace(flag: dict[str, Any], context: dict[str, Any]) -> dict[s
 # Anonymous-to-authenticated identity merging
 # ---------------------------------------------------------------------------
 
-def merge_identity(anonymous_id: str, authenticated_id: str, sticky_assignments: dict) -> dict:
+
+def merge_identity(
+    anonymous_id: str, authenticated_id: str, sticky_assignments: dict
+) -> dict:
     """Merge anonymous user assignments to authenticated user.
 
     Returns updated sticky assignments dict with anonymous assignments transferred.

@@ -26,18 +26,29 @@ class EnvironmentDB(Base):
     __tablename__ = "environments"
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    project_id = Column(String(36), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    project_id = Column(
+        String(36), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False
+    )
     slug = Column(String(255), nullable=False, index=True)
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     color = Column(String(7), nullable=True)  # Hex color for UI
-    api_key = Column(String(255), nullable=False, unique=True, default=_generate_api_key)
+    api_key = Column(
+        String(255), nullable=False, unique=True, default=_generate_api_key
+    )
     is_production = Column(Boolean, nullable=False, default=False)
     frozen = Column(Boolean, nullable=False, default=False)
     frozen_reason = Column(Text, nullable=True)
-    settings = Column(Text, nullable=False, default="{}")  # JSON blob for env-specific settings
+    settings = Column(
+        Text, nullable=False, default="{}"
+    )  # JSON blob for env-specific settings
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
 
     project = relationship("ProjectDB", back_populates="environments")
 

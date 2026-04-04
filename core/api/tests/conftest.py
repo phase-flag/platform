@@ -15,6 +15,7 @@ from httpx import ASGITransport, AsyncClient  # noqa: E402
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine  # noqa: E402
 
 from phaseflag_api.config import settings  # noqa: E402
+
 # Force settings to use our test keys
 settings.API_SECRET_KEY = "test-api-key"  # type: ignore[misc]
 settings.JWT_SECRET_KEY = "test-jwt-secret-key-32chars!!"  # type: ignore[misc]
@@ -84,16 +85,22 @@ async def auth_headers(client: AsyncClient) -> dict[str, str]:
     email = f"test-{uuid4().hex[:8]}@example.com"
     password = "TestPassword123!"
 
-    await client.post("/api/v1/auth/register", json={
-        "email": email,
-        "password": password,
-        "name": "Test User",
-    })
+    await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": email,
+            "password": password,
+            "name": "Test User",
+        },
+    )
 
-    resp = await client.post("/api/v1/auth/login", json={
-        "email": email,
-        "password": password,
-    })
+    resp = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": email,
+            "password": password,
+        },
+    )
 
     if resp.status_code == 200:
         data = resp.json()
@@ -105,31 +112,40 @@ async def auth_headers(client: AsyncClient) -> dict[str, str]:
 
 
 @pytest_asyncio.fixture
-async def admin_headers(client: AsyncClient, db_session: AsyncSession) -> dict[str, str]:
+async def admin_headers(
+    client: AsyncClient, db_session: AsyncSession
+) -> dict[str, str]:
     """Create an admin user and return auth headers."""
     from phaseflag_api.models.users import UserDB
 
     email = f"admin-{uuid4().hex[:8]}@example.com"
     password = "AdminPassword123!"
 
-    await client.post("/api/v1/auth/register", json={
-        "email": email,
-        "password": password,
-        "name": "Admin User",
-    })
+    await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": email,
+            "password": password,
+            "name": "Admin User",
+        },
+    )
 
     # Upgrade to admin role
     from sqlalchemy import update
+
     async with test_session_factory() as session:
         await session.execute(
             update(UserDB).where(UserDB.email == email).values(role="admin")
         )
         await session.commit()
 
-    resp = await client.post("/api/v1/auth/login", json={
-        "email": email,
-        "password": password,
-    })
+    resp = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": email,
+            "password": password,
+        },
+    )
 
     if resp.status_code == 200:
         data = resp.json()

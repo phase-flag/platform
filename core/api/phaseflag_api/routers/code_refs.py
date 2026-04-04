@@ -1,6 +1,5 @@
 """Code reference endpoints — flag usage tracking across codebases."""
 
-
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,10 +36,13 @@ class RefOut(BaseModel):
     uploaded_at: str
 
 
-@router.post("/code-refs/upload", status_code=201, dependencies=[require_role("editor")])
+@router.post(
+    "/code-refs/upload", status_code=201, dependencies=[require_role("editor")]
+)
 async def upload_references(body: UploadRefsRequest):
     count = code_ref_service.upload_references(
-        body.flag_key, [r.model_dump() for r in body.references],
+        body.flag_key,
+        [r.model_dump() for r in body.references],
     )
     return {"uploaded": count, "flag_key": body.flag_key}
 

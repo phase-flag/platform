@@ -1,6 +1,5 @@
 """Tests for rollout-related functionality (targeting conditions, percentage rollouts)."""
 
-
 from phaseflag_api.services.evaluation_engine import (
     _evaluate_condition,
     _normalised_hash,
@@ -67,7 +66,11 @@ def test_condition_lt():
 
 def test_condition_matches_regex():
     """The 'matches_regex' operator matches a regex pattern."""
-    cond = {"attribute": "email", "operator": "matches_regex", "value": r".*@company\.com$"}
+    cond = {
+        "attribute": "email",
+        "operator": "matches_regex",
+        "value": r".*@company\.com$",
+    }
     assert _evaluate_condition(cond, {"email": "user@company.com"}) is True
     assert _evaluate_condition(cond, {"email": "user@other.com"}) is False
 

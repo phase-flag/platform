@@ -52,11 +52,15 @@ def test_evaluate_default_no_rules():
 
 def test_evaluate_targeting_match():
     """A matching targeting rule serves the specified variation."""
-    flag = _make_flag(rules=[{
-        "priority": 1,
-        "conditions": [{"attribute": "plan", "operator": "is", "value": "pro"}],
-        "variation_id": "v-on",
-    }])
+    flag = _make_flag(
+        rules=[
+            {
+                "priority": 1,
+                "conditions": [{"attribute": "plan", "operator": "is", "value": "pro"}],
+                "variation_id": "v-on",
+            }
+        ]
+    )
 
     result = evaluate(flag, {"user_id": "user1", "plan": "pro"})
     assert result["variation_key"] == "on"
@@ -66,11 +70,17 @@ def test_evaluate_targeting_match():
 
 def test_evaluate_targeting_no_match():
     """A non-matching targeting rule falls through to default."""
-    flag = _make_flag(rules=[{
-        "priority": 1,
-        "conditions": [{"attribute": "plan", "operator": "is", "value": "enterprise"}],
-        "variation_id": "v-on",
-    }])
+    flag = _make_flag(
+        rules=[
+            {
+                "priority": 1,
+                "conditions": [
+                    {"attribute": "plan", "operator": "is", "value": "enterprise"}
+                ],
+                "variation_id": "v-on",
+            }
+        ]
+    )
 
     result = evaluate(flag, {"user_id": "user1", "plan": "free"})
     assert result["variation_key"] == "off"
@@ -79,16 +89,20 @@ def test_evaluate_targeting_no_match():
 
 def test_evaluate_percentage_rollout():
     """Percentage rollout distributes users deterministically."""
-    flag = _make_flag(rules=[{
-        "priority": 1,
-        "conditions": [],
-        "percentage_rollout": {
-            "variations": [
-                {"variation_id": "v-on", "weight": 50},
-                {"variation_id": "v-off", "weight": 50},
-            ],
-        },
-    }])
+    flag = _make_flag(
+        rules=[
+            {
+                "priority": 1,
+                "conditions": [],
+                "percentage_rollout": {
+                    "variations": [
+                        {"variation_id": "v-on", "weight": 50},
+                        {"variation_id": "v-off", "weight": 50},
+                    ],
+                },
+            }
+        ]
+    )
 
     on_count = 0
     total = 1000
@@ -103,18 +117,22 @@ def test_evaluate_percentage_rollout():
 
 def test_evaluate_priority_ordering():
     """Higher priority (lower number) rules are evaluated first."""
-    flag = _make_flag(rules=[
-        {
-            "priority": 2,
-            "conditions": [{"attribute": "country", "operator": "is", "value": "US"}],
-            "variation_id": "v-off",
-        },
-        {
-            "priority": 1,
-            "conditions": [{"attribute": "plan", "operator": "is", "value": "pro"}],
-            "variation_id": "v-on",
-        },
-    ])
+    flag = _make_flag(
+        rules=[
+            {
+                "priority": 2,
+                "conditions": [
+                    {"attribute": "country", "operator": "is", "value": "US"}
+                ],
+                "variation_id": "v-off",
+            },
+            {
+                "priority": 1,
+                "conditions": [{"attribute": "plan", "operator": "is", "value": "pro"}],
+                "variation_id": "v-on",
+            },
+        ]
+    )
 
     result = evaluate(flag, {"user_id": "user1", "plan": "pro", "country": "US"})
     assert result["variation_key"] == "on"
@@ -123,14 +141,18 @@ def test_evaluate_priority_ordering():
 
 def test_evaluate_multiple_conditions_and():
     """All conditions in a rule must match (AND logic)."""
-    flag = _make_flag(rules=[{
-        "priority": 1,
-        "conditions": [
-            {"attribute": "plan", "operator": "is", "value": "pro"},
-            {"attribute": "country", "operator": "is", "value": "US"},
-        ],
-        "variation_id": "v-on",
-    }])
+    flag = _make_flag(
+        rules=[
+            {
+                "priority": 1,
+                "conditions": [
+                    {"attribute": "plan", "operator": "is", "value": "pro"},
+                    {"attribute": "country", "operator": "is", "value": "US"},
+                ],
+                "variation_id": "v-on",
+            }
+        ]
+    )
 
     # Both match
     result = evaluate(flag, {"user_id": "u1", "plan": "pro", "country": "US"})
@@ -143,11 +165,15 @@ def test_evaluate_multiple_conditions_and():
 
 def test_evaluate_with_trace_returns_trace():
     """evaluate_with_trace includes a trace with rule evaluation details."""
-    flag = _make_flag(rules=[{
-        "priority": 1,
-        "conditions": [{"attribute": "plan", "operator": "is", "value": "pro"}],
-        "variation_id": "v-on",
-    }])
+    flag = _make_flag(
+        rules=[
+            {
+                "priority": 1,
+                "conditions": [{"attribute": "plan", "operator": "is", "value": "pro"}],
+                "variation_id": "v-on",
+            }
+        ]
+    )
 
     result = evaluate_with_trace(flag, {"user_id": "u1", "plan": "pro"})
     assert "trace" in result
@@ -158,8 +184,18 @@ def test_evaluate_with_trace_returns_trace():
 def test_topological_sort_simple():
     """Topological sort orders prerequisites before dependents."""
     flags = {
-        "flag-a": {"key": "flag-a", "prerequisites": [{"flag_key": "flag-b", "variation_key": "on"}], "variations": [], "targeting_rules": []},
-        "flag-b": {"key": "flag-b", "prerequisites": [], "variations": [], "targeting_rules": []},
+        "flag-a": {
+            "key": "flag-a",
+            "prerequisites": [{"flag_key": "flag-b", "variation_key": "on"}],
+            "variations": [],
+            "targeting_rules": [],
+        },
+        "flag-b": {
+            "key": "flag-b",
+            "prerequisites": [],
+            "variations": [],
+            "targeting_rules": [],
+        },
     }
 
     order = topological_sort_prerequisites(flags, "flag-a")
@@ -169,8 +205,18 @@ def test_topological_sort_simple():
 def test_topological_sort_circular_raises():
     """Circular prerequisites raise ValueError."""
     flags = {
-        "flag-a": {"key": "flag-a", "prerequisites": [{"flag_key": "flag-b", "variation_key": "on"}], "variations": [], "targeting_rules": []},
-        "flag-b": {"key": "flag-b", "prerequisites": [{"flag_key": "flag-a", "variation_key": "on"}], "variations": [], "targeting_rules": []},
+        "flag-a": {
+            "key": "flag-a",
+            "prerequisites": [{"flag_key": "flag-b", "variation_key": "on"}],
+            "variations": [],
+            "targeting_rules": [],
+        },
+        "flag-b": {
+            "key": "flag-b",
+            "prerequisites": [{"flag_key": "flag-a", "variation_key": "on"}],
+            "variations": [],
+            "targeting_rules": [],
+        },
     }
 
     with pytest.raises(ValueError, match="Circular"):
@@ -180,17 +226,27 @@ def test_topological_sort_circular_raises():
 def test_evaluate_with_prerequisites_met():
     """When all prerequisites are met, the target flag evaluates normally."""
     flags = {
-        "prereq": _make_flag(key="prereq", rules=[{
-            "priority": 1,
-            "conditions": [],
-            "variation_id": "v-on",
-        }]),
+        "prereq": _make_flag(
+            key="prereq",
+            rules=[
+                {
+                    "priority": 1,
+                    "conditions": [],
+                    "variation_id": "v-on",
+                }
+            ],
+        ),
         "target": {
-            **_make_flag(key="target", rules=[{
-                "priority": 1,
-                "conditions": [],
-                "variation_id": "v-on",
-            }]),
+            **_make_flag(
+                key="target",
+                rules=[
+                    {
+                        "priority": 1,
+                        "conditions": [],
+                        "variation_id": "v-on",
+                    }
+                ],
+            ),
             "prerequisites": [{"flag_key": "prereq", "variation_key": "on"}],
         },
     }
@@ -204,11 +260,16 @@ def test_evaluate_with_prerequisites_failed():
     flags = {
         "prereq": _make_flag(key="prereq"),  # No rules -> default (off)
         "target": {
-            **_make_flag(key="target", rules=[{
-                "priority": 1,
-                "conditions": [],
-                "variation_id": "v-on",
-            }]),
+            **_make_flag(
+                key="target",
+                rules=[
+                    {
+                        "priority": 1,
+                        "conditions": [],
+                        "variation_id": "v-on",
+                    }
+                ],
+            ),
             "prerequisites": [{"flag_key": "prereq", "variation_key": "on"}],
         },
     }

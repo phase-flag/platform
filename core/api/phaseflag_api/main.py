@@ -19,9 +19,29 @@ from phaseflag_api.middleware.license import get_license_info, init_license
 from phaseflag_api.middleware.rate_limit import RateLimitMiddleware
 from phaseflag_api.middleware.security_headers import SecurityHeadersMiddleware
 from phaseflag_api.routers import (
-    admin, analytics, audit, auth, code_refs, developer, environments, evaluation,
-    experiments, flags, governance, health, lifecycle, migrations, observability,
-    pipelines, projects, remote_config, reporting, rollback, sdk, segments, sso,
+    admin,
+    analytics,
+    audit,
+    auth,
+    code_refs,
+    developer,
+    environments,
+    evaluation,
+    experiments,
+    flags,
+    governance,
+    health,
+    lifecycle,
+    migrations,
+    observability,
+    pipelines,
+    projects,
+    remote_config,
+    reporting,
+    rollback,
+    sdk,
+    segments,
+    sso,
     webhooks,
 )
 
@@ -29,6 +49,7 @@ from phaseflag_api.routers import (
 # ---------------------------------------------------------------------------
 # Structured JSON logging
 # ---------------------------------------------------------------------------
+
 
 class _JsonFormatter(logging.Formatter):
     """Emit log records as single-line JSON for log aggregation (ELK, Loki, Datadog)."""
@@ -64,6 +85,7 @@ logger = logging.getLogger(__name__)
 # Request correlation ID middleware
 # ---------------------------------------------------------------------------
 
+
 class RequestIdMiddleware(BaseHTTPMiddleware):
     """Attach a unique request ID to every request for distributed tracing."""
 
@@ -95,6 +117,7 @@ async def lifespan(app: FastAPI):
     """Startup / shutdown lifecycle."""
     logger.info("Creating database tables ...")
     import phaseflag_api.models  # noqa: F401
+
     await create_tables()
     init_license()
 
@@ -117,30 +140,96 @@ All endpoints (except `/health`) require an API key via:
 """
 
 _TAGS_METADATA = [
-    {"name": "flags", "description": "Create, read, update, toggle, archive, and delete feature flags."},
-    {"name": "segments", "description": "Manage reusable audience segments with targeting conditions."},
-    {"name": "sdk", "description": "SDK-facing endpoints for ruleset download, server-side evaluation, and event ingestion."},
-    {"name": "evaluation", "description": "Flag evaluation explainability and batch evaluation."},
-    {"name": "audit", "description": "Query the immutable audit log of all flag mutations."},
-    {"name": "analytics", "description": "Flag evaluation analytics aggregated by time period and variation."},
-    {"name": "webhooks", "description": "Configure webhooks that fire on flag lifecycle events."},
-    {"name": "auth", "description": "User registration, login, and session management."},
-    {"name": "lifecycle", "description": "Flag lifecycle management: stage transitions, stale detection, expiration."},
+    {
+        "name": "flags",
+        "description": "Create, read, update, toggle, archive, and delete feature flags.",
+    },
+    {
+        "name": "segments",
+        "description": "Manage reusable audience segments with targeting conditions.",
+    },
+    {
+        "name": "sdk",
+        "description": "SDK-facing endpoints for ruleset download, server-side evaluation, and event ingestion.",
+    },
+    {
+        "name": "evaluation",
+        "description": "Flag evaluation explainability and batch evaluation.",
+    },
+    {
+        "name": "audit",
+        "description": "Query the immutable audit log of all flag mutations.",
+    },
+    {
+        "name": "analytics",
+        "description": "Flag evaluation analytics aggregated by time period and variation.",
+    },
+    {
+        "name": "webhooks",
+        "description": "Configure webhooks that fire on flag lifecycle events.",
+    },
+    {
+        "name": "auth",
+        "description": "User registration, login, and session management.",
+    },
+    {
+        "name": "lifecycle",
+        "description": "Flag lifecycle management: stage transitions, stale detection, expiration.",
+    },
     {"name": "projects", "description": "Organization and project management."},
-    {"name": "environments", "description": "Environment management, cloning, and promotion."},
-    {"name": "governance", "description": "Change requests, approvals, freeze windows, service accounts."},
-    {"name": "pipelines", "description": "Progressive rollout pipelines with canary/blue-green templates."},
-    {"name": "rollback", "description": "Rollback rules and metric-triggered rollbacks."},
-    {"name": "remote_config", "description": "Typed remote configuration with schema validation."},
-    {"name": "experiments", "description": "A/B and multivariate experiments with statistical analysis."},
-    {"name": "migrations", "description": "Migration flags with staged workflow support."},
-    {"name": "code_refs", "description": "Code reference scanning and flag usage tracking."},
-    {"name": "observability", "description": "System metrics, flag health, and inventory."},
-    {"name": "developer", "description": "Developer workflow tools: test users, forced treatments, rollout simulation."},
-    {"name": "reporting", "description": "Analytics reports: stale flags, releases, drift, timelines, top flags."},
-    {"name": "admin", "description": "Platform-wide admin endpoints for SaaS operators."},
+    {
+        "name": "environments",
+        "description": "Environment management, cloning, and promotion.",
+    },
+    {
+        "name": "governance",
+        "description": "Change requests, approvals, freeze windows, service accounts.",
+    },
+    {
+        "name": "pipelines",
+        "description": "Progressive rollout pipelines with canary/blue-green templates.",
+    },
+    {
+        "name": "rollback",
+        "description": "Rollback rules and metric-triggered rollbacks.",
+    },
+    {
+        "name": "remote_config",
+        "description": "Typed remote configuration with schema validation.",
+    },
+    {
+        "name": "experiments",
+        "description": "A/B and multivariate experiments with statistical analysis.",
+    },
+    {
+        "name": "migrations",
+        "description": "Migration flags with staged workflow support.",
+    },
+    {
+        "name": "code_refs",
+        "description": "Code reference scanning and flag usage tracking.",
+    },
+    {
+        "name": "observability",
+        "description": "System metrics, flag health, and inventory.",
+    },
+    {
+        "name": "developer",
+        "description": "Developer workflow tools: test users, forced treatments, rollout simulation.",
+    },
+    {
+        "name": "reporting",
+        "description": "Analytics reports: stale flags, releases, drift, timelines, top flags.",
+    },
+    {
+        "name": "admin",
+        "description": "Platform-wide admin endpoints for SaaS operators.",
+    },
     {"name": "health", "description": "Service health and readiness checks."},
-    {"name": "sso", "description": "SSO configuration: SAML 2.0, OIDC, and SCIM 2.0 provisioning."},
+    {
+        "name": "sso",
+        "description": "SSO configuration: SAML 2.0, OIDC, and SCIM 2.0 provisioning.",
+    },
     {"name": "license", "description": "License and feature-gate information."},
 ]
 
@@ -151,7 +240,10 @@ app = FastAPI(
     lifespan=lifespan,
     openapi_tags=_TAGS_METADATA,
     contact={"name": "Phase Flag", "url": "https://phaseflag.dev"},
-    license_info={"name": "Apache 2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0"},
+    license_info={
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    },
 )
 
 # -- Middleware (order matters: last added = first executed) --
@@ -160,7 +252,14 @@ app.add_middleware(
     allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-API-Key", "X-PhaseFlag-Environment", "X-Request-ID", "If-None-Match"],
+    allow_headers=[
+        "Authorization",
+        "Content-Type",
+        "X-API-Key",
+        "X-PhaseFlag-Environment",
+        "X-Request-ID",
+        "If-None-Match",
+    ],
 )
 app.add_middleware(RateLimitMiddleware, requests_per_minute=120)
 app.add_middleware(SecurityHeadersMiddleware)
@@ -233,6 +332,7 @@ app.add_api_route(
 if settings.DEPLOYMENT_MODE != DeploymentMode.OSS:
     try:
         from phaseflag_api.routers.enterprise import router as enterprise_router
+
         app.include_router(enterprise_router, tags=["enterprise"])
         logger.info("Enterprise routers mounted")
     except ImportError:

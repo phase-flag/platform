@@ -71,10 +71,14 @@ async def test_update_flag(client: AsyncClient, auth_headers: dict):
     payload = make_flag_payload(key="update-test")
     await client.post("/api/v1/flags", json=payload, headers=auth_headers)
 
-    resp = await client.put("/api/v1/flags/update-test", json={
-        "name": "Updated Name",
-        "description": "Updated description",
-    }, headers=auth_headers)
+    resp = await client.put(
+        "/api/v1/flags/update-test",
+        json={
+            "name": "Updated Name",
+            "description": "Updated description",
+        },
+        headers=auth_headers,
+    )
 
     assert resp.status_code == 200
     data = resp.json()

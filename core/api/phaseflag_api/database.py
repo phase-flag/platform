@@ -14,7 +14,9 @@ from phaseflag_api.config import settings
 
 _is_sqlite = settings.DATABASE_URL.startswith("sqlite")
 
-_db_url = settings.DATABASE_URL.replace("?sslmode=", "?ssl=").replace("&sslmode=", "&ssl=")
+_db_url = settings.DATABASE_URL.replace("?sslmode=", "?ssl=").replace(
+    "&sslmode=", "&ssl="
+)
 
 _engine_kwargs: dict = {"echo": settings.LOG_LEVEL.upper() == "DEBUG"}
 if not _is_sqlite:
@@ -29,6 +31,7 @@ async_session_factory = async_sessionmaker(
 )
 
 if _is_sqlite:
+
     @event.listens_for(engine.sync_engine, "connect")
     def _set_sqlite_pragma(dbapi_conn, connection_record):
         cursor = dbapi_conn.cursor()
@@ -39,6 +42,7 @@ if _is_sqlite:
 
 class Base(DeclarativeBase):
     """Declarative base for all ORM models."""
+
     pass
 
 

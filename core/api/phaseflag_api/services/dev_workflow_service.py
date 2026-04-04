@@ -13,6 +13,7 @@ _forced_treatments: dict[str, dict] = {}  # flag_key -> {user_id: variation}
 # Test users
 # ---------------------------------------------------------------------------
 
+
 def create_test_user(user_id: str, name: str, attributes: dict | None = None) -> dict:
     _test_users[user_id] = {
         "user_id": user_id,
@@ -35,6 +36,7 @@ def delete_test_user(user_id: str) -> bool:
 # Forced treatments
 # ---------------------------------------------------------------------------
 
+
 def set_forced_treatment(flag_key: str, user_id: str, variation: str) -> None:
     if flag_key not in _forced_treatments:
         _forced_treatments[flag_key] = {}
@@ -45,7 +47,9 @@ def get_forced_treatment(flag_key: str, user_id: str) -> str | None:
     return _forced_treatments.get(flag_key, {}).get(user_id)
 
 
-def clear_forced_treatments(flag_key: str | None = None, user_id: str | None = None) -> None:
+def clear_forced_treatments(
+    flag_key: str | None = None, user_id: str | None = None
+) -> None:
     if flag_key and user_id:
         _forced_treatments.get(flag_key, {}).pop(user_id, None)
     elif flag_key:
@@ -57,6 +61,7 @@ def clear_forced_treatments(flag_key: str | None = None, user_id: str | None = N
 # ---------------------------------------------------------------------------
 # Simulation / debug
 # ---------------------------------------------------------------------------
+
 
 def simulate_rollout(flag_key: str, total_users: int, percentage: int) -> dict:
     """Simulate how many users would be affected by a rollout percentage."""
@@ -73,7 +78,9 @@ def simulate_rollout(flag_key: str, total_users: int, percentage: int) -> dict:
         "total_users": total_users,
         "percentage": percentage,
         "affected_count": affected,
-        "actual_percentage": round(affected / total_users * 100, 2) if total_users > 0 else 0,
+        "actual_percentage": round(affected / total_users * 100, 2)
+        if total_users > 0
+        else 0,
     }
 
 

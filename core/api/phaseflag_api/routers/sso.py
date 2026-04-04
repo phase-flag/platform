@@ -10,6 +10,7 @@ router = APIRouter(dependencies=[Depends(require_api_key)])
 
 # --- Schemas ---
 
+
 class SAMLConfig(BaseModel):
     entity_id: str
     sso_url: str
@@ -37,6 +38,7 @@ _scim_users: dict[str, dict] = {}
 
 
 # --- SAML 2.0 ---
+
 
 @router.post("/sso/saml/configure", dependencies=[require_role("admin")])
 async def configure_saml(config: SAMLConfig):
@@ -66,6 +68,7 @@ async def saml_assertion_consumer(body: dict):
 
 
 # --- OIDC ---
+
 
 @router.post("/sso/oidc/configure", dependencies=[require_role("admin")])
 async def configure_oidc(config: OIDCConfig):
@@ -99,6 +102,7 @@ async def oidc_callback(code: str = ""):
 
 
 # --- SCIM 2.0 ---
+
 
 @router.get("/scim/v2/Users")
 async def scim_list_users():

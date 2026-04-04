@@ -7,7 +7,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from phaseflag_api.database import get_session
-from phaseflag_api.middleware.auth import get_current_user, require_api_key, require_role
+from phaseflag_api.middleware.auth import (
+    get_current_user,
+    require_api_key,
+    require_role,
+)
 from phaseflag_api.services import governance_service
 from phaseflag_api.services.policy_engine import PolicyEngine
 
@@ -15,6 +19,7 @@ router = APIRouter(dependencies=[Depends(require_api_key)])
 
 
 # --- Change Request Schemas ---
+
 
 class ChangeRequestCreate(BaseModel):
     title: str = Field(..., max_length=255)
@@ -56,11 +61,17 @@ class PaginatedChangeRequests(BaseModel):
 
 def _cr_to_out(cr) -> ChangeRequestOut:
     return ChangeRequestOut(
-        id=cr.id, title=cr.title, description=cr.description,
-        entity_type=cr.entity_type, entity_key=cr.entity_key,
-        change_type=cr.change_type, status=cr.status,
-        requested_by=cr.requested_by, reviewed_by=cr.reviewed_by,
-        review_comment=cr.review_comment, environment=cr.environment,
+        id=cr.id,
+        title=cr.title,
+        description=cr.description,
+        entity_type=cr.entity_type,
+        entity_key=cr.entity_key,
+        change_type=cr.change_type,
+        status=cr.status,
+        requested_by=cr.requested_by,
+        reviewed_by=cr.reviewed_by,
+        review_comment=cr.review_comment,
+        environment=cr.environment,
         requires_approval_count=cr.requires_approval_count,
         approval_count=cr.approval_count,
         created_at=cr.created_at.isoformat(),
@@ -69,6 +80,7 @@ def _cr_to_out(cr) -> ChangeRequestOut:
 
 
 # --- Service Account Schemas ---
+
 
 class ServiceAccountCreate(BaseModel):
     name: str = Field(..., max_length=255)
@@ -91,14 +103,20 @@ class ServiceAccountOut(BaseModel):
 
 def _sa_to_out(sa) -> ServiceAccountOut:
     return ServiceAccountOut(
-        id=sa.id, name=sa.name, description=sa.description,
-        api_key=sa.api_key, role=sa.role, scopes=sa.get_scopes(),
-        active=sa.active, created_by=sa.created_by,
+        id=sa.id,
+        name=sa.name,
+        description=sa.description,
+        api_key=sa.api_key,
+        role=sa.role,
+        scopes=sa.get_scopes(),
+        active=sa.active,
+        created_by=sa.created_by,
         created_at=sa.created_at.isoformat(),
     )
 
 
 # --- Freeze Window Schemas ---
+
 
 class FreezeWindowCreate(BaseModel):
     name: str = Field(..., max_length=255)
@@ -122,16 +140,27 @@ class FreezeWindowOut(BaseModel):
 
 def _fw_to_out(fw) -> FreezeWindowOut:
     return FreezeWindowOut(
-        id=fw.id, name=fw.name, environment=fw.environment,
-        starts_at=fw.starts_at.isoformat(), ends_at=fw.ends_at.isoformat(),
-        reason=fw.reason, active=fw.active, created_by=fw.created_by,
+        id=fw.id,
+        name=fw.name,
+        environment=fw.environment,
+        starts_at=fw.starts_at.isoformat(),
+        ends_at=fw.ends_at.isoformat(),
+        reason=fw.reason,
+        active=fw.active,
+        created_by=fw.created_by,
         created_at=fw.created_at.isoformat(),
     )
 
 
 # --- Change Request Endpoints ---
 
-@router.post("/changes", response_model=ChangeRequestOut, status_code=201, dependencies=[require_role("editor")])
+
+@router.post(
+    "/changes",
+    response_model=ChangeRequestOut,
+    status_code=201,
+    dependencies=[require_role("editor")],
+)
 async def create_change_request(
     body: ChangeRequestCreate,
     user: dict = Depends(get_current_user),
@@ -139,9 +168,12 @@ async def create_change_request(
 ):
     cr = await governance_service.create_change_request(
         session,
-        title=body.title, description=body.description,
-        entity_type=body.entity_type, entity_key=body.entity_key,
-        change_type=body.change_type, payload=body.payload,
+        title=body.title,
+        description=body.description,
+        entity_type=body.entity_type,
+        entity_key=body.entity_key,
+        change_type=body.change_type,
+        payload=body.payload,
         requested_by=user.get("email", "system"),
         environment=body.environment,
         requires_approval_count=body.requires_approval_count,
@@ -157,7 +189,10 @@ async def list_change_requests(
     session: AsyncSession = Depends(get_session),
 ):
     items, total = await governance_service.list_change_requests(
-        session, status_filter=status_filter, limit=limit, offset=offset,
+        session,
+        status_filter=status_filter,
+        limit=limit,
+        offset=offset,
     )
     return PaginatedChangeRequests(items=[_cr_to_out(cr) for cr in items], total=total)
 
@@ -170,9 +205,14 @@ async def get_change_request(cr_id: str, session: AsyncSession = Depends(get_ses
     return _cr_to_out(cr)
 
 
-@router.post("/changes/{cr_id}/approve", response_model=ChangeRequestOut, dependencies=[require_role("admin")])
+@router.post(
+    "/changes/{cr_id}/approve",
+    response_model=ChangeRequestOut,
+    dependencies=[require_role("admin")],
+)
 async def approve_change_request(
-    cr_id: str, body: ReviewRequest,
+    cr_id: str,
+    body: ReviewRequest,
     user: dict = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
@@ -182,19 +222,29 @@ async def approve_change_request(
 
     # Enforce two-person rule
     try:
-        await governance_service.enforce_two_person_rule(session, cr_id, user.get("email", "system"))
+        await governance_service.enforce_two_person_rule(
+            session, cr_id, user.get("email", "system")
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
     updated = await governance_service.approve_change_request(
-        session, cr, reviewer=user.get("email", "system"), comment=body.comment,
+        session,
+        cr,
+        reviewer=user.get("email", "system"),
+        comment=body.comment,
     )
     return _cr_to_out(updated)
 
 
-@router.post("/changes/{cr_id}/reject", response_model=ChangeRequestOut, dependencies=[require_role("admin")])
+@router.post(
+    "/changes/{cr_id}/reject",
+    response_model=ChangeRequestOut,
+    dependencies=[require_role("admin")],
+)
 async def reject_change_request(
-    cr_id: str, body: ReviewRequest,
+    cr_id: str,
+    body: ReviewRequest,
     user: dict = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
@@ -202,38 +252,61 @@ async def reject_change_request(
     if not cr:
         raise HTTPException(status_code=404, detail="Change request not found")
     updated = await governance_service.reject_change_request(
-        session, cr, reviewer=user.get("email", "system"), comment=body.comment,
+        session,
+        cr,
+        reviewer=user.get("email", "system"),
+        comment=body.comment,
     )
     return _cr_to_out(updated)
 
 
 # --- Service Account Endpoints ---
 
-@router.post("/service-accounts", response_model=ServiceAccountOut, status_code=201, dependencies=[require_role("admin")])
+
+@router.post(
+    "/service-accounts",
+    response_model=ServiceAccountOut,
+    status_code=201,
+    dependencies=[require_role("admin")],
+)
 async def create_service_account(
     body: ServiceAccountCreate,
     user: dict = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
     sa = await governance_service.create_service_account(
-        session, name=body.name, description=body.description,
-        role=body.role, scopes=body.scopes,
+        session,
+        name=body.name,
+        description=body.description,
+        role=body.role,
+        scopes=body.scopes,
         created_by=user.get("email", "system"),
     )
     return _sa_to_out(sa)
 
 
-@router.get("/service-accounts", response_model=list[ServiceAccountOut], dependencies=[require_role("admin")])
+@router.get(
+    "/service-accounts",
+    response_model=list[ServiceAccountOut],
+    dependencies=[require_role("admin")],
+)
 async def list_service_accounts(session: AsyncSession = Depends(get_session)):
     accounts, _ = await governance_service.list_service_accounts(session)
     return [_sa_to_out(sa) for sa in accounts]
 
 
-@router.delete("/service-accounts/{sa_id}", status_code=204, dependencies=[require_role("admin")])
-async def revoke_service_account(sa_id: str, session: AsyncSession = Depends(get_session)):
+@router.delete(
+    "/service-accounts/{sa_id}", status_code=204, dependencies=[require_role("admin")]
+)
+async def revoke_service_account(
+    sa_id: str, session: AsyncSession = Depends(get_session)
+):
     from sqlalchemy import select
     from phaseflag_api.models.governance import ServiceAccountDB
-    result = await session.execute(select(ServiceAccountDB).where(ServiceAccountDB.id == sa_id))
+
+    result = await session.execute(
+        select(ServiceAccountDB).where(ServiceAccountDB.id == sa_id)
+    )
     sa = result.scalar_one_or_none()
     if not sa:
         raise HTTPException(status_code=404, detail="Service account not found")
@@ -242,7 +315,13 @@ async def revoke_service_account(sa_id: str, session: AsyncSession = Depends(get
 
 # --- Freeze Window Endpoints ---
 
-@router.post("/freeze-windows", response_model=FreezeWindowOut, status_code=201, dependencies=[require_role("admin")])
+
+@router.post(
+    "/freeze-windows",
+    response_model=FreezeWindowOut,
+    status_code=201,
+    dependencies=[require_role("admin")],
+)
 async def create_freeze_window(
     body: FreezeWindowCreate,
     user: dict = Depends(get_current_user),
@@ -250,7 +329,8 @@ async def create_freeze_window(
 ):
     fw = await governance_service.create_freeze_window(
         session,
-        name=body.name, environment=body.environment,
+        name=body.name,
+        environment=body.environment,
         starts_at=dt.fromisoformat(body.starts_at.replace("Z", "+00:00")),
         ends_at=dt.fromisoformat(body.ends_at.replace("Z", "+00:00")),
         reason=body.reason,
@@ -264,11 +344,14 @@ async def list_freeze_windows(
     active_only: bool = Query(True),
     session: AsyncSession = Depends(get_session),
 ):
-    windows = await governance_service.list_freeze_windows(session, active_only=active_only)
+    windows = await governance_service.list_freeze_windows(
+        session, active_only=active_only
+    )
     return [_fw_to_out(fw) for fw in windows]
 
 
 # --- Break-Glass Schemas ---
+
 
 class BreakGlassCreate(BaseModel):
     flag_key: str = Field(..., max_length=255)
@@ -299,17 +382,29 @@ class PaginatedBreakGlass(BaseModel):
 
 def _bg_to_out(event) -> BreakGlassOut:
     return BreakGlassOut(
-        id=event.id, flag_key=event.flag_key, environment=event.environment,
-        action=event.action, reason=event.reason, performed_by=event.performed_by,
-        approved_by=event.approved_by, changes_json=event.changes_json,
+        id=event.id,
+        flag_key=event.flag_key,
+        environment=event.environment,
+        action=event.action,
+        reason=event.reason,
+        performed_by=event.performed_by,
+        approved_by=event.approved_by,
+        changes_json=event.changes_json,
         expires_at=event.expires_at.isoformat() if event.expires_at else None,
-        reverted=event.reverted, created_at=event.created_at.isoformat(),
+        reverted=event.reverted,
+        created_at=event.created_at.isoformat(),
     )
 
 
 # --- Break-Glass Endpoints ---
 
-@router.post("/break-glass", response_model=BreakGlassOut, status_code=201, dependencies=[require_role("admin")])
+
+@router.post(
+    "/break-glass",
+    response_model=BreakGlassOut,
+    status_code=201,
+    dependencies=[require_role("admin")],
+)
 async def create_break_glass(
     body: BreakGlassCreate,
     user: dict = Depends(get_current_user),
@@ -334,11 +429,17 @@ async def list_break_glass_events(
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
-    items, total = await governance_service.list_break_glass_events(session, limit=limit, offset=offset)
+    items, total = await governance_service.list_break_glass_events(
+        session, limit=limit, offset=offset
+    )
     return PaginatedBreakGlass(items=[_bg_to_out(e) for e in items], total=total)
 
 
-@router.post("/break-glass/{event_id}/revert", response_model=BreakGlassOut, dependencies=[require_role("admin")])
+@router.post(
+    "/break-glass/{event_id}/revert",
+    response_model=BreakGlassOut,
+    dependencies=[require_role("admin")],
+)
 async def revert_break_glass(
     event_id: str,
     session: AsyncSession = Depends(get_session),
@@ -352,9 +453,13 @@ async def revert_break_glass(
 
 # --- Policy Evaluation ---
 
+
 class PolicyEvaluateRequest(BaseModel):
     action: str = Field(..., examples=["flag.modify", "flag.deploy_production"])
-    resource: dict = Field(default_factory=dict, examples=[{"flag_key": "dark-mode", "environment": "production"}])
+    resource: dict = Field(
+        default_factory=dict,
+        examples=[{"flag_key": "dark-mode", "environment": "production"}],
+    )
 
 
 class PolicyEvaluateResponse(BaseModel):
@@ -369,11 +474,14 @@ async def evaluate_policy(
     session: AsyncSession = Depends(get_session),
 ):
     """Evaluate an access control policy for the current user."""
-    allowed, reason = await PolicyEngine.evaluate_policy(session, body.action, user, body.resource)
+    allowed, reason = await PolicyEngine.evaluate_policy(
+        session, body.action, user, body.resource
+    )
     return PolicyEvaluateResponse(allowed=allowed, reason=reason)
 
 
 # --- Token Rotation / Key Expiry Schemas ---
+
 
 class KeyRotationOut(BaseModel):
     id: str
@@ -393,7 +501,12 @@ class KeyExpiryOut(BaseModel):
 
 # --- Token Rotation / Key Expiry Endpoints ---
 
-@router.post("/service-accounts/{sa_id}/rotate-key", response_model=KeyRotationOut, dependencies=[require_role("admin")])
+
+@router.post(
+    "/service-accounts/{sa_id}/rotate-key",
+    response_model=KeyRotationOut,
+    dependencies=[require_role("admin")],
+)
 async def rotate_service_account_key(
     sa_id: str,
     session: AsyncSession = Depends(get_session),
@@ -406,7 +519,11 @@ async def rotate_service_account_key(
     return KeyRotationOut(**result)
 
 
-@router.put("/service-accounts/{sa_id}/expiry", response_model=KeyExpiryOut, dependencies=[require_role("admin")])
+@router.put(
+    "/service-accounts/{sa_id}/expiry",
+    response_model=KeyExpiryOut,
+    dependencies=[require_role("admin")],
+)
 async def set_key_expiry(
     sa_id: str,
     body: KeyExpiryRequest,

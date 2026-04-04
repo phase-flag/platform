@@ -41,7 +41,9 @@ class FeatureFlagDB(Base):
     lifecycle_stage = Column(String(20), nullable=False, default="development")
 
     # Phase 1.1 — Enhanced flag model
-    flag_classification = Column(String(20), nullable=False, default="release")  # release, experiment, ops_killswitch, permission, migration
+    flag_classification = Column(
+        String(20), nullable=False, default="release"
+    )  # release, experiment, ops_killswitch, permission, migration
     is_permanent = Column(Boolean, nullable=False, default=False)
     expires_at = Column(DateTime, nullable=True)
     ticket_url = Column(String(2048), nullable=True)
@@ -55,7 +57,12 @@ class FeatureFlagDB(Base):
     created_by = Column(String(255), nullable=False, default="system")
     owner = Column(String(255), nullable=False, default="system")
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
     last_evaluated_at = Column(DateTime, nullable=True)
     evaluation_count = Column(Integer, nullable=False, default=0)
 
@@ -93,7 +100,9 @@ class VariationDB(Base):
     __tablename__ = "variations"
 
     id = Column(String(36), primary_key=True, default=_uuid)
-    flag_id = Column(String(36), ForeignKey("feature_flags.id", ondelete="CASCADE"), nullable=False)
+    flag_id = Column(
+        String(36), ForeignKey("feature_flags.id", ondelete="CASCADE"), nullable=False
+    )
     key = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
     value = Column(Text, nullable=False)

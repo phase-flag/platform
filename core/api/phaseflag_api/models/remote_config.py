@@ -23,16 +23,25 @@ class RemoteConfigDB(Base):
     key = Column(String(255), nullable=False, index=True)
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
-    config_type = Column(String(20), nullable=False, default="string")  # string, number, boolean, json
+    config_type = Column(
+        String(20), nullable=False, default="string"
+    )  # string, number, boolean, json
     value = Column(Text, nullable=False)  # JSON-encoded
     default_value = Column(Text, nullable=False)  # JSON-encoded fallback
     environment = Column(String(255), nullable=False, default="development")
     schema_definition = Column(Text, nullable=True)  # JSON Schema for validation
-    is_server_only = Column(Boolean, nullable=False, default=False)  # If true, not sent to client SDKs
+    is_server_only = Column(
+        Boolean, nullable=False, default=False
+    )  # If true, not sent to client SDKs
     version = Column(Integer, nullable=False, default=1)
     owner = Column(String(255), nullable=False, default="system")
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
 
     def get_value(self) -> Any:
         return json.loads(self.value) if self.value else None

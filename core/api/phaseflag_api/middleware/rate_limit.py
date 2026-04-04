@@ -60,7 +60,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     def _cleanup_stale_ips(self, now: float) -> None:
         window = 60.0
         stale_ips = [
-            ip for ip, timestamps in self._buckets.items()
+            ip
+            for ip, timestamps in self._buckets.items()
             if not timestamps or (now - timestamps[-1]) > window
         ]
         for ip in stale_ips:
@@ -77,7 +78,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         now = time.monotonic()
         window = 60.0
 
-        if (now - self._last_cleanup > _CLEANUP_INTERVAL) or len(self._buckets) > _MAX_TRACKED_IPS:
+        if (now - self._last_cleanup > _CLEANUP_INTERVAL) or len(
+            self._buckets
+        ) > _MAX_TRACKED_IPS:
             self._cleanup_stale_ips(now)
 
         self._buckets[ip] = [t for t in self._buckets[ip] if now - t < window]
@@ -98,5 +101,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._buckets[ip].append(now)
         response = await call_next(request)
         response.headers["X-RateLimit-Limit"] = str(self.rpm)
-        response.headers["X-RateLimit-Remaining"] = str(self.rpm - len(self._buckets[ip]))
+        response.headers["X-RateLimit-Remaining"] = str(
+            self.rpm - len(self._buckets[ip])
+        )
         return response

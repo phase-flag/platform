@@ -102,6 +102,7 @@ async def get_ruleset(request: Request, session: AsyncSession = Depends(get_sess
     if_none_match = request.headers.get("if-none-match")
     if if_none_match and if_none_match == etag:
         from fastapi.responses import Response
+
         return Response(status_code=304, headers={"ETag": etag})
 
     return JSONResponse(
@@ -111,9 +112,14 @@ async def get_ruleset(request: Request, session: AsyncSession = Depends(get_sess
 
 
 @router.get("/sdk/stream")
-async def stream_flag_updates(request: Request, session: AsyncSession = Depends(get_session)):
+async def stream_flag_updates(
+    request: Request, session: AsyncSession = Depends(get_session)
+):
     if sse_manager.client_count >= MAX_SSE_CONNECTIONS:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Too many SSE connections.")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Too many SSE connections.",
+        )
 
     flags = await flag_service.compile_ruleset(session)
     version = str(hash(tuple(f["id"] for f in flags)) & 0xFFFFFFFF)
@@ -138,13 +144,19 @@ async def stream_flag_updates(request: Request, session: AsyncSession = Depends(
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )
 
 
 @router.get("/sdk/stream/status", response_model=SSEStatusResponse)
 async def stream_status():
-    return SSEStatusResponse(connected_clients=sse_manager.client_count, streaming_enabled=True)
+    return SSEStatusResponse(
+        connected_clients=sse_manager.client_count, streaming_enabled=True
+    )
 
 
 @router.get("/sdk/bootstrap")
@@ -160,7 +172,9 @@ async def get_bootstrap(session: AsyncSession = Depends(get_session)):
     version = str(hash(tuple(f["id"] for f in flags)) & 0xFFFFFFFF)
 
     # Include segment definitions for local resolution
-    segments_list, _ = await segment_repository.list_segments(session, limit=10000, offset=0)
+    segments_list, _ = await segment_repository.list_segments(
+        session, limit=10000, offset=0
+    )
     segments = [
         {"id": s.id, "key": s.key, "name": s.name, "conditions": s.get_conditions()}
         for s in segments_list
@@ -176,6 +190,7 @@ async def get_bootstrap(session: AsyncSession = Depends(get_session)):
     # Sign the payload
     from phaseflag_api.config import settings
     import json as _json
+
     payload_bytes = _json.dumps(payload, sort_keys=True).encode()
     signature = _hmac.new(
         settings.API_SECRET_KEY.encode(),
@@ -196,7 +211,9 @@ async def _compile_flag(flag_db, session: AsyncSession) -> dict[str, Any]:
             if seg:
                 rule.setdefault("conditions", []).extend(seg.get_conditions())
 
-    prerequisites = flag_db.get_prerequisites() if hasattr(flag_db, "get_prerequisites") else []
+    prerequisites = (
+        flag_db.get_prerequisites() if hasattr(flag_db, "get_prerequisites") else []
+    )
     return {
         "id": flag_db.id,
         "key": flag_db.key,
@@ -211,7 +228,9 @@ async def _compile_flag(flag_db, session: AsyncSession) -> dict[str, Any]:
     }
 
 
-async def _build_flags_map(session: AsyncSession, target_key: str) -> dict[str, dict[str, Any]]:
+async def _build_flags_map(
+    session: AsyncSession, target_key: str
+) -> dict[str, dict[str, Any]]:
     """Build a flags map including all prerequisite chains for a target flag."""
     visited: set[str] = set()
     flags_map: dict[str, dict[str, Any]] = {}
@@ -233,12 +252,20 @@ async def _build_flags_map(session: AsyncSession, target_key: str) -> dict[str, 
 
 
 @router.post("/sdk/evaluate", response_model=EvaluateResponse)
-async def evaluate_flag(body: EvaluateRequest, session: AsyncSession = Depends(get_session)):
+async def evaluate_flag(
+    body: EvaluateRequest, session: AsyncSession = Depends(get_session)
+):
     flag_db = await flag_repository.get_flag_by_key(session, body.flag_key)
     if flag_db is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Flag '{body.flag_key}' not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Flag '{body.flag_key}' not found",
+        )
     if flag_db.status != "active":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Flag '{body.flag_key}' is not active (status={flag_db.status})")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Flag '{body.flag_key}' is not active (status={flag_db.status})",
+        )
 
     ctx_dict = {
         "user_id": body.context.user_id,
@@ -305,14 +332,18 @@ async def evaluate_all_flags(
 
 
 @router.post("/sdk/events", status_code=status.HTTP_202_ACCEPTED)
-async def ingest_events(batch: EventBatch, session: AsyncSession = Depends(get_session)):
+async def ingest_events(
+    batch: EventBatch, session: AsyncSession = Depends(get_session)
+):
     import json as _json
 
     for ev in batch.events:
         ts = datetime.fromisoformat(ev.timestamp) if ev.timestamp else datetime.now(UTC)
         row = EvaluationEventDB(
-            flag_key=ev.flag_key, variation_key=ev.variation_key,
-            user_id=ev.user_id, timestamp=ts,
+            flag_key=ev.flag_key,
+            variation_key=ev.variation_key,
+            user_id=ev.user_id,
+            timestamp=ts,
             event_metadata=_json.dumps(ev.metadata) if ev.metadata else "{}",
         )
         session.add(row)

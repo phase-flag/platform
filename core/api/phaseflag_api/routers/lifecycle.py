@@ -5,7 +5,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from phaseflag_api.database import get_session
-from phaseflag_api.middleware.auth import get_current_user, require_api_key, require_role
+from phaseflag_api.middleware.auth import (
+    get_current_user,
+    require_api_key,
+    require_role,
+)
 from phaseflag_api.repositories import flag_repository
 from phaseflag_api.services import lifecycle_service
 
@@ -38,7 +42,11 @@ class ExpiringFlag(BaseModel):
     status: str
 
 
-@router.post("/flags/{key}/lifecycle/transition", response_model=LifecycleTransitionResponse, dependencies=[require_role("editor")])
+@router.post(
+    "/flags/{key}/lifecycle/transition",
+    response_model=LifecycleTransitionResponse,
+    dependencies=[require_role("editor")],
+)
 async def transition_flag_lifecycle(
     key: str,
     body: LifecycleTransitionRequest,
@@ -48,11 +56,16 @@ async def transition_flag_lifecycle(
     """Transition a flag to a new lifecycle stage."""
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
+        )
 
     old_stage = flag.lifecycle_stage or "development"
     updated = await lifecycle_service.transition_lifecycle(
-        session, flag, body.target_stage, actor=user.get("email", "system"),
+        session,
+        flag,
+        body.target_stage,
+        actor=user.get("email", "system"),
     )
 
     return LifecycleTransitionResponse(
@@ -95,14 +108,22 @@ class CleanupTeamScore(BaseModel):
     total_count: int
 
 
-@router.post("/lifecycle/run-stale-detection", response_model=StaleDetectionResponse, dependencies=[require_role("admin")])
+@router.post(
+    "/lifecycle/run-stale-detection",
+    response_model=StaleDetectionResponse,
+    dependencies=[require_role("admin")],
+)
 async def run_stale_detection(session: AsyncSession = Depends(get_session)):
     """Run stale detection: flags not updated in 90 days are marked stale."""
     marked = await lifecycle_service.run_stale_detection(session)
     return StaleDetectionResponse(marked_stale=len(marked), flags=marked)
 
 
-@router.post("/lifecycle/run-expiration-check", response_model=ExpirationCheckResponse, dependencies=[require_role("admin")])
+@router.post(
+    "/lifecycle/run-expiration-check",
+    response_model=ExpirationCheckResponse,
+    dependencies=[require_role("admin")],
+)
 async def run_expiration_check(session: AsyncSession = Depends(get_session)):
     """Run expiration check: flags past expires_at are auto-archived."""
     archived = await lifecycle_service.run_expiration_check(session)

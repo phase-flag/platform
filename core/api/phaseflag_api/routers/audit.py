@@ -27,8 +27,11 @@ class AuditLogOut(BaseModel):
 
 def _log_to_out(log) -> AuditLogOut:
     return AuditLogOut(
-        id=log.id, action=log.action, entity_type=log.entity_type,
-        entity_id=log.entity_id, entity_key=log.entity_key,
+        id=log.id,
+        action=log.action,
+        entity_type=log.entity_type,
+        entity_id=log.entity_id,
+        entity_key=log.entity_key,
         actor=log.actor,
         changes=json.loads(log.changes) if log.changes else {},
         timestamp=log.timestamp.isoformat(),
@@ -44,8 +47,11 @@ async def list_audit_logs(
     session: AsyncSession = Depends(get_session),
 ):
     logs = await audit_repository.list_logs(
-        session, entity_key=entity_key, entity_type=entity_type,
-        limit=limit, offset=offset,
+        session,
+        entity_key=entity_key,
+        entity_type=entity_type,
+        limit=limit,
+        offset=offset,
     )
     return [_log_to_out(log) for log in logs]
 
@@ -58,7 +64,10 @@ async def list_flag_audit_logs(
     session: AsyncSession = Depends(get_session),
 ):
     logs = await audit_repository.list_logs(
-        session, entity_key=key, entity_type="flag",
-        limit=limit, offset=offset,
+        session,
+        entity_key=key,
+        entity_type="flag",
+        limit=limit,
+        offset=offset,
     )
     return [_log_to_out(log) for log in logs]

@@ -7,11 +7,14 @@ from httpx import AsyncClient
 @pytest.mark.asyncio
 async def test_register_user(client: AsyncClient):
     """Registering a new user returns success."""
-    resp = await client.post("/api/v1/auth/register", json={
-        "email": "newuser@example.com",
-        "password": "StrongPassword123!",
-        "name": "New User",
-    })
+    resp = await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "newuser@example.com",
+            "password": "StrongPassword123!",
+            "name": "New User",
+        },
+    )
 
     assert resp.status_code in (200, 201)
     data = resp.json()
@@ -37,16 +40,22 @@ async def test_register_duplicate_email(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_login_success(client: AsyncClient):
     """Logging in with valid credentials returns a JWT token."""
-    await client.post("/api/v1/auth/register", json={
-        "email": "loginuser@example.com",
-        "password": "ValidPassword123!",
-        "name": "Login User",
-    })
+    await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "loginuser@example.com",
+            "password": "ValidPassword123!",
+            "name": "Login User",
+        },
+    )
 
-    resp = await client.post("/api/v1/auth/login", json={
-        "email": "loginuser@example.com",
-        "password": "ValidPassword123!",
-    })
+    resp = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "loginuser@example.com",
+            "password": "ValidPassword123!",
+        },
+    )
 
     assert resp.status_code == 200
     data = resp.json()
@@ -56,16 +65,22 @@ async def test_login_success(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_login_invalid_password(client: AsyncClient):
     """Logging in with wrong password returns 401."""
-    await client.post("/api/v1/auth/register", json={
-        "email": "wrongpw@example.com",
-        "password": "CorrectPassword123!",
-        "name": "Test User",
-    })
+    await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "wrongpw@example.com",
+            "password": "CorrectPassword123!",
+            "name": "Test User",
+        },
+    )
 
-    resp = await client.post("/api/v1/auth/login", json={
-        "email": "wrongpw@example.com",
-        "password": "WrongPassword123!",
-    })
+    resp = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "wrongpw@example.com",
+            "password": "WrongPassword123!",
+        },
+    )
 
     assert resp.status_code in (400, 401, 403)
 
@@ -73,10 +88,13 @@ async def test_login_invalid_password(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_login_nonexistent_user(client: AsyncClient):
     """Logging in with a non-existent email returns 401."""
-    resp = await client.post("/api/v1/auth/login", json={
-        "email": "nosuchuser@example.com",
-        "password": "SomePassword123!",
-    })
+    resp = await client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "nosuchuser@example.com",
+            "password": "SomePassword123!",
+        },
+    )
 
     assert resp.status_code in (400, 401, 404)
 

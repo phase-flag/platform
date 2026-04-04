@@ -73,7 +73,9 @@ async def _compile_flag_for_eval(flag_db, session: AsyncSession) -> dict[str, An
             if seg:
                 rule.setdefault("conditions", []).extend(seg.get_conditions())
 
-    prerequisites = flag_db.get_prerequisites() if hasattr(flag_db, "get_prerequisites") else []
+    prerequisites = (
+        flag_db.get_prerequisites() if hasattr(flag_db, "get_prerequisites") else []
+    )
     return {
         "id": flag_db.id,
         "key": flag_db.key,
@@ -88,7 +90,9 @@ async def _compile_flag_for_eval(flag_db, session: AsyncSession) -> dict[str, An
     }
 
 
-async def _build_prerequisite_map(session: AsyncSession, target_key: str) -> dict[str, dict[str, Any]]:
+async def _build_prerequisite_map(
+    session: AsyncSession, target_key: str
+) -> dict[str, dict[str, Any]]:
     """Build a flags map including all prerequisite chains for a target flag."""
     visited: set[str] = set()
     flags_map: dict[str, dict[str, Any]] = {}
@@ -110,16 +114,24 @@ async def _build_prerequisite_map(session: AsyncSession, target_key: str) -> dic
 
 
 @router.post("/flags/{key}/explain", response_model=ExplainResponse)
-async def explain_flag(key: str, body: ExplainRequest, session: AsyncSession = Depends(get_session)):
+async def explain_flag(
+    key: str, body: ExplainRequest, session: AsyncSession = Depends(get_session)
+):
     """Evaluate a flag and return an explanation of why the result was chosen."""
     flag_db = await flag_repository.get_flag_by_key(session, key)
     if flag_db is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
+        )
     if flag_db.status != "active":
         return ExplainResponse(flag_key=key, reason="flag_inactive", rules_evaluated=0)
 
     compiled = await _compile_flag_for_eval(flag_db, session)
-    ctx_dict = {"user_id": body.context.user_id, "session_id": body.context.session_id, **(body.context.attributes or {})}
+    ctx_dict = {
+        "user_id": body.context.user_id,
+        "session_id": body.context.session_id,
+        **(body.context.attributes or {}),
+    }
 
     trace_result = evaluate_with_trace(compiled, ctx_dict)
 
@@ -135,40 +147,58 @@ async def explain_flag(key: str, body: ExplainRequest, session: AsyncSession = D
 
 
 @router.post("/evaluate/batch", response_model=list[BatchEvalResult])
-async def batch_evaluate(body: BatchEvalRequest, session: AsyncSession = Depends(get_session)):
+async def batch_evaluate(
+    body: BatchEvalRequest, session: AsyncSession = Depends(get_session)
+):
     """Evaluate multiple flags in one call using prerequisite-aware evaluation."""
-    ctx_dict = {"user_id": body.context.user_id, "session_id": body.context.session_id, **(body.context.attributes or {})}
+    ctx_dict = {
+        "user_id": body.context.user_id,
+        "session_id": body.context.session_id,
+        **(body.context.attributes or {}),
+    }
     results: list[BatchEvalResult] = []
 
     for flag_key in body.flag_keys:
         flag_db = await flag_repository.get_flag_by_key(session, flag_key)
         if flag_db is None or flag_db.status != "active":
-            results.append(BatchEvalResult(flag_key=flag_key, reason="flag_not_found_or_inactive"))
+            results.append(
+                BatchEvalResult(flag_key=flag_key, reason="flag_not_found_or_inactive")
+            )
             continue
 
         flags_map = await _build_prerequisite_map(session, flag_key)
         result = evaluate_with_prerequisites(flags_map, flag_key, ctx_dict)
-        results.append(BatchEvalResult(
-            flag_key=flag_key,
-            variation_key=result.get("variation_key"),
-            value=result.get("value"),
-            reason=result.get("reason", "default"),
-        ))
+        results.append(
+            BatchEvalResult(
+                flag_key=flag_key,
+                variation_key=result.get("variation_key"),
+                value=result.get("value"),
+                reason=result.get("reason", "default"),
+            )
+        )
 
     return results
 
 
 @router.post("/evaluate/group", response_model=GroupRolloutResponse)
-async def evaluate_group(body: GroupRolloutRequest, session: AsyncSession = Depends(get_session)):
+async def evaluate_group(
+    body: GroupRolloutRequest, session: AsyncSession = Depends(get_session)
+):
     """Evaluate whether a group (account/team/tenant) falls within a rollout percentage."""
     flag_db = await flag_repository.get_flag_by_key(session, body.flag_key)
     if flag_db is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found"
+        )
     if flag_db.status != "active":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Flag is not active")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Flag is not active"
+        )
 
     compiled = await _compile_flag_for_eval(flag_db, session)
-    in_rollout = evaluate_group_rollout(compiled, body.group_id, body.rollout_percentage)
+    in_rollout = evaluate_group_rollout(
+        compiled, body.group_id, body.rollout_percentage
+    )
 
     return GroupRolloutResponse(
         flag_key=body.flag_key,

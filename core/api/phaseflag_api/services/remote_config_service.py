@@ -30,16 +30,22 @@ async def create_config(
 ) -> RemoteConfigDB:
     existing = await get_config_by_key(session, key, environment)
     if existing:
-        raise HTTPException(status_code=409, detail=f"Config '{key}' already exists in '{environment}'")
+        raise HTTPException(
+            status_code=409, detail=f"Config '{key}' already exists in '{environment}'"
+        )
 
     # Validate value against schema if provided
     if schema_definition:
         valid, msg = validate_json_schema(value, schema_definition)
         if not valid:
-            raise HTTPException(status_code=422, detail=f"Value does not match schema: {msg}")
+            raise HTTPException(
+                status_code=422, detail=f"Value does not match schema: {msg}"
+            )
 
     config = RemoteConfigDB(
-        key=key, name=name, description=description,
+        key=key,
+        name=name,
+        description=description,
         config_type=config_type,
         value=json.dumps(value),
         default_value=json.dumps(default_value),
@@ -65,7 +71,9 @@ async def update_config(
         if schema_def:
             valid, msg = validate_json_schema(data["value"], schema_def)
             if not valid:
-                raise HTTPException(status_code=422, detail=f"Value does not match schema: {msg}")
+                raise HTTPException(
+                    status_code=422, detail=f"Value does not match schema: {msg}"
+                )
         config.set_value(data["value"])
         config.version += 1
     if "name" in data:
@@ -75,22 +83,32 @@ async def update_config(
     if "is_server_only" in data:
         config.is_server_only = data["is_server_only"]
     if "schema_definition" in data:
-        config.schema_definition = json.dumps(data["schema_definition"]) if data["schema_definition"] else None
+        config.schema_definition = (
+            json.dumps(data["schema_definition"]) if data["schema_definition"] else None
+        )
     config.updated_at = datetime.now(UTC)
     await session.flush()
     await session.refresh(config)
     return config
 
 
-async def get_config_by_key(session: AsyncSession, key: str, environment: str) -> RemoteConfigDB | None:
+async def get_config_by_key(
+    session: AsyncSession, key: str, environment: str
+) -> RemoteConfigDB | None:
     result = await session.execute(
-        select(RemoteConfigDB).where(RemoteConfigDB.key == key, RemoteConfigDB.environment == environment)
+        select(RemoteConfigDB).where(
+            RemoteConfigDB.key == key, RemoteConfigDB.environment == environment
+        )
     )
     return result.scalar_one_or_none()
 
 
-async def get_config_by_id(session: AsyncSession, config_id: str) -> RemoteConfigDB | None:
-    result = await session.execute(select(RemoteConfigDB).where(RemoteConfigDB.id == config_id))
+async def get_config_by_id(
+    session: AsyncSession, config_id: str
+) -> RemoteConfigDB | None:
+    result = await session.execute(
+        select(RemoteConfigDB).where(RemoteConfigDB.id == config_id)
+    )
     return result.scalar_one_or_none()
 
 
@@ -104,8 +122,20 @@ async def list_configs(
     base = select(RemoteConfigDB)
     if environment:
         base = base.where(RemoteConfigDB.environment == environment)
-    total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
-    items = (await session.execute(base.order_by(RemoteConfigDB.created_at.desc()).limit(limit).offset(offset))).scalars().all()
+    total = (
+        await session.execute(select(func.count()).select_from(base.subquery()))
+    ).scalar() or 0
+    items = (
+        (
+            await session.execute(
+                base.order_by(RemoteConfigDB.created_at.desc())
+                .limit(limit)
+                .offset(offset)
+            )
+        )
+        .scalars()
+        .all()
+    )
     return list(items), total
 
 
@@ -114,7 +144,9 @@ async def delete_config(session: AsyncSession, config: RemoteConfigDB) -> None:
     await session.flush()
 
 
-async def get_client_configs(session: AsyncSession, environment: str) -> list[dict[str, Any]]:
+async def get_client_configs(
+    session: AsyncSession, environment: str
+) -> list[dict[str, Any]]:
     """Return configs safe for client-side consumption."""
     result = await session.execute(
         select(RemoteConfigDB)
@@ -123,7 +155,12 @@ async def get_client_configs(session: AsyncSession, environment: str) -> list[di
     )
     configs = result.scalars().all()
     return [
-        {"key": c.key, "value": c.get_value(), "type": c.config_type, "version": c.version}
+        {
+            "key": c.key,
+            "value": c.get_value(),
+            "type": c.config_type,
+            "version": c.version,
+        }
         for c in configs
     ]
 
@@ -131,6 +168,7 @@ async def get_client_configs(session: AsyncSession, environment: str) -> list[di
 # ---------------------------------------------------------------------------
 # Schema validation
 # ---------------------------------------------------------------------------
+
 
 def validate_json_schema(value: Any, schema: dict) -> tuple[bool, str]:
     """Simple JSON schema validation without external deps."""
@@ -156,20 +194,26 @@ def validate_json_schema(value: Any, schema: dict) -> tuple[bool, str]:
     return True, "valid"
 
 
-async def get_config_history(session: AsyncSession, config_id: str, limit: int = 20) -> list[dict]:
+async def get_config_history(
+    session: AsyncSession, config_id: str, limit: int = 20
+) -> list[dict]:
     """Get version history for a config entry."""
     config = await session.get(RemoteConfigDB, config_id)
     if not config:
         return []
-    return [{
-        "version": config.version,
-        "value": config.get_value(),
-        "updated_at": config.updated_at.isoformat(),
-        "is_current": True,
-    }]
+    return [
+        {
+            "version": config.version,
+            "value": config.get_value(),
+            "updated_at": config.updated_at.isoformat(),
+            "is_current": True,
+        }
+    ]
 
 
-async def validate_config_value(session: AsyncSession, config_id: str, value: Any) -> dict:
+async def validate_config_value(
+    session: AsyncSession, config_id: str, value: Any
+) -> dict:
     """Validate a value against the config's schema definition."""
     config = await session.get(RemoteConfigDB, config_id)
     if not config:

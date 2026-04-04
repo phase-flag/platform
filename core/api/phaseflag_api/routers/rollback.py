@@ -35,26 +35,45 @@ class RollbackRuleOut(BaseModel):
 
 def _rule_to_out(r) -> RollbackRuleOut:
     return RollbackRuleOut(
-        id=r.id, flag_key=r.flag_key, metric_name=r.metric_name,
-        operator=r.operator, threshold=r.threshold,
-        window_minutes=r.window_minutes, action=r.action,
+        id=r.id,
+        flag_key=r.flag_key,
+        metric_name=r.metric_name,
+        operator=r.operator,
+        threshold=r.threshold,
+        window_minutes=r.window_minutes,
+        action=r.action,
         active=r.active,
-        last_triggered_at=r.last_triggered_at.isoformat() if r.last_triggered_at else None,
+        last_triggered_at=r.last_triggered_at.isoformat()
+        if r.last_triggered_at
+        else None,
         created_at=r.created_at.isoformat(),
     )
 
 
-@router.post("/rollback-rules", response_model=RollbackRuleOut, status_code=201, dependencies=[require_role("editor")])
-async def create_rollback_rule(body: RollbackRuleCreate, session: AsyncSession = Depends(get_session)):
+@router.post(
+    "/rollback-rules",
+    response_model=RollbackRuleOut,
+    status_code=201,
+    dependencies=[require_role("editor")],
+)
+async def create_rollback_rule(
+    body: RollbackRuleCreate, session: AsyncSession = Depends(get_session)
+):
     rule = await rollout_service.create_rollback_rule(
-        session, flag_key=body.flag_key, metric_name=body.metric_name,
-        operator=body.operator, threshold=body.threshold,
-        window_minutes=body.window_minutes, action=body.action,
+        session,
+        flag_key=body.flag_key,
+        metric_name=body.metric_name,
+        operator=body.operator,
+        threshold=body.threshold,
+        window_minutes=body.window_minutes,
+        action=body.action,
     )
     return _rule_to_out(rule)
 
 
 @router.get("/rollback-rules/{flag_key}", response_model=list[RollbackRuleOut])
-async def list_rollback_rules(flag_key: str, session: AsyncSession = Depends(get_session)):
+async def list_rollback_rules(
+    flag_key: str, session: AsyncSession = Depends(get_session)
+):
     rules = await rollout_service.list_rollback_rules(session, flag_key)
     return [_rule_to_out(r) for r in rules]

@@ -59,7 +59,7 @@ async def transition_lifecycle(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Cannot transition from '{current}' to '{target_stage}'. "
-                   f"Allowed: {', '.join(sorted(ALLOWED_TRANSITIONS.get(current, set())))}",
+            f"Allowed: {', '.join(sorted(ALLOWED_TRANSITIONS.get(current, set())))}",
         )
 
     old_stage = flag.lifecycle_stage
@@ -100,7 +100,12 @@ async def check_expiring_flags(session: AsyncSession) -> list[dict[str, Any]]:
     expired = result.scalars().all()
 
     return [
-        {"key": f.key, "name": f.name, "expires_at": f.expires_at.isoformat(), "status": f.status}
+        {
+            "key": f.key,
+            "name": f.name,
+            "expires_at": f.expires_at.isoformat(),
+            "status": f.status,
+        }
         for f in expired
     ]
 
@@ -131,7 +136,9 @@ async def check_stale_flags(
         {
             "key": f.key,
             "name": f.name,
-            "last_evaluated_at": f.last_evaluated_at.isoformat() if f.last_evaluated_at else None,
+            "last_evaluated_at": f.last_evaluated_at.isoformat()
+            if f.last_evaluated_at
+            else None,
             "owner": f.owner,
             "owner_team": getattr(f, "owner_team", None),
         }
@@ -174,15 +181,20 @@ async def run_stale_detection(session: AsyncSession) -> list[dict[str, Any]]:
             entity_id=flag.id,
             entity_key=flag.key,
             actor="system",
-            changes={"lifecycle_stage": {"old": "production", "new": "stale"}, "reason": "auto_stale_detection_90_days"},
+            changes={
+                "lifecycle_stage": {"old": "production", "new": "stale"},
+                "reason": "auto_stale_detection_90_days",
+            },
         )
-        marked.append({
-            "key": flag.key,
-            "name": flag.name,
-            "updated_at": flag.updated_at.isoformat(),
-            "owner": flag.owner,
-            "owner_team": getattr(flag, "owner_team", None),
-        })
+        marked.append(
+            {
+                "key": flag.key,
+                "name": flag.name,
+                "updated_at": flag.updated_at.isoformat(),
+                "owner": flag.owner,
+                "owner_team": getattr(flag, "owner_team", None),
+            }
+        )
 
     return marked
 
@@ -225,12 +237,14 @@ async def run_expiration_check(session: AsyncSession) -> list[dict[str, Any]]:
                 "expires_at": flag.expires_at.isoformat() if flag.expires_at else None,
             },
         )
-        archived.append({
-            "key": flag.key,
-            "name": flag.name,
-            "expires_at": flag.expires_at.isoformat() if flag.expires_at else None,
-            "status": "archived",
-        })
+        archived.append(
+            {
+                "key": flag.key,
+                "name": flag.name,
+                "expires_at": flag.expires_at.isoformat() if flag.expires_at else None,
+                "status": "archived",
+            }
+        )
 
     return archived
 
@@ -239,30 +253,35 @@ async def run_cleanup_scorecard(session: AsyncSession) -> list[dict[str, Any]]:
     """Return per-owner_team counts of stale, expired, and archived flags."""
     from sqlalchemy import select, func
 
-    stmt = (
-        select(
-            FeatureFlagDB.owner_team,
-            func.count().filter(FeatureFlagDB.lifecycle_stage == "stale").label("stale_count"),
-            func.count().filter(
-                (FeatureFlagDB.expires_at != None) &  # noqa: E711
-                (FeatureFlagDB.expires_at <= datetime.now(UTC))
-            ).label("expired_count"),
-            func.count().filter(FeatureFlagDB.lifecycle_stage == "archived").label("archived_count"),
-            func.count().label("total_count"),
+    stmt = select(
+        FeatureFlagDB.owner_team,
+        func.count()
+        .filter(FeatureFlagDB.lifecycle_stage == "stale")
+        .label("stale_count"),
+        func.count()
+        .filter(
+            (FeatureFlagDB.expires_at != None)  # noqa: E711
+            & (FeatureFlagDB.expires_at <= datetime.now(UTC))
         )
-        .group_by(FeatureFlagDB.owner_team)
-    )
+        .label("expired_count"),
+        func.count()
+        .filter(FeatureFlagDB.lifecycle_stage == "archived")
+        .label("archived_count"),
+        func.count().label("total_count"),
+    ).group_by(FeatureFlagDB.owner_team)
     result = await session.execute(stmt)
     rows = result.all()
 
     scorecard: list[dict[str, Any]] = []
     for row in rows:
-        scorecard.append({
-            "owner_team": row[0] or "unassigned",
-            "stale_count": row[1],
-            "expired_count": row[2],
-            "archived_count": row[3],
-            "total_count": row[4],
-        })
+        scorecard.append(
+            {
+                "owner_team": row[0] or "unassigned",
+                "stale_count": row[1],
+                "expired_count": row[2],
+                "archived_count": row[3],
+                "total_count": row[4],
+            }
+        )
 
     return scorecard

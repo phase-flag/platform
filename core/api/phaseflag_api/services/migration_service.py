@@ -27,11 +27,16 @@ async def create_migration(
 ) -> MigrationFlagDB:
     existing = await get_migration_by_key(session, flag_key)
     if existing:
-        raise HTTPException(status_code=409, detail=f"Migration '{flag_key}' already exists")
+        raise HTTPException(
+            status_code=409, detail=f"Migration '{flag_key}' already exists"
+        )
 
     mig = MigrationFlagDB(
-        flag_key=flag_key, name=name, description=description,
-        source_system=source_system, target_system=target_system,
+        flag_key=flag_key,
+        name=name,
+        description=description,
+        source_system=source_system,
+        target_system=target_system,
         created_by=created_by,
     )
     session.add(mig)
@@ -43,7 +48,9 @@ async def create_migration(
 async def advance_stage(session: AsyncSession, mig: MigrationFlagDB) -> MigrationFlagDB:
     current_idx = STAGE_ORDER.get(mig.stage, 0)
     if current_idx >= len(VALID_STAGES) - 1:
-        raise HTTPException(status_code=400, detail="Migration is already at final stage")
+        raise HTTPException(
+            status_code=400, detail="Migration is already at final stage"
+        )
     mig.stage = VALID_STAGES[current_idx + 1]
     mig.updated_at = datetime.now(UTC)
     await session.flush()
@@ -51,10 +58,14 @@ async def advance_stage(session: AsyncSession, mig: MigrationFlagDB) -> Migratio
     return mig
 
 
-async def rollback_stage(session: AsyncSession, mig: MigrationFlagDB) -> MigrationFlagDB:
+async def rollback_stage(
+    session: AsyncSession, mig: MigrationFlagDB
+) -> MigrationFlagDB:
     current_idx = STAGE_ORDER.get(mig.stage, 0)
     if current_idx <= 0:
-        raise HTTPException(status_code=400, detail="Migration is already at initial stage")
+        raise HTTPException(
+            status_code=400, detail="Migration is already at initial stage"
+        )
     mig.stage = VALID_STAGES[current_idx - 1]
     mig.updated_at = datetime.now(UTC)
     await session.flush()
@@ -76,19 +87,42 @@ async def update_metrics(
     if total > 0 and mig.rollback_threshold:
         error_rate = mig.error_count / total
         if error_rate > mig.rollback_threshold:
-            logger.warning("Migration %s error rate %.2f exceeds threshold %.2f", mig.flag_key, error_rate, mig.rollback_threshold)
+            logger.warning(
+                "Migration %s error rate %.2f exceeds threshold %.2f",
+                mig.flag_key,
+                error_rate,
+                mig.rollback_threshold,
+            )
     await session.flush()
     await session.refresh(mig)
     return mig
 
 
-async def get_migration_by_key(session: AsyncSession, flag_key: str) -> MigrationFlagDB | None:
-    result = await session.execute(select(MigrationFlagDB).where(MigrationFlagDB.flag_key == flag_key))
+async def get_migration_by_key(
+    session: AsyncSession, flag_key: str
+) -> MigrationFlagDB | None:
+    result = await session.execute(
+        select(MigrationFlagDB).where(MigrationFlagDB.flag_key == flag_key)
+    )
     return result.scalar_one_or_none()
 
 
-async def list_migrations(session: AsyncSession, *, limit: int = 50, offset: int = 0) -> tuple[list[MigrationFlagDB], int]:
+async def list_migrations(
+    session: AsyncSession, *, limit: int = 50, offset: int = 0
+) -> tuple[list[MigrationFlagDB], int]:
     base = select(MigrationFlagDB)
-    total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
-    items = (await session.execute(base.order_by(MigrationFlagDB.created_at.desc()).limit(limit).offset(offset))).scalars().all()
+    total = (
+        await session.execute(select(func.count()).select_from(base.subquery()))
+    ).scalar() or 0
+    items = (
+        (
+            await session.execute(
+                base.order_by(MigrationFlagDB.created_at.desc())
+                .limit(limit)
+                .offset(offset)
+            )
+        )
+        .scalars()
+        .all()
+    )
     return list(items), total

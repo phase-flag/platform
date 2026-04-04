@@ -8,10 +8,12 @@ from pydantic_settings import BaseSettings
 
 _logger = logging.getLogger(__name__)
 
-_INSECURE_DEFAULTS = frozenset({
-    "change-me-in-production",
-    "change-jwt-secret-in-production",
-})
+_INSECURE_DEFAULTS = frozenset(
+    {
+        "change-me-in-production",
+        "change-jwt-secret-in-production",
+    }
+)
 
 
 class DeploymentMode(str, Enum):
@@ -59,7 +61,10 @@ settings = Settings()
 
 def _check_secrets() -> None:
     is_prod_db = not settings.DATABASE_URL.startswith("sqlite")
-    is_production = settings.DEPLOYMENT_MODE in (DeploymentMode.SAAS, DeploymentMode.ENTERPRISE)
+    is_production = settings.DEPLOYMENT_MODE in (
+        DeploymentMode.SAAS,
+        DeploymentMode.ENTERPRISE,
+    )
 
     if settings.API_SECRET_KEY in _INSECURE_DEFAULTS:
         if is_production:

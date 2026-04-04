@@ -43,4 +43,6 @@ def create_token(user: UserDB) -> str:
         "iat": now,
         "exp": now + timedelta(hours=settings.JWT_EXPIRE_HOURS),
     }
-    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    return jwt.encode(
+        payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+    )

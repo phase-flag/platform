@@ -26,14 +26,14 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 _BLOCKED_NETWORKS = [
-    ipaddress.ip_network("127.0.0.0/8"),       # Loopback
-    ipaddress.ip_network("10.0.0.0/8"),         # Private A
-    ipaddress.ip_network("172.16.0.0/12"),      # Private B
-    ipaddress.ip_network("192.168.0.0/16"),     # Private C
-    ipaddress.ip_network("169.254.0.0/16"),     # Link-local / cloud metadata
-    ipaddress.ip_network("::1/128"),            # IPv6 loopback
-    ipaddress.ip_network("fc00::/7"),           # IPv6 unique-local
-    ipaddress.ip_network("fe80::/10"),          # IPv6 link-local
+    ipaddress.ip_network("127.0.0.0/8"),  # Loopback
+    ipaddress.ip_network("10.0.0.0/8"),  # Private A
+    ipaddress.ip_network("172.16.0.0/12"),  # Private B
+    ipaddress.ip_network("192.168.0.0/16"),  # Private C
+    ipaddress.ip_network("169.254.0.0/16"),  # Link-local / cloud metadata
+    ipaddress.ip_network("::1/128"),  # IPv6 loopback
+    ipaddress.ip_network("fc00::/7"),  # IPv6 unique-local
+    ipaddress.ip_network("fe80::/10"),  # IPv6 link-local
 ]
 
 _BLOCKED_HOSTNAMES = {"localhost", "metadata.google.internal"}
@@ -47,7 +47,9 @@ def _validate_webhook_url(url: str) -> None:
     parsed = urlparse(url)
 
     if parsed.scheme not in ("http", "https"):
-        raise ValueError(f"Webhook URL must use http or https scheme, got '{parsed.scheme}'")
+        raise ValueError(
+            f"Webhook URL must use http or https scheme, got '{parsed.scheme}'"
+        )
 
     hostname = (parsed.hostname or "").lower()
     if not hostname:
@@ -82,7 +84,9 @@ async def list_webhooks(
     return list(result.scalars().all()), total
 
 
-async def create_webhook(session: AsyncSession, url: str, events: list[str], secret: str) -> WebhookDB:
+async def create_webhook(
+    session: AsyncSession, url: str, events: list[str], secret: str
+) -> WebhookDB:
     _validate_webhook_url(url)
     webhook = WebhookDB(url=url, secret=secret)
     webhook.set_events(events)
@@ -118,10 +122,14 @@ async def update_webhook(
     return webhook
 
 
-async def fire_webhooks(session: AsyncSession, event_type: str, flag_key: str, flag_data: dict[str, Any]) -> None:
+async def fire_webhooks(
+    session: AsyncSession, event_type: str, flag_key: str, flag_data: dict[str, Any]
+) -> None:
     """Fire all matching active webhooks asynchronously."""
     result = await session.execute(
-        select(WebhookDB).where(WebhookDB.active == True).order_by(WebhookDB.created_at.desc())  # noqa: E712
+        select(WebhookDB)
+        .where(WebhookDB.active == True)
+        .order_by(WebhookDB.created_at.desc())  # noqa: E712
     )
     all_webhooks = list(result.scalars().all())
     active = [w for w in all_webhooks if event_type in w.get_events()]
@@ -129,12 +137,14 @@ async def fire_webhooks(session: AsyncSession, event_type: str, flag_key: str, f
     if not active:
         return
 
-    payload = json.dumps({
-        "event_type": event_type,
-        "flag_key": flag_key,
-        "flag_data": flag_data,
-        "timestamp": datetime.now(UTC).isoformat(),
-    })
+    payload = json.dumps(
+        {
+            "event_type": event_type,
+            "flag_key": flag_key,
+            "flag_data": flag_data,
+            "timestamp": datetime.now(UTC).isoformat(),
+        }
+    )
 
     async with httpx.AsyncClient(timeout=10.0, follow_redirects=False) as client:
         for webhook in active:
@@ -166,16 +176,26 @@ async def fire_webhooks(session: AsyncSession, event_type: str, flag_key: str, f
                         break
                     logger.warning(
                         "Webhook %s returned %s (attempt %d/%d)",
-                        webhook.url, resp.status_code, attempt + 1, MAX_RETRIES,
+                        webhook.url,
+                        resp.status_code,
+                        attempt + 1,
+                        MAX_RETRIES,
                     )
                 except Exception:
                     logger.warning(
                         "Webhook delivery failed to %s (attempt %d/%d)",
-                        webhook.url, attempt + 1, MAX_RETRIES, exc_info=True,
+                        webhook.url,
+                        attempt + 1,
+                        MAX_RETRIES,
+                        exc_info=True,
                     )
 
                 if attempt < MAX_RETRIES - 1:
                     await asyncio.sleep(RETRY_DELAYS[attempt])
 
             if not delivered:
-                logger.error("Webhook delivery permanently failed for %s after %d attempts", webhook.url, MAX_RETRIES)
+                logger.error(
+                    "Webhook delivery permanently failed for %s after %d attempts",
+                    webhook.url,
+                    MAX_RETRIES,
+                )

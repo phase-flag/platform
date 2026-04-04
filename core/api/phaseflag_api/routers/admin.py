@@ -33,6 +33,7 @@ _PROCESS_START_WALL = datetime.now(UTC)
 # Response schemas
 # ---------------------------------------------------------------------------
 
+
 class EvaluationsByDay(BaseModel):
     date: str
     count: int
@@ -146,18 +147,31 @@ class PlatformHealth(BaseModel):
 # Endpoints
 # ---------------------------------------------------------------------------
 
-@router.get("/admin/overview", response_model=PlatformOverview, dependencies=[require_role("admin")])
+
+@router.get(
+    "/admin/overview",
+    response_model=PlatformOverview,
+    dependencies=[require_role("admin")],
+)
 async def admin_overview(session: AsyncSession = Depends(get_session)):
     """Platform-wide statistics dashboard."""
-    total_orgs = (await session.execute(select(func.count(OrganizationDB.id)))).scalar_one()
+    total_orgs = (
+        await session.execute(select(func.count(OrganizationDB.id)))
+    ).scalar_one()
     total_users = (await session.execute(select(func.count(UserDB.id)))).scalar_one()
-    total_flags = (await session.execute(select(func.count(FeatureFlagDB.id)))).scalar_one()
-    total_evals = (await session.execute(
-        select(func.coalesce(func.sum(FeatureFlagDB.evaluation_count), 0))
-    )).scalar_one()
-    active_flags = (await session.execute(
-        select(func.count(FeatureFlagDB.id)).where(FeatureFlagDB.status == "active")
-    )).scalar_one()
+    total_flags = (
+        await session.execute(select(func.count(FeatureFlagDB.id)))
+    ).scalar_one()
+    total_evals = (
+        await session.execute(
+            select(func.coalesce(func.sum(FeatureFlagDB.evaluation_count), 0))
+        )
+    ).scalar_one()
+    active_flags = (
+        await session.execute(
+            select(func.count(FeatureFlagDB.id)).where(FeatureFlagDB.status == "active")
+        )
+    ).scalar_one()
 
     # Evaluations by day for the last 30 days.
     thirty_days_ago = datetime.now(UTC) - timedelta(days=30)
@@ -171,10 +185,7 @@ async def admin_overview(session: AsyncSession = Depends(get_session)):
         .order_by(cast(EvaluationEventDB.timestamp, Date))
     )
     rows = (await session.execute(stmt)).all()
-    evals_by_day = [
-        EvaluationsByDay(date=str(row.day), count=row.cnt)
-        for row in rows
-    ]
+    evals_by_day = [EvaluationsByDay(date=str(row.day), count=row.cnt) for row in rows]
 
     return PlatformOverview(
         total_organizations=total_orgs,
@@ -188,7 +199,11 @@ async def admin_overview(session: AsyncSession = Depends(get_session)):
     )
 
 
-@router.get("/admin/tenants", response_model=PaginatedTenants, dependencies=[require_role("admin")])
+@router.get(
+    "/admin/tenants",
+    response_model=PaginatedTenants,
+    dependencies=[require_role("admin")],
+)
 async def list_tenants(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
@@ -208,53 +223,84 @@ async def list_tenants(
     total = (await session.execute(count_stmt)).scalar_one()
 
     # Fetch orgs.
-    org_stmt = select(OrganizationDB).order_by(OrganizationDB.created_at.desc()).limit(limit).offset(offset)
+    org_stmt = (
+        select(OrganizationDB)
+        .order_by(OrganizationDB.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
     if where_clauses:
         org_stmt = org_stmt.where(*where_clauses)
     orgs = (await session.execute(org_stmt)).scalars().all()
 
     # Total flag count (flags don't have org_id yet, so we share the global total).
-    total_flags = (await session.execute(select(func.count(FeatureFlagDB.id)))).scalar_one()
+    total_flags = (
+        await session.execute(select(func.count(FeatureFlagDB.id)))
+    ).scalar_one()
 
     items: list[TenantSummary] = []
     for org in orgs:
-        project_count = (await session.execute(
-            select(func.count(ProjectDB.id)).where(ProjectDB.organization_id == org.id)
-        )).scalar_one()
-        user_count = (await session.execute(
-            select(func.count(OrgMemberDB.id)).where(OrgMemberDB.organization_id == org.id)
-        )).scalar_one()
+        project_count = (
+            await session.execute(
+                select(func.count(ProjectDB.id)).where(
+                    ProjectDB.organization_id == org.id
+                )
+            )
+        ).scalar_one()
+        user_count = (
+            await session.execute(
+                select(func.count(OrgMemberDB.id)).where(
+                    OrgMemberDB.organization_id == org.id
+                )
+            )
+        ).scalar_one()
 
-        items.append(TenantSummary(
-            id=org.id,
-            name=org.name,
-            slug=org.slug,
-            created_at=org.created_at.isoformat() if org.created_at else "",
-            project_count=project_count,
-            user_count=user_count,
-            flag_count=total_flags,
-            status="active",
-        ))
+        items.append(
+            TenantSummary(
+                id=org.id,
+                name=org.name,
+                slug=org.slug,
+                created_at=org.created_at.isoformat() if org.created_at else "",
+                project_count=project_count,
+                user_count=user_count,
+                flag_count=total_flags,
+                status="active",
+            )
+        )
 
     return PaginatedTenants(items=items, total=total, limit=limit, offset=offset)
 
 
-@router.get("/admin/tenants/{org_id}", response_model=TenantDetail, dependencies=[require_role("admin")])
+@router.get(
+    "/admin/tenants/{org_id}",
+    response_model=TenantDetail,
+    dependencies=[require_role("admin")],
+)
 async def get_tenant(org_id: str, session: AsyncSession = Depends(get_session)):
     """Get single tenant details with enriched data."""
-    org = (await session.execute(
-        select(OrganizationDB).where(OrganizationDB.id == org_id)
-    )).scalar_one_or_none()
+    org = (
+        await session.execute(select(OrganizationDB).where(OrganizationDB.id == org_id))
+    ).scalar_one_or_none()
     if org is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found"
+        )
 
-    project_count = (await session.execute(
-        select(func.count(ProjectDB.id)).where(ProjectDB.organization_id == org.id)
-    )).scalar_one()
-    user_count = (await session.execute(
-        select(func.count(OrgMemberDB.id)).where(OrgMemberDB.organization_id == org.id)
-    )).scalar_one()
-    total_flags = (await session.execute(select(func.count(FeatureFlagDB.id)))).scalar_one()
+    project_count = (
+        await session.execute(
+            select(func.count(ProjectDB.id)).where(ProjectDB.organization_id == org.id)
+        )
+    ).scalar_one()
+    user_count = (
+        await session.execute(
+            select(func.count(OrgMemberDB.id)).where(
+                OrgMemberDB.organization_id == org.id
+            )
+        )
+    ).scalar_one()
+    total_flags = (
+        await session.execute(select(func.count(FeatureFlagDB.id)))
+    ).scalar_one()
 
     return TenantDetail(
         id=org.id,
@@ -270,14 +316,20 @@ async def get_tenant(org_id: str, session: AsyncSession = Depends(get_session)):
     )
 
 
-@router.put("/admin/tenants/{org_id}/suspend", response_model=TenantStatusResponse, dependencies=[require_role("admin")])
+@router.put(
+    "/admin/tenants/{org_id}/suspend",
+    response_model=TenantStatusResponse,
+    dependencies=[require_role("admin")],
+)
 async def suspend_tenant(org_id: str, session: AsyncSession = Depends(get_session)):
     """Suspend an organization (placeholder — records intent but does not block)."""
-    org = (await session.execute(
-        select(OrganizationDB).where(OrganizationDB.id == org_id)
-    )).scalar_one_or_none()
+    org = (
+        await session.execute(select(OrganizationDB).where(OrganizationDB.id == org_id))
+    ).scalar_one_or_none()
     if org is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found"
+        )
 
     # Placeholder: actual suspension logic would update a status column and
     # enforce access restrictions across the platform.
@@ -289,14 +341,20 @@ async def suspend_tenant(org_id: str, session: AsyncSession = Depends(get_sessio
     )
 
 
-@router.put("/admin/tenants/{org_id}/activate", response_model=TenantStatusResponse, dependencies=[require_role("admin")])
+@router.put(
+    "/admin/tenants/{org_id}/activate",
+    response_model=TenantStatusResponse,
+    dependencies=[require_role("admin")],
+)
 async def activate_tenant(org_id: str, session: AsyncSession = Depends(get_session)):
     """Reactivate a previously suspended organization."""
-    org = (await session.execute(
-        select(OrganizationDB).where(OrganizationDB.id == org_id)
-    )).scalar_one_or_none()
+    org = (
+        await session.execute(select(OrganizationDB).where(OrganizationDB.id == org_id))
+    ).scalar_one_or_none()
     if org is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found"
+        )
 
     return TenantStatusResponse(
         id=org.id,
@@ -306,7 +364,9 @@ async def activate_tenant(org_id: str, session: AsyncSession = Depends(get_sessi
     )
 
 
-@router.get("/admin/users", response_model=PaginatedUsers, dependencies=[require_role("admin")])
+@router.get(
+    "/admin/users", response_model=PaginatedUsers, dependencies=[require_role("admin")]
+)
 async def list_users(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
@@ -328,7 +388,9 @@ async def list_users(
         count_stmt = count_stmt.where(*where_clauses)
     total = (await session.execute(count_stmt)).scalar_one()
 
-    user_stmt = select(UserDB).order_by(UserDB.created_at.desc()).limit(limit).offset(offset)
+    user_stmt = (
+        select(UserDB).order_by(UserDB.created_at.desc()).limit(limit).offset(offset)
+    )
     if where_clauses:
         user_stmt = user_stmt.where(*where_clauses)
     users = (await session.execute(user_stmt)).scalars().all()
@@ -347,7 +409,11 @@ async def list_users(
     return PaginatedUsers(items=items, total=total, limit=limit, offset=offset)
 
 
-@router.put("/admin/users/{user_id}/role", response_model=UserSummary, dependencies=[require_role("admin")])
+@router.put(
+    "/admin/users/{user_id}/role",
+    response_model=UserSummary,
+    dependencies=[require_role("admin")],
+)
 async def update_user_role(
     user_id: str,
     body: RoleUpdate,
@@ -361,11 +427,13 @@ async def update_user_role(
             detail=f"role must be one of: {', '.join(sorted(valid_roles))}",
         )
 
-    user = (await session.execute(
-        select(UserDB).where(UserDB.id == user_id)
-    )).scalar_one_or_none()
+    user = (
+        await session.execute(select(UserDB).where(UserDB.id == user_id))
+    ).scalar_one_or_none()
     if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
 
     user.role = body.role
     await session.flush()
@@ -379,46 +447,58 @@ async def update_user_role(
     )
 
 
-@router.delete("/admin/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[require_role("admin")])
+@router.delete(
+    "/admin/users/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[require_role("admin")],
+)
 async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)):
     """Delete a user from the platform."""
-    user = (await session.execute(
-        select(UserDB).where(UserDB.id == user_id)
-    )).scalar_one_or_none()
+    user = (
+        await session.execute(select(UserDB).where(UserDB.id == user_id))
+    ).scalar_one_or_none()
     if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
 
     await session.delete(user)
     await session.flush()
 
 
-@router.get("/admin/usage", response_model=UsageMetrics, dependencies=[require_role("admin")])
+@router.get(
+    "/admin/usage", response_model=UsageMetrics, dependencies=[require_role("admin")]
+)
 async def admin_usage(session: AsyncSession = Depends(get_session)):
     """Usage metrics: per-flag evaluation counts and month-over-month totals."""
     now = datetime.now(UTC)
     this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    last_month_start = (this_month_start - timedelta(days=1)).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_month_start = (this_month_start - timedelta(days=1)).replace(
+        day=1, hour=0, minute=0, second=0, microsecond=0
+    )
 
-    evals_this_month = (await session.execute(
-        select(func.count(EvaluationEventDB.id)).where(
-            EvaluationEventDB.timestamp >= this_month_start,
-        )
-    )).scalar_one()
-
-    evals_last_month = (await session.execute(
-        select(func.count(EvaluationEventDB.id)).where(
-            and_(
-                EvaluationEventDB.timestamp >= last_month_start,
-                EvaluationEventDB.timestamp < this_month_start,
+    evals_this_month = (
+        await session.execute(
+            select(func.count(EvaluationEventDB.id)).where(
+                EvaluationEventDB.timestamp >= this_month_start,
             )
         )
-    )).scalar_one()
+    ).scalar_one()
+
+    evals_last_month = (
+        await session.execute(
+            select(func.count(EvaluationEventDB.id)).where(
+                and_(
+                    EvaluationEventDB.timestamp >= last_month_start,
+                    EvaluationEventDB.timestamp < this_month_start,
+                )
+            )
+        )
+    ).scalar_one()
 
     # Top 20 most evaluated flags.
     top_flags_stmt = (
-        select(FeatureFlagDB)
-        .order_by(FeatureFlagDB.evaluation_count.desc())
-        .limit(20)
+        select(FeatureFlagDB).order_by(FeatureFlagDB.evaluation_count.desc()).limit(20)
     )
     flags = (await session.execute(top_flags_stmt)).scalars().all()
 
@@ -427,7 +507,9 @@ async def admin_usage(session: AsyncSession = Depends(get_session)):
             flag_key=f.key,
             flag_name=f.name,
             evaluation_count=f.evaluation_count or 0,
-            last_evaluated_at=f.last_evaluated_at.isoformat() if f.last_evaluated_at else None,
+            last_evaluated_at=f.last_evaluated_at.isoformat()
+            if f.last_evaluated_at
+            else None,
         )
         for f in flags
     ]
@@ -439,7 +521,11 @@ async def admin_usage(session: AsyncSession = Depends(get_session)):
     )
 
 
-@router.get("/admin/billing", response_model=BillingSummary, dependencies=[require_role("admin")])
+@router.get(
+    "/admin/billing",
+    response_model=BillingSummary,
+    dependencies=[require_role("admin")],
+)
 async def admin_billing(session: AsyncSession = Depends(get_session)):
     """Billing summary (placeholder / mock data)."""
     tiers = [
@@ -448,13 +534,17 @@ async def admin_billing(session: AsyncSession = Depends(get_session)):
         BillingTier(name="Enterprise", eval_limit="unlimited", price_monthly=499),
     ]
 
-    total_customers = (await session.execute(select(func.count(OrganizationDB.id)))).scalar_one()
+    total_customers = (
+        await session.execute(select(func.count(OrganizationDB.id)))
+    ).scalar_one()
 
     # Build per-tenant billing placeholders.
     orgs = (await session.execute(select(OrganizationDB))).scalars().all()
-    total_evals = (await session.execute(
-        select(func.coalesce(func.sum(FeatureFlagDB.evaluation_count), 0))
-    )).scalar_one()
+    total_evals = (
+        await session.execute(
+            select(func.coalesce(func.sum(FeatureFlagDB.evaluation_count), 0))
+        )
+    ).scalar_one()
 
     tenants = [
         BillingTenant(
@@ -474,7 +564,9 @@ async def admin_billing(session: AsyncSession = Depends(get_session)):
     )
 
 
-@router.get("/admin/health", response_model=PlatformHealth, dependencies=[require_role("admin")])
+@router.get(
+    "/admin/health", response_model=PlatformHealth, dependencies=[require_role("admin")]
+)
 async def admin_health(session: AsyncSession = Depends(get_session)):
     """Platform health diagnostics."""
     # Verify database connectivity with a lightweight query.
@@ -484,10 +576,14 @@ async def admin_health(session: AsyncSession = Depends(get_session)):
     except Exception:
         db_status = "disconnected"
 
-    total_flags = (await session.execute(select(func.count(FeatureFlagDB.id)))).scalar_one()
-    active_flags = (await session.execute(
-        select(func.count(FeatureFlagDB.id)).where(FeatureFlagDB.status == "active")
-    )).scalar_one()
+    total_flags = (
+        await session.execute(select(func.count(FeatureFlagDB.id)))
+    ).scalar_one()
+    active_flags = (
+        await session.execute(
+            select(func.count(FeatureFlagDB.id)).where(FeatureFlagDB.status == "active")
+        )
+    ).scalar_one()
 
     uptime = time.monotonic() - _PROCESS_START
 
@@ -495,6 +591,7 @@ async def admin_health(session: AsyncSession = Depends(get_session)):
     memory_mb = "unknown"
     try:
         import psutil  # type: ignore[import-untyped]
+
         process = psutil.Process(os.getpid())
         memory_mb = f"{process.memory_info().rss / (1024 * 1024):.1f}"
     except Exception:

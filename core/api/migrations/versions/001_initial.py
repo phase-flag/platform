@@ -4,6 +4,7 @@ Revision ID: 001_initial
 Revises: None
 Create Date: 2026-03-20
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -41,8 +42,18 @@ def upgrade() -> None:
     op.create_table(
         "org_members",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("org_id", sa.String(36), sa.ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "org_id",
+            sa.String(36),
+            sa.ForeignKey("organizations.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column(
+            "user_id",
+            sa.String(36),
+            sa.ForeignKey("users.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("role", sa.String(20), nullable=False, server_default="viewer"),
         sa.Column("joined_at", sa.DateTime(), nullable=False),
     )
@@ -51,7 +62,12 @@ def upgrade() -> None:
     op.create_table(
         "projects",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("org_id", sa.String(36), sa.ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "org_id",
+            sa.String(36),
+            sa.ForeignKey("organizations.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("slug", sa.String(255), nullable=False, index=True),
         sa.Column("description", sa.Text(), nullable=True),
@@ -63,7 +79,12 @@ def upgrade() -> None:
     op.create_table(
         "environments",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("project_id", sa.String(36), sa.ForeignKey("projects.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "project_id",
+            sa.String(36),
+            sa.ForeignKey("projects.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("slug", sa.String(255), nullable=False, index=True),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
@@ -86,21 +107,35 @@ def upgrade() -> None:
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("flag_type", sa.String(20), nullable=False, server_default="boolean"),
         sa.Column("status", sa.String(20), nullable=False, server_default="inactive"),
-        sa.Column("environment", sa.String(20), nullable=False, server_default="development"),
+        sa.Column(
+            "environment", sa.String(20), nullable=False, server_default="development"
+        ),
         sa.Column("default_variation_id", sa.String(36), nullable=False),
         sa.Column("tags", sa.Text(), nullable=False, server_default="[]"),
         sa.Column("scheduled_on", sa.DateTime(), nullable=True),
         sa.Column("scheduled_status", sa.String(20), nullable=True),
         sa.Column("prerequisites", sa.Text(), nullable=False, server_default="[]"),
-        sa.Column("lifecycle_stage", sa.String(20), nullable=False, server_default="development"),
-        sa.Column("flag_classification", sa.String(20), nullable=False, server_default="release"),
+        sa.Column(
+            "lifecycle_stage",
+            sa.String(20),
+            nullable=False,
+            server_default="development",
+        ),
+        sa.Column(
+            "flag_classification",
+            sa.String(20),
+            nullable=False,
+            server_default="release",
+        ),
         sa.Column("is_permanent", sa.Boolean(), nullable=False, server_default="0"),
         sa.Column("expires_at", sa.DateTime(), nullable=True),
         sa.Column("ticket_url", sa.String(2048), nullable=True),
         sa.Column("runbook_url", sa.String(2048), nullable=True),
         sa.Column("owner_team", sa.String(255), nullable=True),
         sa.Column("namespace", sa.String(255), nullable=True, index=True),
-        sa.Column("created_by", sa.String(255), nullable=False, server_default="system"),
+        sa.Column(
+            "created_by", sa.String(255), nullable=False, server_default="system"
+        ),
         sa.Column("owner", sa.String(255), nullable=False, server_default="system"),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
@@ -113,7 +148,12 @@ def upgrade() -> None:
     op.create_table(
         "variations",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("flag_id", sa.String(36), sa.ForeignKey("feature_flags.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "flag_id",
+            sa.String(36),
+            sa.ForeignKey("feature_flags.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("key", sa.String(255), nullable=False),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("value", sa.Text(), nullable=False),
@@ -128,7 +168,9 @@ def upgrade() -> None:
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("conditions", sa.Text(), nullable=False, server_default="[]"),
-        sa.Column("created_by", sa.String(255), nullable=False, server_default="system"),
+        sa.Column(
+            "created_by", sa.String(255), nullable=False, server_default="system"
+        ),
         sa.Column("created_at", sa.DateTime(), nullable=False),
     )
 
@@ -191,7 +233,9 @@ def upgrade() -> None:
         sa.Column("reviewed_by", sa.String(255), nullable=True),
         sa.Column("review_comment", sa.Text(), nullable=True),
         sa.Column("environment", sa.String(255), nullable=True),
-        sa.Column("requires_approval_count", sa.Integer(), nullable=False, server_default="1"),
+        sa.Column(
+            "requires_approval_count", sa.Integer(), nullable=False, server_default="1"
+        ),
         sa.Column("approval_count", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
@@ -252,10 +296,14 @@ def upgrade() -> None:
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("status", sa.String(20), nullable=False, server_default="pending"),
-        sa.Column("current_stage_index", sa.Integer(), nullable=False, server_default="0"),
+        sa.Column(
+            "current_stage_index", sa.Integer(), nullable=False, server_default="0"
+        ),
         sa.Column("environment", sa.String(255), nullable=True),
         sa.Column("template", sa.String(50), nullable=True),
-        sa.Column("created_by", sa.String(255), nullable=False, server_default="system"),
+        sa.Column(
+            "created_by", sa.String(255), nullable=False, server_default="system"
+        ),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.Column("completed_at", sa.DateTime(), nullable=True),
@@ -265,7 +313,12 @@ def upgrade() -> None:
     op.create_table(
         "pipeline_stages",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("pipeline_id", sa.String(36), sa.ForeignKey("pipelines.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "pipeline_id",
+            sa.String(36),
+            sa.ForeignKey("pipelines.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("stage_order", sa.Integer(), nullable=False),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("rollout_percentage", sa.Integer(), nullable=False),
@@ -273,7 +326,9 @@ def upgrade() -> None:
         sa.Column("status", sa.String(20), nullable=False, server_default="pending"),
         sa.Column("started_at", sa.DateTime(), nullable=True),
         sa.Column("completed_at", sa.DateTime(), nullable=True),
-        sa.Column("rollback_on_failure", sa.Boolean(), nullable=False, server_default="1"),
+        sa.Column(
+            "rollback_on_failure", sa.Boolean(), nullable=False, server_default="1"
+        ),
         sa.Column("health_check_url", sa.String(2048), nullable=True),
         sa.Column("success_threshold", sa.Float(), nullable=True),
     )
@@ -303,7 +358,9 @@ def upgrade() -> None:
         sa.Column("value_type", sa.String(20), nullable=False, server_default="string"),
         sa.Column("value", sa.Text(), nullable=False),
         sa.Column("schema_json", sa.Text(), nullable=True),
-        sa.Column("environment", sa.String(255), nullable=False, server_default="development"),
+        sa.Column(
+            "environment", sa.String(255), nullable=False, server_default="development"
+        ),
         sa.Column("version", sa.Integer(), nullable=False, server_default="1"),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
@@ -319,12 +376,18 @@ def upgrade() -> None:
         sa.Column("flag_key", sa.String(255), nullable=False, index=True),
         sa.Column("hypothesis", sa.Text(), nullable=True),
         sa.Column("status", sa.String(20), nullable=False, server_default="draft"),
-        sa.Column("experiment_type", sa.String(20), nullable=False, server_default="ab"),
-        sa.Column("traffic_percentage", sa.Integer(), nullable=False, server_default="100"),
+        sa.Column(
+            "experiment_type", sa.String(20), nullable=False, server_default="ab"
+        ),
+        sa.Column(
+            "traffic_percentage", sa.Integer(), nullable=False, server_default="100"
+        ),
         sa.Column("start_date", sa.DateTime(), nullable=True),
         sa.Column("end_date", sa.DateTime(), nullable=True),
         sa.Column("winner_variation_id", sa.String(36), nullable=True),
-        sa.Column("created_by", sa.String(255), nullable=False, server_default="system"),
+        sa.Column(
+            "created_by", sa.String(255), nullable=False, server_default="system"
+        ),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
     )
@@ -333,11 +396,18 @@ def upgrade() -> None:
     op.create_table(
         "experiment_goals",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("experiment_id", sa.String(36), sa.ForeignKey("experiments.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "experiment_id",
+            sa.String(36),
+            sa.ForeignKey("experiments.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("metric_key", sa.String(255), nullable=False),
-        sa.Column("goal_type", sa.String(20), nullable=False, server_default="conversion"),
+        sa.Column(
+            "goal_type", sa.String(20), nullable=False, server_default="conversion"
+        ),
         sa.Column("is_primary", sa.Boolean(), nullable=False, server_default="0"),
         sa.Column("min_sample_size", sa.Integer(), nullable=True),
     )
@@ -346,7 +416,12 @@ def upgrade() -> None:
     op.create_table(
         "experiment_results",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("experiment_id", sa.String(36), sa.ForeignKey("experiments.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "experiment_id",
+            sa.String(36),
+            sa.ForeignKey("experiments.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("variation_key", sa.String(255), nullable=False),
         sa.Column("goal_id", sa.String(36), nullable=True),
         sa.Column("sample_size", sa.Integer(), nullable=False, server_default="0"),

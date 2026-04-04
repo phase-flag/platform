@@ -56,16 +56,22 @@ class TelemetryMiddleware(BaseHTTPMiddleware):
         # Update metrics
         _metrics["requests_total"] += 1
         method = request.method
-        _metrics["requests_by_method"][method] = _metrics["requests_by_method"].get(method, 0) + 1
+        _metrics["requests_by_method"][method] = (
+            _metrics["requests_by_method"].get(method, 0) + 1
+        )
 
         status_code = str(response.status_code)
-        _metrics["requests_by_status"][status_code] = _metrics["requests_by_status"].get(status_code, 0) + 1
+        _metrics["requests_by_status"][status_code] = (
+            _metrics["requests_by_status"].get(status_code, 0) + 1
+        )
 
         # Track by path pattern (first 2 segments to avoid cardinality explosion)
         path = request.url.path
         path_parts = path.strip("/").split("/")[:3]
         path_key = "/" + "/".join(path_parts) if path_parts else "/"
-        _metrics["requests_by_path"][path_key] = _metrics["requests_by_path"].get(path_key, 0) + 1
+        _metrics["requests_by_path"][path_key] = (
+            _metrics["requests_by_path"].get(path_key, 0) + 1
+        )
 
         _metrics["latency_sum_ms"] += duration_ms
         _metrics["latency_count"] += 1

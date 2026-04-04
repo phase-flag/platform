@@ -10,7 +10,9 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 logger = logging.getLogger(__name__)
 
 
-def _error_response(status_code: int, detail: str, errors: list | None = None) -> JSONResponse:
+def _error_response(
+    status_code: int, detail: str, errors: list | None = None
+) -> JSONResponse:
     body: dict = {
         "error": {
             "code": status_code,
@@ -26,11 +28,15 @@ def install_error_handlers(app: FastAPI) -> None:
     """Register global exception handlers for consistent error format."""
 
     @app.exception_handler(StarletteHTTPException)
-    async def http_exception_handler(_request: Request, exc: StarletteHTTPException) -> JSONResponse:
+    async def http_exception_handler(
+        _request: Request, exc: StarletteHTTPException
+    ) -> JSONResponse:
         return _error_response(exc.status_code, str(exc.detail))
 
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(_request: Request, exc: RequestValidationError) -> JSONResponse:
+    async def validation_exception_handler(
+        _request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
         errors = [
             {
                 "field": ".".join(str(loc) for loc in e["loc"]),
@@ -46,7 +52,9 @@ def install_error_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(Exception)
-    async def unhandled_exception_handler(_request: Request, exc: Exception) -> JSONResponse:
+    async def unhandled_exception_handler(
+        _request: Request, exc: Exception
+    ) -> JSONResponse:
         logger.exception("Unhandled exception: %s", exc)
         return _error_response(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
