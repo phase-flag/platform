@@ -32,6 +32,17 @@ mypy = "^1.8.0"
 asyncio_mode = "auto"
 testpaths = ["tests"]
 
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]   # re-exports are intentional in __init__ files
+"tests/conftest.py" = ["E402"]  # late imports required for env var setup
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
