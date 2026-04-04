@@ -79,12 +79,12 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
+          cache: 'maven'
 
       - name: Test
         run: |
           cd sdks/java
-          ./gradlew test
+          mvn test
 
   dotnet:
     name: .NET SDK

@@ -1,0 +1,69 @@
+version: '3.8'
+
+# Production compose file — uses pre-built GHCR images, not local builds
+# Required env vars (set in /opt/phaseflag/.env on the server):
+#   PHASEFLAG_DB_PASSWORD, PHASEFLAG_JWT_SECRET_KEY, PHASEFLAG_API_SECRET_KEY
+
+services:
+  api:
+    image: ghcr.io/phase-flag/api:dev
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      - PHASEFLAG_DATABASE_URL=postgresql+asyncpg://phaseflag:${PHASEFLAG_DB_PASSWORD}@db:5432/phaseflag
+      - PHASEFLAG_DEPLOYMENT_MODE=saas
+      - PHASEFLAG_CORS_ORIGINS=${PHASEFLAG_CORS_ORIGINS:-https://app.phaseflag.io,https://portal.phaseflag.io}
+      - PHASEFLAG_LOG_LEVEL=${PHASEFLAG_LOG_LEVEL:-INFO}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  relay:
+    image: ghcr.io/phase-flag/relay:dev
+    ports:
+      - "8081:8081"
+    env_file: .env
+    environment:
+      - PHASEFLAG_RELAY_UPSTREAM=http://api:8000
+      - PHASEFLAG_RELAY_POLL_INTERVAL=30s
+      - PHASEFLAG_RELAY_CACHE_TTL=5m
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  dashboard:
+    image: ghcr.io/phase-flag/dashboard:dev
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=https://api.phaseflag.io
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    env_file: .env
+    environment:
+      POSTGRES_USER: phaseflag
+      POSTGRES_PASSWORD: ${PHASEFLAG_DB_PASSWORD}
+      POSTGRES_DB: phaseflag
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phaseflag"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
