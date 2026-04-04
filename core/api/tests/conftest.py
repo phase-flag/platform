@@ -9,12 +9,12 @@ from uuid import uuid4
 os.environ.setdefault("PHASEFLAG_API_SECRET_KEY", "test-api-key")
 os.environ.setdefault("PHASEFLAG_JWT_SECRET_KEY", "test-jwt-secret-key-32chars!!")
 
-import pytest
-import pytest_asyncio
-from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+import pytest  # noqa: E402
+import pytest_asyncio  # noqa: E402
+from httpx import ASGITransport, AsyncClient  # noqa: E402
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine  # noqa: E402
 
-from phaseflag_api.config import settings
+from phaseflag_api.config import settings  # noqa: E402
 # Force settings to use our test keys
 settings.API_SECRET_KEY = "test-api-key"  # type: ignore[misc]
 settings.JWT_SECRET_KEY = "test-jwt-secret-key-32chars!!"  # type: ignore[misc]
