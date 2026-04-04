@@ -10,7 +10,6 @@ from phaseflag_api.database import get_session
 from phaseflag_api.middleware.auth import require_api_key
 from phaseflag_api.repositories import flag_repository, segment_repository
 from phaseflag_api.services.evaluation_engine import (
-    evaluate,
     evaluate_group_rollout,
     evaluate_with_prerequisites,
     evaluate_with_trace,

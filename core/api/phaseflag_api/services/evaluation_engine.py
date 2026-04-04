@@ -60,7 +60,7 @@ def _safe_regex_match(pattern: str, text: str) -> bool:
             except (OSError, ValueError):
                 pass
 
-from packaging.version import Version
+from packaging.version import Version  # noqa: E402
 
 
 def _djb2_hash(value: str) -> int:

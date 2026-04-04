@@ -5,7 +5,7 @@ import logging
 from datetime import UTC, datetime
 
 import jwt
-from fastapi import Depends, HTTPException, Request, Security, status
+from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
 
 from phaseflag_api.config import settings

@@ -5,7 +5,7 @@ from typing import Sequence
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from phaseflag_api.models.flags import FeatureFlagDB, VariationDB
+from phaseflag_api.models.flags import FeatureFlagDB
 
 
 async def list_flags(

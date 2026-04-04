@@ -1,6 +1,5 @@
 """Tests for rollout-related functionality (targeting conditions, percentage rollouts)."""
 
-import pytest
 
 from phaseflag_api.services.evaluation_engine import (
     _evaluate_condition,

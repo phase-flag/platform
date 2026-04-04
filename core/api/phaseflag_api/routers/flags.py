@@ -1,6 +1,5 @@
 """Feature-flag CRUD endpoints."""
 
-import json
 import re
 from typing import Any
 
@@ -9,7 +8,7 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from phaseflag_api.database import get_session
-from phaseflag_api.middleware.auth import get_current_user, require_api_key, require_role
+from phaseflag_api.middleware.auth import require_api_key, require_role
 from phaseflag_api.repositories import flag_repository
 from phaseflag_api.services import flag_service
 

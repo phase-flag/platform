@@ -19,8 +19,8 @@ from phaseflag_api.config import settings
 settings.API_SECRET_KEY = "test-api-key"  # type: ignore[misc]
 settings.JWT_SECRET_KEY = "test-jwt-secret-key-32chars!!"  # type: ignore[misc]
 
-from phaseflag_api.database import Base, get_session
-from phaseflag_api.main import app
+from phaseflag_api.database import Base, get_session  # noqa: E402
+from phaseflag_api.main import app  # noqa: E402
 
 # Use an in-memory SQLite database for tests
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"

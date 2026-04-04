@@ -1,10 +1,9 @@
 """Audit log and evaluation event ORM models."""
 
-import json
 from datetime import UTC, datetime
 from uuid import uuid4
 
-from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy import Column, DateTime, String, Text
 
 from phaseflag_api.database import Base
 

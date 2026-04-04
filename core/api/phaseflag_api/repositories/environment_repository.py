@@ -1,6 +1,5 @@
 """Async SQLAlchemy queries for environments."""
 
-import json
 from typing import Sequence
 
 from sqlalchemy import func, select

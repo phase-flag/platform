@@ -1,6 +1,6 @@
 """Developer workflow endpoints — test users, forced treatments, simulation."""
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from phaseflag_api.middleware.auth import require_api_key, require_role

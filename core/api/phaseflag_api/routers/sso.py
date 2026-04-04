@@ -1,6 +1,6 @@
 """SSO endpoints — SAML 2.0, OIDC, and SCIM provisioning."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from phaseflag_api.middleware.auth import require_api_key, require_role

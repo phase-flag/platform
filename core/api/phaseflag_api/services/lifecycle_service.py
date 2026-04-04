@@ -237,7 +237,7 @@ async def run_expiration_check(session: AsyncSession) -> list[dict[str, Any]]:
 
 async def run_cleanup_scorecard(session: AsyncSession) -> list[dict[str, Any]]:
     """Return per-owner_team counts of stale, expired, and archived flags."""
-    from sqlalchemy import select, func, case
+    from sqlalchemy import select, func
 
     stmt = (
         select(

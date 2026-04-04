@@ -3,9 +3,8 @@
 import logging
 from datetime import UTC, datetime
 from typing import Any
-from uuid import uuid4
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

@@ -1,8 +1,6 @@
 """Migration flag ORM models."""
 
-import json
 from datetime import UTC, datetime
-from typing import Any
 from uuid import uuid4
 
 from sqlalchemy import Column, DateTime, Float, Integer, String, Text
