@@ -6,10 +6,12 @@ on:
     tags: ['v*']
     paths:
       - 'sdks/**'
+      - '.github/workflows/sdk-ci.yml'
   pull_request:
     branches: [main]
     paths:
       - 'sdks/**'
+  workflow_dispatch:
 
 jobs:
   javascript:
