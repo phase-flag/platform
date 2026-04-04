@@ -118,16 +118,12 @@ async def my_organizations(
     session: AsyncSession = Depends(get_session),
 ):
     """Return all organizations the current user belongs to."""
-    result = await session.execute(
-        select(OrgMemberDB).where(OrgMemberDB.user_id == user["id"])
-    )
+    result = await session.execute(select(OrgMemberDB).where(OrgMemberDB.user_id == user["id"]))
     memberships = result.scalars().all()
     org_ids = [m.organization_id for m in memberships]
     if not org_ids:
         return []
-    orgs_result = await session.execute(
-        select(OrganizationDB).where(OrganizationDB.id.in_(org_ids))
-    )
+    orgs_result = await session.execute(select(OrganizationDB).where(OrganizationDB.id.in_(org_ids)))
     return [_org_to_out(o) for o in orgs_result.scalars().all()]
 
 

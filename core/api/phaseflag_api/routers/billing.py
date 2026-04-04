@@ -178,9 +178,7 @@ async def stripe_webhook(
         plan_id = metadata.get("plan_id")
         if org_id and plan_id:
             await session.execute(
-                update(OrganizationDB)
-                .where(OrganizationDB.id == org_id)
-                .values(subscription_tier=plan_id)
+                update(OrganizationDB).where(OrganizationDB.id == org_id).values(subscription_tier=plan_id)
             )
             await session.commit()
             logger.info("Organization %s subscription updated to %s", org_id, plan_id)
@@ -192,9 +190,7 @@ async def stripe_webhook(
         if org_id:
             new_tier = "free" if event_type.endswith("deleted") else metadata.get("plan_id", "free")
             await session.execute(
-                update(OrganizationDB)
-                .where(OrganizationDB.id == org_id)
-                .values(subscription_tier=new_tier)
+                update(OrganizationDB).where(OrganizationDB.id == org_id).values(subscription_tier=new_tier)
             )
             await session.commit()
 

@@ -87,9 +87,7 @@ async def login(body: LoginRequest, session: AsyncSession = Depends(get_session)
 
     org_id: str | None = None
     if settings.DEPLOYMENT_MODE == DeploymentMode.SAAS:
-        membership = await session.execute(
-            select(OrgMemberDB).where(OrgMemberDB.user_id == user.id).limit(1)
-        )
+        membership = await session.execute(select(OrgMemberDB).where(OrgMemberDB.user_id == user.id).limit(1))
         first_membership = membership.scalar_one_or_none()
         if first_membership:
             org_id = first_membership.organization_id
