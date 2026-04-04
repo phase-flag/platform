@@ -85,7 +85,16 @@ jobs:
           poetry run pytest tests/ -v --tb=short --junitxml=test-results.xml
         env:
           PHASEFLAG_DATABASE_URL: postgresql+asyncpg://phaseflag:phaseflag@localhost:5432/phaseflag_test
-          PHASEFLAG_JWT_SECRET_KEY: test-secret
+          PHASEFLAG_JWT_SECRET_KEY: test-secret-32-chars-long-enough!!
+          PHASEFLAG_API_SECRET_KEY: test-api-secret
+
+      - name: Run integration tests
+        run: |
+          cd core/api
+          poetry run pytest tests/integration/ -v --tb=short
+        env:
+          PHASEFLAG_DATABASE_URL: postgresql+asyncpg://phaseflag:phaseflag@localhost:5432/phaseflag_test
+          PHASEFLAG_JWT_SECRET_KEY: test-secret-32-chars-long-enough!!
           PHASEFLAG_API_SECRET_KEY: test-api-secret
 
       - name: Upload test results
