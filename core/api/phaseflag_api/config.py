@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     DEPLOYMENT_MODE: DeploymentMode = DeploymentMode.OSS
     LICENSE_KEY: str = ""
 
+    # Stripe billing (SaaS mode)
+    STRIPE_SECRET_KEY: str = "sk_test_placeholder"
+    STRIPE_WEBHOOK_SECRET: str = "whsec_placeholder"
+    STRIPE_PRO_PRICE_ID: str = ""
+    STRIPE_ENTERPRISE_PRICE_ID: str = ""
+
     @property
     def cors_origins_list(self) -> list[str]:
         if self.CORS_ORIGINS == "*":

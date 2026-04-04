@@ -23,6 +23,7 @@ from phaseflag_api.routers import (
     analytics,
     audit,
     auth,
+    billing,
     code_refs,
     developer,
     environments,
@@ -319,6 +320,9 @@ app.include_router(reporting.router, prefix="/api/v1", tags=["reporting"])
 
 # -- Admin --
 app.include_router(admin.router, prefix="/api/v1", tags=["admin"])
+
+# -- Billing (SaaS) --
+app.include_router(billing.router, prefix="/api/v1", tags=["billing"])
 
 # -- License info endpoint --
 app.add_api_route(
