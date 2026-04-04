@@ -15,7 +15,8 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "echo 'No tests yet' && exit 0"
   },
   "keywords": ["feature-flags", "phaseflag", "phase-flag", "sdk"],
   "license": "Apache-2.0",

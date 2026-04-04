@@ -20,5 +20,5 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!-- Zero external dependencies -- uses only java.net.http and java.util -->
+    <!-- Zero external dependencies: uses only java.net.http and java.util -->
 </project>
