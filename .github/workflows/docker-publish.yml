@@ -9,6 +9,7 @@ on:
       - 'core/dashboard/**'
 
 permissions:
+  contents: read
   packages: write
 
 jobs:
@@ -32,7 +33,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/phaseflag/api
+          images: ghcr.io/phase-flag/api
           tags: |
             type=sha
             type=raw,value=dev
@@ -66,7 +67,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/phaseflag/relay
+          images: ghcr.io/phase-flag/relay
           tags: |
             type=sha
             type=raw,value=dev
@@ -100,7 +101,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/phaseflag/dashboard
+          images: ghcr.io/phase-flag/dashboard
           tags: |
             type=sha
             type=raw,value=dev
