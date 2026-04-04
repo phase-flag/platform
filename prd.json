@@ -1,0 +1,624 @@
+{
+  "project": "phaseflag-platform",
+  "version": "1.0.0",
+  "created": "2026-04-04",
+  "model": "claude-sonnet-4-6",
+  "product": {
+    "name": "Phase Flag",
+    "slug": "phaseflag",
+    "description": "Production-grade feature flagging SaaS — OSS, SaaS, and Enterprise deployment modes",
+    "domain": "phaseflag.io"
+  },
+  "phases": [
+    "PHASE 1: Migration & Scaffold Setup",
+    "PHASE 2: GitHub & CI/CD",
+    "PHASE 3: Production Infrastructure",
+    "PHASE 4: SaaS Portal & Billing",
+    "PHASE 5: SDK Publishing Pipeline",
+    "PHASE 6: Documentation Site",
+    "PHASE 7: Quality, Security & Performance"
+  ],
+  "stories": [
+    {
+      "id": "US-001",
+      "title": "Verify migration completeness and tool availability",
+      "priority": 1,
+      "phase": "PHASE 1: Migration & Scaffold Setup",
+      "description": "Confirm the full source tree has been copied to the phase-flag master folder, that all required CLI tools are present and authenticated, and that the project structure matches expectations.",
+      "acceptance_criteria": [
+        "Working directory exists with core/, sdks/, enterprise/, portal/, marketing/, infra/, docs/, tools/, tests/, scripts/, scaffold/",
+        "core/api/ has pyproject.toml with fastapi dependency",
+        "core/dashboard/ has package.json with react@18",
+        "core/cli/ has go.mod",
+        "core/relay/ has go.mod",
+        "All tools available: gh, docker, poetry, npm, go, git, jq",
+        "gh auth status shows active session",
+        "docker info returns valid output",
+        "CLAUDE.md, prd.json, progress.txt all present at project root",
+        "progress.txt created (may be empty)"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-002",
+      "title": "Verify and finalize GitHub Actions CI path references",
+      "priority": 2,
+      "phase": "PHASE 1: Migration & Scaffold Setup",
+      "description": "Confirm all GitHub Actions workflow files in .github/workflows/ reference correct paths for the monorepo root (e.g. 'core/api/**' not 'phaseflag/core/api/**'). Fix any remaining incorrect paths.",
+      "acceptance_criteria": [
+        ".github/workflows/api-ci.yml paths trigger on 'core/api/**'",
+        ".github/workflows/dashboard-ci.yml paths trigger on 'core/dashboard/**'",
+        ".github/workflows/docker-publish.yml paths trigger on 'core/api/**', 'core/relay/**', 'core/dashboard/**'",
+        ".github/workflows/release.yml build contexts reference 'core/api', 'core/relay', 'core/cli'",
+        ".github/workflows/sdk-ci.yml paths trigger on 'sdks/**'",
+        "All cd commands in workflows reference correct relative paths (core/api, sdks/javascript, etc.)",
+        "No remaining 'phaseflag/core/' or 'phaseflag/sdks/' path references in workflow files"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-003",
+      "title": "Verify local development stack starts end-to-end",
+      "priority": 3,
+      "phase": "PHASE 1: Migration & Scaffold Setup",
+      "description": "Start the full local dev stack using infra/docker/docker-compose.yml, run Alembic migrations, verify the API health endpoint, and confirm the dashboard builds cleanly.",
+      "acceptance_criteria": [
+        "infra/docker/docker-compose.yml build contexts reference correct relative paths (../../core/api, ../../core/dashboard)",
+        "docker compose -f infra/docker/docker-compose.yml up -d succeeds",
+        "docker compose ps shows api, dashboard, db containers running",
+        "curl http://localhost:8000/health returns 200",
+        "curl http://localhost:8000/docs returns 200 (Swagger UI)",
+        "poetry run alembic upgrade head succeeds in core/api/",
+        "npm run build succeeds in core/dashboard/",
+        "docker compose down cleans up all containers"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-004",
+      "title": "Create root .gitignore",
+      "priority": 4,
+      "phase": "PHASE 1: Migration & Scaffold Setup",
+      "description": "Create a comprehensive root .gitignore that covers all languages and tools used in this monorepo: Python, Node.js, Go, Rust, Java, and general artifacts.",
+      "acceptance_criteria": [
+        ".gitignore present at project root",
+        "Python artifacts excluded: __pycache__/, *.pyc, *.pyo, *.pyd, .venv/, .env, dist/, *.egg-info/",
+        "SQLite dev files excluded: *.db, *.db-shm, *.db-wal",
+        "Node.js artifacts excluded: node_modules/, dist/, .next/, .turbo/",
+        "Go artifacts excluded: bin/, *.test",
+        "Rust artifacts excluded: target/",
+        "General artifacts excluded: .DS_Store, *.log, .idea/, .vscode/",
+        "Secrets excluded: .env, .env.local, .env.*.local, *.pem, *.key",
+        "Docker excluded: .dockerignore entries not needed in root gitignore"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-005",
+      "title": "Initialize git repository and make initial commit",
+      "priority": 5,
+      "phase": "PHASE 1: Migration & Scaffold Setup",
+      "description": "Initialize git in the phase-flag root, add the .gitignore, stage all source files, and make the initial commit. Do NOT push to GitHub yet (that is US-006).",
+      "acceptance_criteria": [
+        "git init at project root succeeds",
+        ".gitignore committed",
+        "git add . stages all source files (excluding gitignored artifacts)",
+        "git commit -m 'Initial commit: Phase Flag platform monorepo' succeeds",
+        "git log shows 1 commit",
+        "git status shows clean working tree"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-006",
+      "title": "Create GitHub repository and push monorepo",
+      "priority": 6,
+      "phase": "PHASE 2: GitHub & CI/CD",
+      "description": "Create the phaseflag GitHub repository under the phaseflag org (or user account), set the remote, and push the monorepo.",
+      "acceptance_criteria": [
+        "GitHub repo created (private initially): gh repo create phaseflag/phaseflag --private",
+        "git remote add origin https://github.com/phaseflag/phaseflag.git",
+        "git push -u origin main succeeds",
+        "gh repo view phaseflag/phaseflag confirms repository with commits",
+        "Repository description set: 'Production-grade feature flagging SaaS'"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-007",
+      "title": "Set required GitHub Actions secrets",
+      "priority": 7,
+      "phase": "PHASE 2: GitHub & CI/CD",
+      "description": "Configure GitHub repository secrets needed for CI/CD workflows. GITHUB_TOKEN is auto-provided; this story covers additional secrets.",
+      "acceptance_criteria": [
+        "gh secret set NPM_TOKEN with npm publish token (for SDK publishing)",
+        "gh secret set PYPI_API_TOKEN with PyPI token (for Python SDK)",
+        "gh workflow list shows all 5 workflows",
+        "Secrets list: gh secret list shows NPM_TOKEN, PYPI_API_TOKEN"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-008",
+      "title": "Validate API CI workflow on feature branch",
+      "priority": 8,
+      "phase": "PHASE 2: GitHub & CI/CD",
+      "description": "Trigger the api-ci.yml workflow to verify it runs correctly with the migrated path structure. Create a test branch, push a trivial change, and confirm the workflow passes.",
+      "acceptance_criteria": [
+        "git checkout -b ci/verify-api-ci",
+        "Trivial change pushed to core/api/ (e.g. add a comment to main.py)",
+        "git push origin ci/verify-api-ci triggers api-ci.yml",
+        "gh run list --workflow=api-ci.yml shows run in progress/completed",
+        "Workflow completes with status: success (all jobs: lint, test, build pass)",
+        "Test branch deleted after verification"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-009",
+      "title": "Validate Docker publish workflow builds multi-arch images",
+      "priority": 9,
+      "phase": "PHASE 2: GitHub & CI/CD",
+      "description": "Trigger docker-publish.yml manually to verify it can build the API and relay Docker images for linux/amd64 and linux/arm64.",
+      "acceptance_criteria": [
+        "gh workflow run docker-publish.yml triggers successfully",
+        "gh run list --workflow=docker-publish.yml shows run completed",
+        "API image build succeeds: ghcr.io/phaseflag/api:dev",
+        "Relay image build succeeds: ghcr.io/phaseflag/relay:dev",
+        "Dashboard image build succeeds: ghcr.io/phaseflag/dashboard:dev",
+        "No build errors in workflow logs"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-010",
+      "title": "Provision DigitalOcean Droplet for production API",
+      "priority": 10,
+      "phase": "PHASE 3: Production Infrastructure",
+      "description": "Provision the production DigitalOcean Droplet for the Phase Flag API backend.",
+      "acceptance_criteria": [
+        "Droplet named 'phaseflag-api' provisioned: doctl compute droplet create phaseflag-api --size s-2vcpu-4gb --image ubuntu-24-04-x64",
+        "SSH key added to Droplet during creation",
+        "Droplet IP recorded in progress.txt",
+        "SSH connection verified: ssh root@DROPLET_IP 'uname -a' succeeds",
+        "doctl compute droplet list shows phaseflag-api with active status"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-011",
+      "title": "Configure Droplet — Docker + nginx",
+      "priority": 11,
+      "phase": "PHASE 3: Production Infrastructure",
+      "description": "Install Docker, docker compose v2, and nginx on the production Droplet. Configure nginx as reverse proxy for the API.",
+      "acceptance_criteria": [
+        "Docker installed and daemon running on Droplet: docker info succeeds",
+        "docker compose v2 available: docker compose version",
+        "nginx installed and enabled: systemctl status nginx shows active",
+        "nginx config at /etc/nginx/sites-available/phaseflag-api",
+        "nginx proxies / to localhost:8000",
+        "nginx config symlinked to sites-enabled/",
+        "nginx -t passes",
+        "nginx reloaded: systemctl reload nginx"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-012",
+      "title": "Configure DNS for all phaseflag.io domains",
+      "priority": 12,
+      "phase": "PHASE 3: Production Infrastructure",
+      "description": "Add DNS A and CNAME records for all Phase Flag domains. API and relay point to the Droplet; frontend apps point to Vercel.",
+      "acceptance_criteria": [
+        "A record: api.phaseflag.io → Droplet IP",
+        "A record: relay.phaseflag.io → Droplet IP",
+        "CNAME or A: app.phaseflag.io → Vercel",
+        "CNAME or A: portal.phaseflag.io → Vercel",
+        "CNAME or A: phaseflag.io → Vercel (apex domain)",
+        "CNAME: docs.phaseflag.io → Vercel or Netlify",
+        "DNS propagation verified: dig api.phaseflag.io +short returns Droplet IP"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-013",
+      "title": "Issue SSL certificates (Let's Encrypt)",
+      "priority": 13,
+      "phase": "PHASE 3: Production Infrastructure",
+      "description": "Use certbot to issue SSL certificates for api.phaseflag.io and relay.phaseflag.io. Configure nginx for HTTPS with auto-renewal.",
+      "acceptance_criteria": [
+        "certbot installed on Droplet",
+        "SSL cert issued for api.phaseflag.io",
+        "SSL cert issued for relay.phaseflag.io",
+        "nginx HTTP → HTTPS redirect active on port 80",
+        "nginx SSL block active for both domains",
+        "nginx -t passes with SSL config",
+        "curl https://api.phaseflag.io/health returns 200 with valid cert",
+        "certbot renew --dry-run passes (auto-renewal verified)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-014",
+      "title": "Deploy API to production (SaaS mode)",
+      "priority": 14,
+      "phase": "PHASE 3: Production Infrastructure",
+      "description": "Deploy the Phase Flag API to the production Droplet in SaaS mode. Configure production env vars, run Alembic migrations, and verify the API is healthy.",
+      "acceptance_criteria": [
+        "Production .env file on Droplet with all PHASEFLAG_ vars (never committed to git)",
+        "PHASEFLAG_DEPLOYMENT_MODE=saas in production .env",
+        "PHASEFLAG_DATABASE_URL points to production Postgres container",
+        "PHASEFLAG_JWT_SECRET_KEY and PHASEFLAG_API_SECRET_KEY are strong random secrets",
+        "docker compose -f infra/docker/docker-compose.selfhosted.yml up -d on Droplet succeeds",
+        "API container healthy: docker compose ps shows healthy",
+        "Postgres container healthy with persistent pgdata volume",
+        "Alembic migrations run on production DB: poetry run alembic upgrade head",
+        "curl https://api.phaseflag.io/health returns 200",
+        "curl https://api.phaseflag.io/docs returns 200 (Swagger UI)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-015",
+      "title": "Deploy relay to production",
+      "priority": 15,
+      "phase": "PHASE 3: Production Infrastructure",
+      "description": "Build the relay Docker image and deploy it to the Droplet. Configure nginx to route relay.phaseflag.io to the relay service.",
+      "acceptance_criteria": [
+        "Relay Docker image built (either on Droplet or pulled from GHCR)",
+        "Relay container running on Droplet port 8001",
+        "nginx config routes relay.phaseflag.io → localhost:8001",
+        "SSL cert active for relay.phaseflag.io (from US-013)",
+        "curl https://relay.phaseflag.io/health returns 200",
+        "Relay logs show successful connection to production API"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-016",
+      "title": "Deploy dashboard, portal, and marketing to Vercel",
+      "priority": 16,
+      "phase": "PHASE 3: Production Infrastructure",
+      "description": "Deploy the three frontend Vite apps to Vercel with custom domains and correct VITE_API_URL environment variables.",
+      "acceptance_criteria": [
+        "core/dashboard deployed to Vercel, domain: app.phaseflag.io",
+        "portal/ deployed to Vercel, domain: portal.phaseflag.io",
+        "marketing/ deployed to Vercel, domain: phaseflag.io",
+        "VITE_API_URL=https://api.phaseflag.io set in dashboard Vercel env",
+        "All three Vercel deployments show status: Ready",
+        "curl https://app.phaseflag.io returns 200",
+        "curl https://portal.phaseflag.io returns 200",
+        "curl https://phaseflag.io returns 200"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-017",
+      "title": "Implement Organization + OrganizationMembers data model",
+      "priority": 17,
+      "phase": "PHASE 4: SaaS Portal & Billing",
+      "description": "Add the Organization model to support multi-tenancy in SaaS mode. All projects and users must be scoped to an organization.",
+      "acceptance_criteria": [
+        "organizations table: id, name, slug (unique), subscription_tier (free/pro/enterprise), created_at",
+        "organization_members table: org_id, user_id, role (owner/admin/member), joined_at",
+        "Alembic migration file created and runs successfully",
+        "OrganizationDB and OrganizationMemberDB SQLAlchemy models in models/organizations.py",
+        "POST /organizations — create org (authenticated)",
+        "GET /organizations/me — returns current user's organizations",
+        "POST /organizations/{id}/members — invite member by email",
+        "JWT tokens in SaaS mode include org_id claim",
+        "prd.json updated after story passes"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-018",
+      "title": "Implement Stripe billing integration",
+      "priority": 18,
+      "phase": "PHASE 4: SaaS Portal & Billing",
+      "description": "Add Stripe billing to support Free, Pro, and Enterprise subscription plans. Implement checkout, billing portal, and webhook handler.",
+      "acceptance_criteria": [
+        "stripe Python SDK added to core/api/pyproject.toml",
+        "Billing router at phaseflag_api/routers/billing.py registered in main.py",
+        "GET /billing/plans — returns available plans with pricing",
+        "POST /billing/checkout — creates Stripe Checkout session, returns URL",
+        "POST /billing/webhook — handles checkout.session.completed, customer.subscription.updated, customer.subscription.deleted with HMAC signature validation",
+        "Organization subscription_tier updated on successful subscription events",
+        "STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET added to .env.example",
+        "Stripe test mode used in development (sk_test_...)",
+        "curl http://localhost:8000/billing/plans returns plan list"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-019",
+      "title": "SaaS portal: authentication pages connected to API",
+      "priority": 19,
+      "phase": "PHASE 4: SaaS Portal & Billing",
+      "description": "Build portal login and signup pages that connect to the Phase Flag API. Add AuthProvider context.",
+      "acceptance_criteria": [
+        "portal/src/pages/Login.tsx — email/password form, calls POST /auth/login, stores JWT",
+        "portal/src/pages/Signup.tsx — name/email/password/org name form, calls POST /auth/signup",
+        "portal/src/contexts/AuthContext.tsx — manages JWT, user state, expiry",
+        "Authenticated users redirected to /dashboard",
+        "Unauthenticated users redirected to /login",
+        "VITE_API_URL env var used for API base URL",
+        "npm run build succeeds for portal/",
+        "Vercel deployment updated"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-020",
+      "title": "SaaS portal: onboarding wizard",
+      "priority": 20,
+      "phase": "PHASE 4: SaaS Portal & Billing",
+      "description": "Build the post-signup onboarding wizard to guide new users from account creation through their first flag evaluation.",
+      "acceptance_criteria": [
+        "portal/src/pages/Onboarding.tsx — 3-step wizard",
+        "Step 1: Create first project (POST /projects, shows project key)",
+        "Step 2: Choose SDK language (JS, Python, Go, React, etc.) — shows install command",
+        "Step 3: Copy SDK initialization snippet with project API key pre-filled",
+        "Onboarding marks as complete after Step 3 (stored in localStorage or API)",
+        "Completed onboarding redirects to app.phaseflag.io dashboard",
+        "npm run build succeeds"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-021",
+      "title": "SaaS portal: billing page",
+      "priority": 21,
+      "phase": "PHASE 4: SaaS Portal & Billing",
+      "description": "Build the billing page in the SaaS portal showing the current subscription plan, usage, and upgrade options.",
+      "acceptance_criteria": [
+        "portal/src/pages/Billing.tsx — shows current plan tier, renewal date",
+        "Upgrade CTA button calls POST /billing/checkout and redirects to Stripe Checkout",
+        "Plan comparison table: Free vs Pro vs Enterprise features",
+        "After successful payment, page reflects updated subscription tier",
+        "npm run build succeeds",
+        "Vercel deployment updated"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-022",
+      "title": "Publish JavaScript SDK to npm (@phaseflag/js-sdk)",
+      "priority": 22,
+      "phase": "PHASE 5: SDK Publishing Pipeline",
+      "description": "Publish the JavaScript/TypeScript SDK to npm. Configure CI for automated publishing on release tags.",
+      "acceptance_criteria": [
+        "sdks/javascript/package.json name is '@phaseflag/js-sdk'",
+        "sdks/javascript/README.md has install and quickstart code example",
+        "npm pack in sdks/javascript/ produces a valid tarball with no errors",
+        "npm publish --dry-run passes in sdks/javascript/",
+        ".github/workflows/sdk-ci.yml publish job added: triggers on v* tags, publishes @phaseflag/js-sdk",
+        "NPM_TOKEN secret confirmed set in GitHub",
+        "Package published and visible on npmjs.com"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-023",
+      "title": "Publish Python SDK to PyPI (phaseflag-sdk)",
+      "priority": 23,
+      "phase": "PHASE 5: SDK Publishing Pipeline",
+      "description": "Publish the Python SDK to PyPI. Configure CI for automated publishing on release tags.",
+      "acceptance_criteria": [
+        "sdks/python/pyproject.toml name is 'phaseflag-sdk'",
+        "sdks/python/README.md has pip install and quickstart",
+        "poetry build in sdks/python/ produces dist/ artifacts",
+        "poetry publish --dry-run passes",
+        ".github/workflows/sdk-ci.yml publish job added for Python SDK",
+        "PYPI_API_TOKEN secret confirmed set in GitHub",
+        "pip install phaseflag-sdk succeeds (verify on PyPI)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-024",
+      "title": "Publish Go SDK (github.com/phaseflag/go-sdk)",
+      "priority": 24,
+      "phase": "PHASE 5: SDK Publishing Pipeline",
+      "description": "Ensure the Go SDK module is correctly tagged so it is discoverable via go get.",
+      "acceptance_criteria": [
+        "sdks/go/go.mod has module github.com/phaseflag/go-sdk",
+        "go build ./... succeeds in sdks/go/",
+        "go test ./... passes in sdks/go/",
+        "SDK tagged v0.1.0 in git",
+        "pkg.go.dev/github.com/phaseflag/go-sdk resolves after tag push",
+        "sdks/go/README.md has go get install instructions"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-025",
+      "title": "Publish React SDK to npm (@phaseflag/react)",
+      "priority": 25,
+      "phase": "PHASE 5: SDK Publishing Pipeline",
+      "description": "Publish the React SDK (useFlag hook) to npm and verify it works with the JS SDK as a peer dependency.",
+      "acceptance_criteria": [
+        "sdks/react/package.json name is '@phaseflag/react'",
+        "@phaseflag/js-sdk listed as peer dependency",
+        "npm pack passes in sdks/react/",
+        "npm publish --dry-run passes",
+        "CI publish job added for React SDK",
+        "Package published on npmjs.com"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-026",
+      "title": "Release pfctl CLI binaries via GitHub Releases",
+      "priority": 26,
+      "phase": "PHASE 5: SDK Publishing Pipeline",
+      "description": "Trigger the release workflow to build and publish multi-platform pfctl binaries as GitHub Release v0.1.0.",
+      "acceptance_criteria": [
+        "release.yml build matrix covers: linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64",
+        "go build succeeds for all 5 platforms in core/cli/",
+        "GitHub Release v0.1.0 created: gh release create v0.1.0",
+        "All 5 pfctl binaries attached to the release",
+        "Download test: curl binary from release URL, chmod +x, ./pfctl --help returns usage output",
+        "API and relay Docker images pushed to GHCR as part of release"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-027",
+      "title": "Initialize documentation site",
+      "priority": 27,
+      "phase": "PHASE 6: Documentation Site",
+      "description": "Create a documentation site from the existing docs/ content. Use Mintlify (mint.json) or Docusaurus. Set up navigation structure covering all major sections.",
+      "acceptance_criteria": [
+        "Docs site initialized in docs/site/ (Mintlify) or a docs-site/ folder (Docusaurus)",
+        "Navigation covers: Getting Started, API Reference, SDKs (top 5), Deployment, Architecture",
+        "Existing markdown content from docs/ imported",
+        "npm run build succeeds for docs site",
+        "Local preview: npm run dev serves docs at localhost:3001 (or similar)",
+        "CNAME docs.phaseflag.io configured in DNS"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-028",
+      "title": "Write SDK quickstart guides for top 5 languages",
+      "priority": 28,
+      "phase": "PHASE 6: Documentation Site",
+      "description": "Create complete quickstart documentation for JavaScript, Python, Go, React, and Java SDKs.",
+      "acceptance_criteria": [
+        "docs/sdk-guides/javascript.md — npm install, init, evaluateFlag example",
+        "docs/sdk-guides/python.md — pip install, init, evaluate_flag example",
+        "docs/sdk-guides/go.md — go get, init, EvaluateFlag example",
+        "docs/sdk-guides/react.md — npm install, PhaseFlag provider, useFlag hook example",
+        "docs/sdk-guides/java.md — Maven/Gradle dependency, init, evaluateFlag example",
+        "Each guide covers: install, initialize with API key, identify user, evaluate boolean flag, handle targeting",
+        "Guides linked from docs site navigation"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-029",
+      "title": "Write deployment guides (OSS, Self-Hosted, Kubernetes)",
+      "priority": 29,
+      "phase": "PHASE 6: Documentation Site",
+      "description": "Create production deployment documentation for all three deployment modes.",
+      "acceptance_criteria": [
+        "docs/deployment/oss-docker.md — step-by-step using infra/docker/docker-compose.yml",
+        "docs/deployment/self-hosted.md — docker-compose.selfhosted.yml walkthrough with all env vars",
+        "docs/deployment/kubernetes.md — Helm install: helm install phaseflag infra/k8s/helm/phaseflag --values custom-values.yaml",
+        "docs/deployment/terraform.md — Terraform usage from infra/terraform/",
+        "All guides document required PHASEFLAG_ env vars",
+        "Docs site updated with deployment section"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-030",
+      "title": "Publish API reference from OpenAPI spec",
+      "priority": 30,
+      "phase": "PHASE 6: Documentation Site",
+      "description": "Generate and publish comprehensive API reference documentation from the FastAPI OpenAPI spec.",
+      "acceptance_criteria": [
+        "OpenAPI spec accessible at https://api.phaseflag.io/openapi.json",
+        "Spec exported to docs/api-reference/openapi.json (committed to repo)",
+        "Docs site renders API reference (Mintlify API pages or Redoc component)",
+        "All endpoint groups documented: flags, segments, environments, experiments, auth, webhooks, evaluation, SDK",
+        "curl and JavaScript code examples for key endpoints",
+        "docs.phaseflag.io/api-reference renders correctly"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-031",
+      "title": "Deploy documentation site to docs.phaseflag.io",
+      "priority": 31,
+      "phase": "PHASE 6: Documentation Site",
+      "description": "Deploy the documentation site to Vercel or Netlify at docs.phaseflag.io.",
+      "acceptance_criteria": [
+        "Docs site deployed to Vercel or Netlify",
+        "Custom domain docs.phaseflag.io configured",
+        "curl https://docs.phaseflag.io returns 200",
+        "All navigation links resolve (no 404s)",
+        "Deployment triggers automatically on push to main (CI configured)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-032",
+      "title": "Write API integration test suite",
+      "priority": 32,
+      "phase": "PHASE 7: Quality, Security & Performance",
+      "description": "Write integration tests covering all major API routers. Tests run against a real Postgres test database.",
+      "acceptance_criteria": [
+        "tests/integration/test_flags.py — flag CRUD, toggle, targeting rules, rollout percentage",
+        "tests/integration/test_segments.py — segment create, update, user attribute matching",
+        "tests/integration/test_experiments.py — experiment create, user assignment, results",
+        "tests/integration/test_evaluation.py — flag evaluation with different user attributes",
+        "tests/integration/test_auth.py — signup, login, refresh token, logout flow",
+        "All integration tests pass with Postgres test database: poetry run pytest tests/integration/ -v",
+        "Coverage report: > 70% line coverage on routers/ and services/",
+        "Tests added to .github/workflows/api-ci.yml"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-033",
+      "title": "Write end-to-end test suite",
+      "priority": 33,
+      "phase": "PHASE 7: Quality, Security & Performance",
+      "description": "Write end-to-end tests covering the critical user flows from signup through SDK flag evaluation. Tests run against the local Docker stack.",
+      "acceptance_criteria": [
+        "Playwright or Cypress configured in tests/e2e/",
+        "Test: signup flow (API: POST /auth/signup → login → GET /auth/me)",
+        "Test: create project (POST /projects)",
+        "Test: create boolean feature flag (POST /projects/{id}/flags)",
+        "Test: evaluate flag via SDK endpoint (GET /sdk/flags, verify variation returned)",
+        "Test: toggle flag off and verify evaluation returns default",
+        "Tests run against local stack: npm run test:e2e passes",
+        "E2E job added to .github/workflows/api-ci.yml on merge to main"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-034",
+      "title": "Security hardening audit",
+      "priority": 34,
+      "phase": "PHASE 7: Quality, Security & Performance",
+      "description": "Audit and verify the API security posture: rate limiting, security headers, input validation, and JWT handling.",
+      "acceptance_criteria": [
+        "Rate limiting active: rapid requests (>120/min) return 429 Too Many Requests",
+        "Security headers present on all responses: X-Content-Type-Options: nosniff, X-Frame-Options: DENY, Strict-Transport-Security (on HTTPS), Content-Security-Policy",
+        "All POST/PUT endpoints validated with Pydantic — no raw dict access",
+        "SQL injection test: flag key with SQL metacharacters returns 422, not 500",
+        "JWT expiry enforced: expired token returns 401 Unauthorized",
+        "API keys not exposed in logs (grep for api_key in log output)",
+        "Safety headers verified: curl -I https://api.phaseflag.io/health shows all required headers",
+        "Security findings documented in docs/security.md"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-035",
+      "title": "End-to-end production verification",
+      "priority": 35,
+      "phase": "PHASE 7: Quality, Security & Performance",
+      "description": "Perform full end-to-end verification of the deployed platform. Confirm every domain resolves, auth flows work, and core features function in production.",
+      "acceptance_criteria": [
+        "curl https://api.phaseflag.io/health → 200 OK",
+        "curl https://api.phaseflag.io/docs → Swagger UI loads",
+        "curl https://relay.phaseflag.io/health → 200 OK",
+        "curl https://app.phaseflag.io → dashboard loads",
+        "curl https://portal.phaseflag.io → portal loads",
+        "curl https://phaseflag.io → marketing site loads",
+        "curl https://docs.phaseflag.io → docs site loads",
+        "Sign up flow: POST /auth/signup → success with JWT returned",
+        "Login flow: POST /auth/login → JWT and refresh token returned",
+        "Authenticated request to GET /sdk/flags → returns ruleset",
+        "All Docker containers on Droplet healthy: docker compose ps shows healthy",
+        "All Vercel deployments show status: Ready",
+        "GitHub Actions: all workflows passing on main branch"
+      ],
+      "passes": false
+    }
+  ]
+}

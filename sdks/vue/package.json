@@ -1,0 +1,32 @@
+{
+  "name": "@phaseflag/vue",
+  "version": "0.1.0",
+  "description": "Phase Flag Vue 3 SDK for feature flag evaluation",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
+  },
+  "keywords": ["feature-flags", "phaseflag", "phase-flag", "vue", "sdk"],
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "@phaseflag/sdk-js": ">=0.1.0",
+    "vue": ">=3.3.0"
+  },
+  "devDependencies": {
+    "@phaseflag/sdk-js": "^0.1.0",
+    "vue": "^3.4.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}

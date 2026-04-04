@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>PhaseFlag.Sdk</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>PhaseFlag</Authors>
+    <Description>C#/.NET SDK for the Phase Flag feature flag platform. Provides local evaluation with background polling, server-side evaluation fallback, and event tracking.</Description>
+    <RootNamespace>PhaseFlag</RootNamespace>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,30 @@
+{
+  "name": "{{PRODUCT_SLUG}}-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev":              "turbo dev",
+    "build":            "turbo build",
+    "typecheck":        "turbo typecheck",
+    "lint":             "biome lint .",
+    "format":           "biome format --write .",
+    "check":            "biome check --write .",
+    "ci":               "biome ci .",
+    "clean":            "find . \\( -name '.next' -o -name 'dist' -o -name '.turbo' \\) -not -path '*/node_modules/*' -exec rm -rf {} +",
+    "dev:app":          "turbo dev --filter=@{{PRODUCT_SLUG}}/app",
+    "dev:web":          "turbo dev --filter=@{{PRODUCT_SLUG}}/web",
+    "dev:ops":          "turbo dev --filter=@{{PRODUCT_SLUG}}/ops",
+    "ui:build":         "turbo build --filter=@{{PRODUCT_SLUG}}/ui",
+    "api-client:sync":  "pnpm --filter=@{{PRODUCT_SLUG}}/api-client sync-types"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "turbo":          "^2.0.0",
+    "typescript":     "^5"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

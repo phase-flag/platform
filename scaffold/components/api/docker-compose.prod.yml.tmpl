@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: {{PRODUCT_SLUG}}-postgres
+    restart: always
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+{{#if INCLUDES_GRAPH}}  neo4j:
+    image: neo4j:5-community
+    container_name: {{PRODUCT_SLUG}}-neo4j
+    restart: always
+    env_file: .env
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD}
+      NEO4J_PLUGINS: '["apoc"]'
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - internal
+
+{{/if}}  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+    container_name: {{PRODUCT_SLUG}}-api
+    restart: always
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "{{API_PORT}}:{{API_PORT}}"
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  postgres_data:
+{{#if INCLUDES_GRAPH}}  neo4j_data:
+  neo4j_logs:
+{{/if}}

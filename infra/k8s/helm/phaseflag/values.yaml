@@ -1,0 +1,142 @@
+# Phase Flag Helm Chart - Default Values
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/phaseflag/api
+  tag: ""  # Defaults to Chart appVersion
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# API configuration
+api:
+  port: 8000
+  logLevel: INFO
+  deploymentMode: oss  # oss, saas, enterprise
+  corsOrigins: "*"
+
+# Secrets — reference a Kubernetes Secret
+secrets:
+  # Name of existing Secret containing database URL, JWT secret, API secret
+  existingSecret: ""
+  # Keys within the secret
+  databaseUrlKey: database-url
+  jwtSecretKey: jwt-secret
+  apiSecretKey: api-secret
+  # If not using existingSecret, these values are used (not recommended for production)
+  databaseUrl: ""
+  jwtSecret: ""
+  apiSecret: ""
+
+# Relay proxy
+relay:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: ghcr.io/phaseflag/relay
+    tag: ""
+    pullPolicy: IfNotPresent
+  port: 8081
+  pollInterval: "30s"
+  cacheTTL: "5m"
+  resources:
+    limits:
+      cpu: 500m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+
+# Dashboard
+dashboard:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: ghcr.io/phaseflag/dashboard
+    tag: ""
+    pullPolicy: IfNotPresent
+  port: 3000
+  apiUrl: ""  # Auto-set to API service URL if empty
+
+# PostgreSQL (using Bitnami subchart or external)
+postgresql:
+  enabled: false  # Set true to deploy PostgreSQL in-cluster
+  auth:
+    username: phaseflag
+    password: ""
+    database: phaseflag
+  primary:
+    persistence:
+      size: 10Gi
+
+# External database (when postgresql.enabled=false)
+externalDatabase:
+  host: ""
+  port: 5432
+  user: phaseflag
+  password: ""
+  database: phaseflag
+  sslMode: require
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: phaseflag.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: "1"
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL

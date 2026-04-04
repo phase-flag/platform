@@ -1,0 +1,372 @@
+{
+  "project": "{{PRODUCT_SLUG}}-platform-deployment",
+  "version": "1.0.0",
+  "created": "{{CREATED_DATE}}",
+  "model": "claude-sonnet-4-6",
+  "product": {
+    "name": "{{PRODUCT_NAME}}",
+    "slug": "{{PRODUCT_SLUG}}",
+    "description": "{{PRODUCT_DESCRIPTION}}",
+    "domain": "{{ROOT_DOMAIN}}"
+  },
+  "phases": [
+    "PHASE 1: Project Setup",
+    "PHASE 2: GitHub Repositories",
+    "PHASE 3: Backend API",
+    "PHASE 4: Main App Frontend",
+    "PHASE 5: Database",
+    "PHASE 6: Marketing Site",
+    "PHASE 7: Ops Dashboard",
+    "PHASE 8: Infrastructure",
+    "PHASE 9: Production Deploy",
+    "PHASE 10: Verification"
+  ],
+  "stories": [
+    {
+      "id": "US-001",
+      "title": "Initialize project structure and CLAUDE.md",
+      "priority": 1,
+      "phase": "PHASE 1: Project Setup",
+      "description": "Create the root project directory structure, verify CLAUDE.md is in place, initialize progress.txt, and confirm all required CLI tools are available.",
+      "acceptance_criteria": [
+        "Working directory exists at {{WORKING_DIR}}",
+        "CLAUDE.md is present and contains project config",
+        "prd.json is present and parseable with jq",
+        "progress.txt exists (may be empty)",
+        "All tools available: gh, vercel, doctl, docker, pnpm, npm, node, git, jq",
+        "gh auth status shows active session",
+        "vercel whoami returns authenticated user",
+        "doctl account get returns account info"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-002",
+      "title": "Create GitHub organization repositories",
+      "priority": 2,
+      "phase": "PHASE 2: GitHub Repositories",
+      "description": "Create all required private GitHub repositories under the {{GITHUB_ORG}} organization. Each repo will hold one sub-project of the platform.",
+      "acceptance_criteria": [
+        "Repo {{GITHUB_ORG}}/{{PRODUCT_SLUG}}-api created (private)",
+        "Repo {{GITHUB_ORG}}/{{PRODUCT_SLUG}}-app created (private)",
+        "Repo {{GITHUB_ORG}}/{{PRODUCT_SLUG}}-web created (private)",
+        "Repo {{GITHUB_ORG}}/{{PRODUCT_SLUG}}-ops created (private)",
+        "Repo {{GITHUB_ORG}}/{{PRODUCT_SLUG}}-db created (private)",
+        "All repos verified with: gh repo view {{GITHUB_ORG}}/REPO_NAME"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-003",
+      "title": "Initialize backend API monorepo",
+      "priority": 3,
+      "phase": "PHASE 3: Backend API",
+      "description": "Set up the {{PRODUCT_SLUG}}-api Fastify monorepo with pnpm workspaces. Create the package structure for api, db, and shared packages. Configure TypeScript, ESLint, and Docker.",
+      "acceptance_criteria": [
+        "{{PRODUCT_SLUG}}-api/ exists with pnpm-workspace.yaml",
+        "packages/api/ exists with Fastify server skeleton (index.ts, health endpoint)",
+        "packages/db/ exists with Drizzle ORM config",
+        "packages/shared/ exists with base TypeScript types",
+        "Root package.json has scripts: dev, build, lint, typecheck",
+        "tsconfig.json with strict mode",
+        "docker-compose.yml runs Postgres on port 5432",
+        "pnpm install completes without errors",
+        "pnpm typecheck passes"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-004",
+      "title": "Set up local Docker services",
+      "priority": 4,
+      "phase": "PHASE 3: Backend API",
+      "description": "Configure and start local Docker services for development. Postgres (required) and Neo4j (if applicable).",
+      "acceptance_criteria": [
+        "docker-compose.yml present in {{PRODUCT_SLUG}}-api/",
+        "Postgres 16 service configured (port 5432, user: {{PG_USER}}, db: {{PG_DB}})",
+        "docker compose up -d succeeds",
+        "Postgres is healthy: docker compose ps shows 'healthy'",
+        "Can connect: psql postgresql://{{PG_USER}}:{{PG_PASSWORD}}@localhost:5432/{{PG_DB}} -c '\\l'"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-005",
+      "title": "Implement core database schema",
+      "priority": 5,
+      "phase": "PHASE 5: Database",
+      "description": "Define the initial Drizzle ORM schema for core entities. Create migration files and run them against the local Postgres instance.",
+      "acceptance_criteria": [
+        "packages/db/src/schema/ contains core entity schemas",
+        "users table with id, email, password_hash, created_at",
+        "refresh_tokens table for auth",
+        "At least one product-specific core entity table",
+        "Drizzle migration runs successfully: pnpm db:migrate",
+        "Schema verified: tables exist in local Postgres"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-006",
+      "title": "Implement auth API endpoints",
+      "priority": 6,
+      "phase": "PHASE 3: Backend API",
+      "description": "Build the authentication system: signup, login, logout, token refresh, and /me endpoint. Use JWT with refresh tokens stored in Postgres.",
+      "acceptance_criteria": [
+        "POST /auth/signup — creates user, returns access + refresh tokens",
+        "POST /auth/login — validates credentials, returns tokens",
+        "POST /auth/logout — invalidates refresh token",
+        "POST /auth/refresh — issues new access token from valid refresh token",
+        "GET /auth/me — returns authenticated user profile",
+        "GET /health — returns 200 OK",
+        "Swagger docs available at /docs",
+        "pnpm typecheck passes in packages/api"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-007",
+      "title": "Implement core domain API endpoints",
+      "priority": 7,
+      "phase": "PHASE 3: Backend API",
+      "description": "Build the primary domain-specific API endpoints for {{PRODUCT_NAME}}. These are the core data endpoints that the frontend will consume.",
+      "acceptance_criteria": [
+        "At least 5 domain-specific endpoints implemented",
+        "All endpoints require auth middleware (except public ones)",
+        "Endpoints follow RESTful conventions",
+        "Input validation with Zod or Fastify schema",
+        "Error responses use consistent JSON structure: { error, message, statusCode }",
+        "pnpm typecheck passes",
+        "pnpm build succeeds"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-008",
+      "title": "Initialize main app frontend",
+      "priority": 8,
+      "phase": "PHASE 4: Main App Frontend",
+      "description": "Set up the {{PRODUCT_SLUG}}-app Next.js 15 frontend with App Router, TypeScript, Tailwind CSS v4, and the product design system.",
+      "acceptance_criteria": [
+        "{{PRODUCT_SLUG}}-app/ created with Next.js 15 + TypeScript",
+        "Tailwind CSS v4 configured via @tailwindcss/postcss",
+        "src/styles/globals.css contains design system CSS variables",
+        "next.config.ts rewrites /api/* → http://localhost:{{API_PORT}}/*",
+        ".env.local.example documents NEXT_PUBLIC_API_URL",
+        "npm run dev starts on port {{APP_PORT}} without errors",
+        "npm run build succeeds",
+        "Favicon and PWA manifest in public/"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-009",
+      "title": "Build frontend auth pages",
+      "priority": 9,
+      "phase": "PHASE 4: Main App Frontend",
+      "description": "Create login, signup, and forgot-password pages. Implement an AuthProvider context that manages JWT tokens and protects authenticated routes.",
+      "acceptance_criteria": [
+        "app/login/page.tsx — login form, redirects to / on success",
+        "app/signup/page.tsx — signup form",
+        "app/forgot-password/page.tsx — email submission form",
+        "AuthProvider wraps app in layout.tsx, exposes useAuth() hook",
+        "Unauthenticated users redirected to /login",
+        "Tokens stored in httpOnly cookies or localStorage (document your choice)",
+        "npm run build passes"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-010",
+      "title": "Build frontend core pages",
+      "priority": 10,
+      "phase": "PHASE 4: Main App Frontend",
+      "description": "Build the main dashboard and core feature pages for {{PRODUCT_NAME}}. These are the primary screens authenticated users will see.",
+      "acceptance_criteria": [
+        "app/(auth)/layout.tsx — authenticated shell with navigation",
+        "app/page.tsx — main dashboard (at minimum a skeleton with real data fetch)",
+        "At least 3 additional domain-specific pages",
+        "All pages use design system tokens — no hardcoded colors",
+        "Responsive layout (mobile + desktop)",
+        "npm run build passes with no TypeScript errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-011",
+      "title": "Push API and app repos to GitHub",
+      "priority": 11,
+      "phase": "PHASE 2: GitHub Repositories",
+      "description": "Initialize git in {{PRODUCT_SLUG}}-api and {{PRODUCT_SLUG}}-app, add .gitignore, and push to GitHub. Configure branch protection on main.",
+      "acceptance_criteria": [
+        "{{PRODUCT_SLUG}}-api has .gitignore (node_modules, .env, dist, .next)",
+        "{{PRODUCT_SLUG}}-api pushed to {{GITHUB_ORG}}/{{PRODUCT_SLUG}}-api on branch main",
+        "{{PRODUCT_SLUG}}-app has .gitignore",
+        "{{PRODUCT_SLUG}}-app pushed to {{GITHUB_ORG}}/{{PRODUCT_SLUG}}-app on branch main",
+        "gh repo view confirms both repos have commits"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-012",
+      "title": "Build marketing site",
+      "priority": 12,
+      "phase": "PHASE 6: Marketing Site",
+      "description": "Create the {{PRODUCT_SLUG}}-web Next.js 15 marketing site. Implement a compelling homepage that explains the product value proposition.",
+      "acceptance_criteria": [
+        "{{PRODUCT_SLUG}}-web/ created with Next.js 15 + TypeScript",
+        "Same design tokens as {{PRODUCT_SLUG}}-app",
+        "app/page.tsx — homepage with hero, features, CTA sections",
+        "Navigation links to /login on {{APP_DOMAIN}}",
+        "No authentication required — fully public",
+        "npm run build passes",
+        "Pushed to {{GITHUB_ORG}}/{{PRODUCT_SLUG}}-web"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-013",
+      "title": "Build ops dashboard",
+      "priority": 13,
+      "phase": "PHASE 7: Ops Dashboard",
+      "description": "Create the {{PRODUCT_SLUG}}-ops internal dashboard for platform monitoring and administration.",
+      "acceptance_criteria": [
+        "{{PRODUCT_SLUG}}-ops/ created with Next.js 15",
+        "Auth-gated — returns 401 for unauthenticated requests",
+        "Basic health/status page showing API, DB connectivity",
+        "npm run build passes",
+        "Pushed to {{GITHUB_ORG}}/{{PRODUCT_SLUG}}-ops"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-014",
+      "title": "Provision DigitalOcean Droplet",
+      "priority": 14,
+      "phase": "PHASE 8: Infrastructure",
+      "description": "Provision a DigitalOcean Droplet for the backend API. Configure it with Docker, nginx, and the production docker-compose setup.",
+      "acceptance_criteria": [
+        "Droplet named '{{PRODUCT_SLUG}}-api' provisioned in {{DO_REGION}}",
+        "Size: {{DO_SIZE}}, Image: ubuntu-24-04-x64",
+        "SSH key {{DO_SSH_KEY_ID}} added to Droplet",
+        "Droplet IP recorded in progress.txt",
+        "SSH connection verified: ssh root@DROPLET_IP 'uname -a'"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-015",
+      "title": "Configure Droplet — Docker + nginx",
+      "priority": 15,
+      "phase": "PHASE 8: Infrastructure",
+      "description": "Install Docker, docker compose, and nginx on the Droplet. Set up nginx as reverse proxy for the API.",
+      "acceptance_criteria": [
+        "Docker installed and running on Droplet",
+        "docker compose v2 available",
+        "nginx installed and enabled",
+        "nginx config at /etc/nginx/sites-available/{{PRODUCT_SLUG}}-api",
+        "Proxy passes / → localhost:{{API_PORT}}",
+        "nginx -t passes (valid config)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-016",
+      "title": "Deploy backend API to Droplet",
+      "priority": 16,
+      "phase": "PHASE 9: Production Deploy",
+      "description": "Deploy the {{PRODUCT_SLUG}}-api to the Droplet using docker-compose.prod.yml. Configure production env vars.",
+      "acceptance_criteria": [
+        "docker-compose.prod.yml present on Droplet",
+        ".env present on Droplet (gitignored, not in repo)",
+        "docker compose -f docker-compose.prod.yml up -d succeeds",
+        "API container is healthy",
+        "Postgres container is healthy with persistent volume",
+        "curl http://localhost:{{API_PORT}}/health returns 200",
+        "curl https://{{API_DOMAIN}}/health returns 200 (after DNS + SSL)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-017",
+      "title": "Configure DNS records",
+      "priority": 17,
+      "phase": "PHASE 8: Infrastructure",
+      "description": "Add DNS A and CNAME records for all platform domains.",
+      "acceptance_criteria": [
+        "A record: {{API_DOMAIN}} → Droplet IP",
+        "CNAME or A record: {{APP_DOMAIN}} → Vercel",
+        "CNAME or A record: {{MARKETING_DOMAIN}} → Vercel",
+        "CNAME or A record: {{OPS_DOMAIN}} → Vercel",
+        "DNS propagation verified with: dig {{API_DOMAIN}} +short"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-018",
+      "title": "Issue SSL certificates",
+      "priority": 18,
+      "phase": "PHASE 8: Infrastructure",
+      "description": "Use Let's Encrypt (certbot) to issue SSL certificates for all backend domains.",
+      "acceptance_criteria": [
+        "certbot installed on Droplet",
+        "SSL cert issued for {{API_DOMAIN}}",
+        "nginx config updated to redirect HTTP → HTTPS",
+        "nginx config has SSL block for {{API_DOMAIN}}",
+        "curl https://{{API_DOMAIN}}/health returns 200 with valid cert"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-019",
+      "title": "Deploy frontends to Vercel",
+      "priority": 19,
+      "phase": "PHASE 9: Production Deploy",
+      "description": "Deploy {{PRODUCT_SLUG}}-app, {{PRODUCT_SLUG}}-web, and {{PRODUCT_SLUG}}-ops to Vercel. Configure custom domains and env vars.",
+      "acceptance_criteria": [
+        "{{PRODUCT_SLUG}}-app deployed to Vercel, domain: {{APP_DOMAIN}}",
+        "{{PRODUCT_SLUG}}-web deployed to Vercel, domain: {{MARKETING_DOMAIN}}",
+        "{{PRODUCT_SLUG}}-ops deployed to Vercel, domain: {{OPS_DOMAIN}}",
+        "NEXT_PUBLIC_API_URL set to https://{{API_DOMAIN}} in each app",
+        "All Vercel deployments show status: Ready",
+        "curl https://{{APP_DOMAIN}} returns 200"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-020",
+      "title": "Set up GitHub Actions CI/CD",
+      "priority": 20,
+      "phase": "PHASE 9: Production Deploy",
+      "description": "Create GitHub Actions workflows for automated testing and deployment on push to main.",
+      "acceptance_criteria": [
+        "{{PRODUCT_SLUG}}-api/.github/workflows/ci.yml — runs typecheck + build on PR",
+        "{{PRODUCT_SLUG}}-app/.github/workflows/ci.yml — runs build on PR",
+        "GitHub secrets set: any required API keys, DO tokens",
+        "Workflows trigger on push to main and pull_request",
+        "Manual trigger (workflow_dispatch) available"
+      ],
+      "passes": false
+    },
+    {
+      "id": "US-021",
+      "title": "End-to-end verification",
+      "priority": 21,
+      "phase": "PHASE 10: Verification",
+      "description": "Perform full end-to-end verification of the deployed platform. Confirm every domain resolves, auth flows work, and core features function.",
+      "acceptance_criteria": [
+        "https://{{API_DOMAIN}}/health → 200 OK",
+        "https://{{API_DOMAIN}}/docs → Swagger UI loads",
+        "https://{{APP_DOMAIN}} → app loads without errors",
+        "https://{{MARKETING_DOMAIN}} → marketing site loads",
+        "https://{{OPS_DOMAIN}} → ops dashboard loads (auth-gated)",
+        "Sign up flow: POST /auth/signup → success",
+        "Login flow: POST /auth/login → JWT returned",
+        "Authenticated request to a core endpoint → returns data",
+        "All Docker containers on Droplet are healthy",
+        "All Vercel deployments show: Ready"
+      ],
+      "passes": false
+    }
+  ]
+}

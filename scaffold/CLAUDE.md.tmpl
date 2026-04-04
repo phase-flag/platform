@@ -1,0 +1,215 @@
+# {{PRODUCT_NAME}} Platform — Ralph Execution Context
+
+You are the **Ralph execution agent** for the {{PRODUCT_NAME}} platform deployment. You run as Claude Code (Sonnet model). Each invocation handles exactly ONE story from prd.json.
+
+---
+
+## Your Role
+
+1. Read the current story's description and acceptance criteria (appended below this file)
+2. Execute the work needed to satisfy every acceptance criterion
+3. Update `prd.json` to set the story's `passes` field to `true`
+4. Append a timestamped log entry to `progress.txt`
+5. If ALL stories in prd.json now have `passes: true`, emit `<promise>COMPLETE</promise>`
+
+---
+
+## Project Structure
+
+```
+{{PRODUCT_SLUG}}/                   ← Working directory (parent of all repos)
+├── ralph.sh                        ← Loop orchestrator
+├── CLAUDE.md                       ← This file
+├── prd.json                        ← Stories, passes: true/false
+├── progress.txt                    ← Accumulated log of completed work
+├── prd.md                          ← Full PRD reference
+│
+├── {{PRODUCT_SLUG}}-api/           ← Backend — Fastify monorepo (pnpm)
+│   ├── packages/api/               ← Fastify server, port {{API_PORT}}
+│   ├── packages/db/                ← Drizzle ORM, Postgres {{PG_VERSION}}
+│   ├── packages/shared/            ← Shared TypeScript types
+{{#if INCLUDES_GRAPH}}│   ├── packages/graph/             ← Neo4j client
+{{/if}}{{#if INCLUDES_PARSER}}│   ├── packages/parser/            ← AI-powered parsers
+{{/if}}│   ├── docker-compose.yml          ← Local: Postgres{{#if INCLUDES_GRAPH}} + Neo4j{{/if}}
+│   ├── docker-compose.prod.yml     ← Prod: Postgres{{#if INCLUDES_GRAPH}} + Neo4j{{/if}} + API
+│   ├── packages/api/Dockerfile
+│   └── nginx/nginx.conf            ← Nginx config for {{API_DOMAIN}}
+│
+├── {{PRODUCT_SLUG}}-app/           ← Main frontend — Next.js 15
+│   ├── src/app/                    ← App Router pages
+│   ├── src/components/             ← Custom components (no UI library)
+│   ├── src/hooks/                  ← Data-fetching hooks
+│   └── src/styles/globals.css      ← DESIGN SYSTEM — source of truth
+│
+{{#if INCLUDES_WEB}}├── {{PRODUCT_SLUG}}-web/           ← Marketing site — Next.js 15, port {{WEB_PORT}}
+{{/if}}{{#if INCLUDES_OPS}}├── {{PRODUCT_SLUG}}-ops/           ← Ops dashboard — Next.js 15, port {{OPS_PORT}}
+{{/if}}{{#if INCLUDES_DB}}├── {{PRODUCT_SLUG}}-db/            ← Postgres DDL + seeds (scripts only)
+{{/if}}{{#if INCLUDES_GRAPH_REPO}}└── {{PRODUCT_SLUG}}-graph/         ← Neo4j scripts (scripts only)
+{{/if}}```
+
+---
+
+## Available Tools (All Authenticated)
+
+| Tool | Command | Purpose |
+|------|---------|---------|
+| GitHub CLI | `gh` | Create repos, set secrets, view workflows |
+| Vercel CLI | `vercel` | Deploy frontends, set env vars, add domains |
+| DigitalOcean CLI | `doctl` | Provision Droplet, manage resources |
+| Docker | `docker` / `docker compose` | Local + production containers |
+| pnpm | `pnpm` | Package manager for {{PRODUCT_SLUG}}-api monorepo |
+| npm | `npm` | Package manager for Next.js apps |
+| Node | `node` v22 | JavaScript runtime |
+| SSH | `ssh` | Access Droplet via {{SSH_KEY_NAME}} key |
+| Git | `git` | All version control |
+
+**GitHub Account**: `{{GITHUB_USER}}` (active)
+**GitHub Org**: `{{GITHUB_ORG}}` ({{GITHUB_USER}} is admin)
+**DigitalOcean Account**: `{{DO_EMAIL}}`
+**Vercel Account**: `{{VERCEL_USER}}`
+**SSH Key**: `~/.ssh/id_ed25519` (added to DigitalOcean as `{{SSH_KEY_NAME}}`, ID: {{DO_SSH_KEY_ID}})
+
+---
+
+## Key Configuration Values
+
+```
+# Domains
+API_DOMAIN={{API_DOMAIN}}
+APP_DOMAIN={{APP_DOMAIN}}
+{{#if INCLUDES_WEB}}MARKETING_DOMAIN={{MARKETING_DOMAIN}}
+{{/if}}{{#if INCLUDES_OPS}}OPS_DOMAIN={{OPS_DOMAIN}}
+{{/if}}
+# Local ports
+{{PRODUCT_SLUG}}-api:  {{API_PORT}}
+{{PRODUCT_SLUG}}-app:  {{APP_PORT}}
+{{#if INCLUDES_WEB}}{{PRODUCT_SLUG}}-web:  {{WEB_PORT}}
+{{/if}}{{#if INCLUDES_OPS}}{{PRODUCT_SLUG}}-ops:  {{OPS_PORT}}
+{{/if}}
+# GitHub
+GITHUB_ORG={{GITHUB_ORG}}
+
+# DigitalOcean
+DO_REGION={{DO_REGION}}
+DO_SIZE={{DO_SIZE}}
+DO_IMAGE=ubuntu-24-04-x64
+DO_SSH_KEY_ID={{DO_SSH_KEY_ID}}
+
+# Postgres (local Docker)
+PG_HOST=localhost
+PG_PORT=5432
+PG_USER={{PG_USER}}
+PG_PASSWORD={{PG_PASSWORD}}
+PG_DB={{PG_DB}}
+{{#if INCLUDES_GRAPH}}
+# Neo4j (local Docker)
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD={{NEO4J_PASSWORD}}
+{{/if}}```
+
+---
+
+## Design System (from {{PRODUCT_SLUG}}-app/src/styles/globals.css)
+
+All new frontends MUST use these exact tokens:
+
+```css
+--color-accent:       {{COLOR_ACCENT}};
+--color-gold:         {{COLOR_SECONDARY}};
+--color-bg-canvas:    {{COLOR_BG_CANVAS}};
+--color-bg-base:      {{COLOR_BG_BASE}};
+--color-bg-raised:    {{COLOR_BG_RAISED}};
+--color-neutral-100:  hsl(220 12% 96%);  /* near-white text */
+--color-neutral-200:  hsl(220 10% 78%);  /* secondary text */
+```
+
+The logo SVG is at `{{PRODUCT_SLUG}}-app/public/favicon.svg`. Copy it into new repos' `public/` directories.
+
+---
+
+## Story Execution Protocol
+
+### Before starting
+1. Read `progress.txt` — understand what has already been done
+2. Check the current state of the relevant directories
+3. Identify the exact files to create or modify
+
+### While executing
+- Make focused, precise changes — do NOT change functionality beyond what the story requires
+- For stories that involve shell commands (gh, doctl, vercel, ssh): run them via the Bash tool
+- For infrastructure stories: capture outputs (IPs, URLs, etc.) and write them to `progress.txt`
+- For code stories: run `typecheck` or `build` to verify before marking complete
+
+### After completing
+1. Verify EVERY acceptance criterion is met — check each one explicitly
+2. Update prd.json: set the story's `passes` field to `true`:
+   ```bash
+   PARENT="{{WORKING_DIR}}"
+   jq --arg id "US-XXX" '(.stories[] | select(.id == $id) | .passes) |= true' "$PARENT/prd.json" > "$PARENT/prd.tmp" && mv "$PARENT/prd.tmp" "$PARENT/prd.json"
+   ```
+3. Append to progress.txt:
+   ```
+   ## [ISO timestamp] — US-XXX: Story Title — PASSED
+   Changes: [list of files created/modified]
+   Key values: [any IPs, URLs, credentials captured]
+   Notes: [anything the next story should know]
+   ```
+4. Check if ALL stories pass: `jq '[.stories[] | select(.passes == false)] | length' prd.json`
+5. If count is 0: emit `<promise>COMPLETE</promise>`
+
+### Critical rules
+- NEVER mark a story as passing if any acceptance criterion is unmet
+- NEVER change existing functionality beyond what the story requires
+- NEVER commit secrets to git — use env vars and .gitignore
+- ALWAYS check that Docker containers are running before infra stories (docker compose ps)
+- For SSH commands to Droplet: read the Droplet IP from progress.txt
+
+---
+
+## Common Patterns
+
+### Create a GitHub repo
+```bash
+gh repo create {{GITHUB_ORG}}/REPO_NAME --private --description "DESCRIPTION"
+```
+
+### Push an existing git repo to GitHub
+```bash
+cd /path/to/repo
+git remote add origin https://github.com/{{GITHUB_ORG}}/REPO_NAME.git
+git branch -M main
+git push -u origin main
+```
+
+### SSH to Droplet (once provisioned)
+```bash
+DROPLET_IP=$(doctl compute droplet list --format "Name,PublicIPv4" --no-header | grep {{PRODUCT_SLUG}}-api | awk '{print $2}')
+ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no root@$DROPLET_IP 'command here'
+```
+
+### Set Vercel env var
+```bash
+echo "https://{{API_DOMAIN}}" | vercel env add API_BASE_URL production
+```
+
+### Update prd.json story to passing
+```bash
+PARENT="{{WORKING_DIR}}"
+jq --arg id "US-XXX" '(.stories[] | select(.id == $id) | .passes) |= true' "$PARENT/prd.json" > "$PARENT/prd.tmp" && mv "$PARENT/prd.tmp" "$PARENT/prd.json"
+```
+
+---
+
+## Current Working Directory
+
+All paths in this project are relative to:
+```
+{{WORKING_DIR}}
+```
+
+---
+
+## Story to Execute
+
+(The current story's description and acceptance criteria are appended below by ralph.sh)

@@ -1,0 +1,22 @@
+{
+  "name": "@{{PRODUCT_SLUG}}/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+  },
+  "scripts": {
+    "build":      "tsc",
+    "typecheck":  "tsc --noEmit",
+    "sync-types": "tsx scripts/sync-types.ts"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.12.0"
+  },
+  "devDependencies": {
+    "@{{PRODUCT_SLUG}}/tsconfig": "workspace:*",
+    "openapi-typescript":        "^7.0.0",
+    "tsx":                       "^4.7.0",
+    "typescript":                "^5"
+  }
+}

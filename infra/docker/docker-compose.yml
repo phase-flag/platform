@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  api:
+    build: ../../core/api
+    ports:
+      - "8000:8000"
+    environment:
+      - PHASEFLAG_DATABASE_URL=postgresql+asyncpg://phaseflag:${PHASEFLAG_DB_PASSWORD:?Set PHASEFLAG_DB_PASSWORD in .env}@db:5432/phaseflag
+      - PHASEFLAG_JWT_SECRET_KEY=${PHASEFLAG_JWT_SECRET_KEY:?Set PHASEFLAG_JWT_SECRET_KEY in .env}
+      - PHASEFLAG_API_SECRET_KEY=${PHASEFLAG_API_SECRET_KEY:?Set PHASEFLAG_API_SECRET_KEY in .env}
+      - PHASEFLAG_CORS_ORIGINS=http://localhost:3000,http://localhost:5173
+      - PHASEFLAG_LOG_LEVEL=DEBUG
+      - PHASEFLAG_DEPLOYMENT_MODE=oss
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  dashboard:
+    build: ../../core/dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - api
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: phaseflag
+      POSTGRES_PASSWORD: ${PHASEFLAG_DB_PASSWORD:?Set PHASEFLAG_DB_PASSWORD in .env}
+      POSTGRES_DB: phaseflag
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Database port not exposed by default — access via Docker network only
+    # Uncomment for local development debugging:
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phaseflag"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

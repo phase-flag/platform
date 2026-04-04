@@ -1,0 +1,66 @@
+/**
+ * @{{PRODUCT_SLUG}}/api-client
+ *
+ * Typed HTTP client for the {{PRODUCT_NAME}} API.
+ * Types are auto-generated from the OpenAPI spec — run `pnpm api-client:sync`.
+ *
+ * Usage:
+ *   import { api, setAuthToken } from "@{{PRODUCT_SLUG}}/api-client";
+ *
+ *   const { data, error } = await api.GET("/health");
+ *   setAuthToken("my-jwt");
+ *   const { data: user } = await api.GET("/auth/me");
+ */
+
+import createClient, { type Middleware } from "openapi-fetch";
+import type { paths } from "./api.gen.js";
+
+// Base URL — Next.js inlines NEXT_PUBLIC_* at build time, so process.env
+// works in both server and browser contexts. No window.__ENV__ needed.
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:{{API_PORT}}";
+
+// ── Auth middleware ───────────────────────────────────────────────────────────
+let _token: string | null = null;
+
+const authMiddleware: Middleware = {
+  async onRequest({ request }) {
+    if (_token) {
+      request.headers.set("Authorization", `Bearer ${_token}`);
+    }
+    return request;
+  },
+};
+
+// ── Client ────────────────────────────────────────────────────────────────────
+export const api = createClient<paths>({ baseUrl: BASE_URL });
+api.use(authMiddleware);
+
+/** Call after login/signup to attach the JWT to all subsequent requests. */
+export function setAuthToken(token: string | null) {
+  _token = token;
+}
+
+export function getAuthToken() {
+  return _token;
+}
+
+// ── Convenience helpers ───────────────────────────────────────────────────────
+
+/** Throws a typed Error if the response has an error, otherwise returns data. */
+export async function unwrap<T>(
+  promise: Promise<{ data?: T; error?: unknown }>
+): Promise<T> {
+  const { data, error } = await promise;
+  if (error) {
+    const msg =
+      typeof error === "object" && error !== null && "message" in error
+        ? (error as { message: string }).message
+        : "API request failed";
+    throw new Error(msg);
+  }
+  if (data === undefined) throw new Error("No data returned");
+  return data;
+}
+
+// ── Re-export generated types ─────────────────────────────────────────────────
+export type { paths, components } from "./api.gen.js";

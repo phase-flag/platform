@@ -1,0 +1,66 @@
+/*
+ * Phase Flag — Brand Design Tokens
+ * Use these CSS custom properties across all Phase Flag frontends.
+ */
+
+:root {
+  /* Primary palette — derived from logo */
+  --pf-navy: #2B4C5C;
+  --pf-dark: #1E3A4A;
+  --pf-mint: #5BBAA7;
+  --pf-mint-light: #7ED4C1;
+  --pf-mint-pale: #E8F7F3;
+
+  /* Neutrals */
+  --pf-white: #FFFFFF;
+  --pf-gray-50: #F8FAFB;
+  --pf-gray-100: #EDF1F3;
+  --pf-gray-200: #D8DEE2;
+  --pf-gray-300: #B4BFC6;
+  --pf-gray-400: #8E9DA6;
+  --pf-gray-500: #6B7F8A;
+  --pf-gray-600: #4A5E69;
+  --pf-gray-700: #344750;
+  --pf-gray-800: #1E3038;
+  --pf-gray-900: #0F1A1F;
+
+  /* Semantic */
+  --pf-success: #22C55E;
+  --pf-success-light: #DCFCE7;
+  --pf-warning: #F59E0B;
+  --pf-warning-light: #FEF3C7;
+  --pf-danger: #EF4444;
+  --pf-danger-light: #FEE2E2;
+  --pf-info: #3B82F6;
+  --pf-info-light: #DBEAFE;
+
+  /* Typography */
+  --pf-font-brand: 'Josefin Sans', sans-serif;
+  --pf-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --pf-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* Spacing scale */
+  --pf-space-1: 4px;
+  --pf-space-2: 8px;
+  --pf-space-3: 12px;
+  --pf-space-4: 16px;
+  --pf-space-5: 20px;
+  --pf-space-6: 24px;
+  --pf-space-8: 32px;
+  --pf-space-10: 40px;
+  --pf-space-12: 48px;
+  --pf-space-16: 64px;
+
+  /* Border radius */
+  --pf-radius-sm: 4px;
+  --pf-radius-md: 8px;
+  --pf-radius-lg: 12px;
+  --pf-radius-xl: 16px;
+  --pf-radius-full: 9999px;
+
+  /* Shadows */
+  --pf-shadow-sm: 0 1px 2px rgba(43, 76, 92, 0.06);
+  --pf-shadow-md: 0 4px 6px rgba(43, 76, 92, 0.08);
+  --pf-shadow-lg: 0 10px 15px rgba(43, 76, 92, 0.10);
+  --pf-shadow-xl: 0 20px 25px rgba(43, 76, 92, 0.12);
+}

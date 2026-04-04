@@ -1,0 +1,32 @@
+{
+  "name": "@phaseflag/solid",
+  "version": "0.1.0",
+  "description": "Phase Flag Solid.js SDK for feature flag evaluation",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.tsx --format cjs,esm --dts",
+    "dev": "tsup src/index.tsx --format cjs,esm --dts --watch"
+  },
+  "keywords": ["feature-flags", "phaseflag", "phase-flag", "solid", "solidjs", "sdk"],
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "@phaseflag/sdk-js": ">=0.1.0",
+    "solid-js": ">=1.7.0"
+  },
+  "devDependencies": {
+    "@phaseflag/sdk-js": "^0.1.0",
+    "solid-js": "^1.8.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}

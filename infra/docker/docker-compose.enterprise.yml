@@ -1,0 +1,111 @@
+version: '3.8'
+
+# Extends the self-hosted compose file with enterprise modules.
+# Usage: docker compose -f docker-compose.selfhosted.yml -f docker-compose.enterprise.yml up
+
+services:
+  api:
+    build: ../../core/api
+    ports:
+      - "8000:8000"
+    environment:
+      - PHASEFLAG_DATABASE_URL=postgresql+asyncpg://phaseflag:${PHASEFLAG_DB_PASSWORD:?Set PHASEFLAG_DB_PASSWORD in .env}@db:5432/phaseflag
+      - PHASEFLAG_JWT_SECRET_KEY=${PHASEFLAG_JWT_SECRET_KEY}
+      - PHASEFLAG_API_SECRET_KEY=${PHASEFLAG_API_SECRET_KEY}
+      - PHASEFLAG_CORS_ORIGINS=${PHASEFLAG_CORS_ORIGINS:?Set PHASEFLAG_CORS_ORIGINS - wildcard not allowed in enterprise mode}
+      - PHASEFLAG_LOG_LEVEL=${PHASEFLAG_LOG_LEVEL:-INFO}
+      - PHASEFLAG_DEPLOYMENT_MODE=enterprise
+      - PHASEFLAG_LICENSE_KEY=${PHASEFLAG_LICENSE_KEY}
+    volumes:
+      - ../../enterprise:/app/enterprise:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '2.0'
+
+  relay:
+    build: ../../core/relay
+    ports:
+      - "8081:8081"
+    environment:
+      - PHASEFLAG_RELAY_UPSTREAM=http://api:8000
+      - PHASEFLAG_RELAY_API_KEY=${PHASEFLAG_RELAY_API_KEY:-}
+      - PHASEFLAG_RELAY_POLL_INTERVAL=15s
+      - PHASEFLAG_RELAY_CACHE_TTL=2m
+      - PHASEFLAG_RELAY_LOG_LEVEL=${PHASEFLAG_LOG_LEVEL:-info}
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+
+  dashboard:
+    build: ../../core/dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=${PHASEFLAG_API_EXTERNAL_URL:-http://localhost:8000}
+      - VITE_ENTERPRISE=true
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: phaseflag
+      POSTGRES_PASSWORD: ${PHASEFLAG_DB_PASSWORD:?Set PHASEFLAG_DB_PASSWORD in .env}
+      POSTGRES_DB: phaseflag
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Database port not exposed externally — access via Docker network only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phaseflag"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+
+  redis:
+    image: redis:7-alpine
+    # Redis port not exposed externally — access via Docker network only
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+
+volumes:
+  pgdata:
+  redisdata:

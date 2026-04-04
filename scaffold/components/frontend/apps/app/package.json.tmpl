@@ -1,0 +1,29 @@
+{
+  "name": "@{{PRODUCT_SLUG}}/app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev":       "next dev -p {{APP_PORT}}",
+    "build":     "next build",
+    "start":     "next start -p {{APP_PORT}}",
+    "typecheck": "tsc --noEmit",
+    "lint":      "next lint"
+  },
+  "dependencies": {
+    "@{{PRODUCT_SLUG}}/ui":         "workspace:*",
+    "@{{PRODUCT_SLUG}}/env":        "workspace:*",
+    "@{{PRODUCT_SLUG}}/api-client": "workspace:*",
+    "next":                         "15.2.4",
+    "react":                        "^19.0.0",
+    "react-dom":                    "^19.0.0"
+  },
+  "devDependencies": {
+    "@{{PRODUCT_SLUG}}/tsconfig":  "workspace:*",
+    "@tailwindcss/postcss":        "^4.0.0",
+    "tailwindcss":                 "^4.0.0",
+    "@types/node":                 "^22",
+    "@types/react":                "^19",
+    "@types/react-dom":            "^19",
+    "typescript":                  "^5"
+  }
+}

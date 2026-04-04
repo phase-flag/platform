@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme {
+  --color-pf-navy: #2B4C5C;
+  --color-pf-dark: #1E3A4A;
+  --color-pf-mint: #5BBAA7;
+  --color-pf-mint-light: #7ED4C1;
+  --color-pf-mint-pale: #E8F7F3;
+  --color-pf-white: #FFFFFF;
+  --color-pf-gray-50: #F8FAFB;
+  --color-pf-gray-100: #EDF1F3;
+  --color-pf-gray-500: #6B7F8A;
+  --color-pf-success: #22C55E;
+  --color-pf-warning: #F59E0B;
+  --color-pf-danger: #EF4444;
+
+  --color-pf-page: #0F1A20;
+  --color-pf-card: #162029;
+  --color-pf-surface: #1C2D38;
+  --color-pf-text: #E8F0F2;
+  --color-pf-text-muted: #8FA3AD;
+  --color-pf-border: rgba(91, 186, 167, 0.15);
+
+  --font-heading: 'Josefin Sans', sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-body);
+  color: #E8F0F2;
+  background: #0F1A20;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+code, pre {
+  font-family: var(--font-mono);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom toggle animation */
+.toggle-track {
+  transition: background-color 0.3s ease;
+}
+.toggle-thumb {
+  transition: transform 0.3s ease;
+}
+
+/* Code block styling */
+.code-block {
+  background: var(--color-pf-dark);
+  color: #e2e8f0;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+}
+.code-block .keyword { color: #c792ea; }
+.code-block .string { color: #c3e88d; }
+.code-block .comment { color: #546e7a; }
+.code-block .function { color: #82aaff; }
+.code-block .variable { color: #f78c6c; }
+.code-block .type { color: #ffcb6b; }
+
+/* Fade-in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}

@@ -1,0 +1,17 @@
+apiVersion: v2
+name: phaseflag
+description: Phase Flag - Open-source feature flag management platform
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - feature-flags
+  - feature-management
+  - a-b-testing
+  - release-management
+home: https://phaseflag.dev
+sources:
+  - https://github.com/phaseflag/phaseflag
+maintainers:
+  - name: Phase Flag Team
+    url: https://phaseflag.dev

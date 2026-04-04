@@ -1,0 +1,31 @@
+# Phase Flag — Progress Log
+# Created: 2026-04-04
+# Working directory: /Users/manav/Library/Mobile Documents/com~apple~CloudDocs/hextrot/phase-flag
+# GitHub org: phaseflag
+#
+# Format: ## [ISO timestamp] — US-XXX: Story Title — PASSED
+#         Changes: ...
+#         Key values: ...
+#         Notes: ...
+#
+# This file is append-only. Do not edit existing entries.
+
+## 2026-04-04T00:00:00Z — US-001: Verify migration completeness and tool availability — PASSED
+Changes: Installed poetry 2.3.3, installed go 1.26.1 via homebrew
+Key values: GitHub active account=hextrot, GitHub org=phase-flag (not phaseflag — update stories), Docker 29.1.3, poetry 2.3.3, go 1.26.1
+Notes: GitHub org is phase-flag (has phase-flag org listed). Need to use hextrot account with phase-flag org for repo operations. All 12 directories present, all tools verified.
+
+## 2026-04-04T00:01:00Z — US-002: Verify and finalize GitHub Actions CI path references — PASSED
+Changes: No changes needed — all paths already correct from migration step
+Key values: All 5 workflows verified clean (api-ci, dashboard-ci, docker-publish, release, sdk-ci)
+Notes: No remaining phaseflag/core or phaseflag/sdks refs. All cd commands and context: fields reference correct relative paths.
+
+## 2026-04-04T00:21:00Z — US-003: Verify local development stack starts end-to-end — PASSED
+Changes: Created infra/docker/.env with generated secrets; fixed Dockerfile (--no-root); changed postgres port 5432→5433 (conflict); stamped alembic to head (API auto-creates tables on startup)
+Key values: API health: {"status":"ok","version":"0.1.0","database":"connected"}, Dashboard build: 2159 modules, 994KB bundle, DB running on 5433
+Notes: API does create_all on startup — alembic stamp head needed for existing DB. Dashboard clean install required (stale node_modules). Python 3.13 on host incompatible with asyncpg 0.29.0 — use Docker container for migrations.
+
+## 2026-04-04T00:22:00Z — US-004: Create root .gitignore — PASSED
+Changes: Created /.gitignore covering Python, SQLite, Node, Go, Rust, Java, .NET, secrets, macOS, IDEs, Terraform, Docker
+Key values: infra/docker/.env explicitly gitignored
+Notes: poetry.lock is committed (intentional). CLI binaries (pfctl, pfctl-*) excluded.

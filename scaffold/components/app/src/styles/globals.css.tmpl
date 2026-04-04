@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+/* ── Design System — {{PRODUCT_NAME}} ─────────────────────────────────────── */
+/* SINGLE SOURCE OF TRUTH: all color tokens live here.
+   Copy this block verbatim to vettr-web, vettr-ops, etc.         */
+
+:root {
+  /* Brand */
+  --color-accent:       {{COLOR_ACCENT}};
+  --color-secondary:    {{COLOR_SECONDARY}};
+
+  /* Backgrounds (dark-first) */
+  --color-bg-canvas:    {{COLOR_BG_CANVAS}};
+  --color-bg-base:      {{COLOR_BG_BASE}};
+  --color-bg-raised:    {{COLOR_BG_RAISED}};
+  --color-bg-overlay:   hsl(220 12% 18%);
+
+  /* Text */
+  --color-neutral-100:  hsl(220 12% 96%);   /* near-white — primary text */
+  --color-neutral-200:  hsl(220 10% 78%);   /* secondary text */
+  --color-neutral-400:  hsl(220  8% 50%);   /* muted / placeholder */
+  --color-neutral-600:  hsl(220  8% 30%);   /* borders */
+
+  /* Semantic */
+  --color-success:      hsl(142 60% 45%);
+  --color-warning:      hsl( 38 85% 55%);
+  --color-danger:       hsl(  4 80% 55%);
+  --color-info:         hsl(210 70% 55%);
+
+  /* Spacing scale */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+
+  /* Radii */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px hsl(220 15% 5% / 0.4);
+  --shadow-md: 0 4px 12px hsl(220 15% 5% / 0.5);
+  --shadow-lg: 0 8px 24px hsl(220 15% 5% / 0.6);
+
+  /* Transitions */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   400ms ease;
+}
+
+/* ── Base reset ───────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--color-bg-canvas);
+  color: var(--color-neutral-100);
+  min-height: 100dvh;
+}
+
+/* ── Utility classes ─────────────────────────────────────────────────────── */
+.card {
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-neutral-600);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.card-raised {
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-neutral-600);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: opacity var(--transition-fast), background var(--transition-fast);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: hsl(220 15% 8%);
+}
+
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-neutral-200);
+  border: 1px solid var(--color-neutral-600);
+}
+
+.btn-ghost:hover { background: var(--color-bg-raised); }
+
+.text-accent   { color: var(--color-accent); }
+.text-muted    { color: var(--color-neutral-400); }
+.text-secondary { color: var(--color-neutral-200); }

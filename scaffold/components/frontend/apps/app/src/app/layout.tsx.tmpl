@@ -1,0 +1,28 @@
+import type { Metadata } from "next";
+import { {{FONT_NEXT_IMPORT}} } from "next/font/google";
+import "../globals.css";
+
+const fontSans = {{FONT_NEXT_CALL_SANS}};
+{{#if FONT_MONO_GOOGLE}}const fontMono = {{FONT_NEXT_CALL_MONO}};
+{{/if}}
+export const metadata: Metadata = {
+  title: {
+    default:  "{{PRODUCT_NAME}}",
+    template: "%s — {{PRODUCT_NAME}}",
+  },
+  description: "{{PRODUCT_DESCRIPTION}}",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html
+      lang="en"
+      className={[
+        fontSans.variable,
+        {{#if FONT_MONO_GOOGLE}}fontMono.variable,{{/if}}
+      ].join(" ")}
+    >
+      <body>{children}</body>
+    </html>
+  );
+}

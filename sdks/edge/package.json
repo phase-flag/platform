@@ -1,0 +1,38 @@
+{
+  "name": "@phaseflag/edge",
+  "version": "0.1.0",
+  "description": "Phase Flag Edge SDK for Cloudflare Workers, Vercel Edge, and Deno Deploy",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./cloudflare": {
+      "import": "./dist/cloudflare-worker.mjs",
+      "types": "./dist/cloudflare-worker.d.ts"
+    },
+    "./vercel": {
+      "import": "./dist/vercel-edge.mjs",
+      "types": "./dist/vercel-edge.d.ts"
+    },
+    "./deno": {
+      "import": "./dist/deno.mjs",
+      "types": "./dist/deno.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts src/cloudflare-worker.ts src/vercel-edge.ts src/deno.ts --format esm --dts",
+    "dev": "tsup src/index.ts --format esm --dts --watch"
+  },
+  "keywords": ["feature-flags", "phaseflag", "edge", "cloudflare-workers", "vercel-edge", "deno"],
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}

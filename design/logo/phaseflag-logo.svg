@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 635 100" fill="none">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;300&amp;display=swap');
+    .logo-text { font-family: 'Josefin Sans', sans-serif; font-weight: 200; font-size: 64px; fill: #2B4C5C; letter-spacing: 4px; }
+  </style>
+  <!-- PHASE -->
+  <text x="20" y="70" class="logo-text">PHASE</text>
+  <!-- Toggle switch icon -->
+  <rect x="273" y="18" rx="20" ry="20" width="30" height="56" stroke="#5BBAA7" stroke-width="2.5" fill="none"/>
+  <circle cx="288" cy="38" r="8" stroke="#5BBAA7" stroke-width="2" fill="none"/>
+  <!-- FLAG -->
+  <text x="315" y="70" class="logo-text">FLAG</text>
+</svg>

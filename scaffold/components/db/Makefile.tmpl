@@ -1,0 +1,53 @@
+# {{PRODUCT_NAME}} DB — Postgres helper targets
+# Requires: psql, DATABASE_URL in .env
+
+include .env
+export
+
+DB_URL := postgresql://$(PG_USER):$(PG_PASSWORD)@$(PG_HOST):$(PG_PORT)/$(PG_DB)
+
+.PHONY: help connect migrate seed reset dump restore
+
+help:
+	@echo "Available targets:"
+	@echo "  make connect   — psql shell into the DB"
+	@echo "  make migrate   — run all DDL migrations in order"
+	@echo "  make seed      — run seed scripts"
+	@echo "  make reset     — drop and recreate the database (DESTRUCTIVE)"
+	@echo "  make dump      — pg_dump to backups/YYYY-MM-DD.sql"
+	@echo "  make restore   — restore from backups/latest.sql"
+
+connect:
+	psql "$(DB_URL)"
+
+migrate:
+	@echo "Running migrations..."
+	@for f in ddl/*.sql; do \
+		echo "  → $$f"; \
+		psql "$(DB_URL)" -f "$$f"; \
+	done
+	@echo "Migrations complete."
+
+seed:
+	@echo "Running seeds..."
+	@for f in seeds/*.sql; do \
+		echo "  → $$f"; \
+		psql "$(DB_URL)" -f "$$f"; \
+	done
+	@echo "Seeding complete."
+
+reset:
+	@echo "WARNING: Dropping and recreating database '$(PG_DB)'"
+	@read -p "Are you sure? [y/N] " confirm && [ "$$confirm" = "y" ]
+	psql "postgresql://$(PG_USER):$(PG_PASSWORD)@$(PG_HOST):$(PG_PORT)/postgres" \
+		-c "DROP DATABASE IF EXISTS $(PG_DB);" \
+		-c "CREATE DATABASE $(PG_DB) OWNER $(PG_USER);"
+	@$(MAKE) migrate seed
+
+dump:
+	@mkdir -p backups
+	pg_dump "$(DB_URL)" > "backups/$$(date +%Y-%m-%d).sql"
+	@echo "Dumped to backups/$$(date +%Y-%m-%d).sql"
+
+restore:
+	psql "$(DB_URL)" < backups/latest.sql
