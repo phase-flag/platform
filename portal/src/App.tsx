@@ -10,6 +10,8 @@ import SDKDemo from './pages/SDKDemo';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import Onboarding from './pages/Onboarding';
+import Billing from './pages/Billing';
 
 function NotFound() {
   return (
@@ -52,6 +54,8 @@ function AppRoutes() {
 
       {/* Protected pages — no shell */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+      <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
 
       {/* Public pages with shell */}
       <Route path="/" element={<ShellLayout><Home /></ShellLayout>} />
