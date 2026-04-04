@@ -5,8 +5,10 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from phaseflag_api.config import DeploymentMode, settings
 from phaseflag_api.database import get_session
 from phaseflag_api.middleware.auth import get_current_user
+from phaseflag_api.models.projects import OrgMemberDB
 from phaseflag_api.models.users import UserDB
 from phaseflag_api.services.auth_service import (
     create_token,
@@ -83,7 +85,16 @@ async def login(body: LoginRequest, session: AsyncSession = Depends(get_session)
     if not user.password_hash.startswith(("$2b$", "$2a$", "$2y$")):
         user.password_hash = hash_password(body.password)
 
-    token = create_token(user)
+    org_id: str | None = None
+    if settings.DEPLOYMENT_MODE == DeploymentMode.SAAS:
+        membership = await session.execute(
+            select(OrgMemberDB).where(OrgMemberDB.user_id == user.id).limit(1)
+        )
+        first_membership = membership.scalar_one_or_none()
+        if first_membership:
+            org_id = first_membership.organization_id
+
+    token = create_token(user, org_id=org_id)
     return {
         "token": token,
         "user": {

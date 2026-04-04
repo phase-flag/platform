@@ -32,7 +32,7 @@ def verify_password(password: str, password_hash: str) -> bool:
     return hmac.compare_digest(h, stored_hash)
 
 
-def create_token(user: UserDB) -> str:
+def create_token(user: UserDB, org_id: str | None = None) -> str:
     """Create a JWT access token for the given user."""
     now = datetime.now(UTC)
     payload = {
@@ -43,4 +43,6 @@ def create_token(user: UserDB) -> str:
         "iat": now,
         "exp": now + timedelta(hours=settings.JWT_EXPIRE_HOURS),
     }
+    if org_id is not None:
+        payload["org_id"] = org_id
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)

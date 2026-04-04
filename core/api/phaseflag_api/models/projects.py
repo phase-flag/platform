@@ -22,6 +22,7 @@ class OrganizationDB(Base):
     slug = Column(String(255), unique=True, nullable=False, index=True)
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
+    subscription_tier = Column(String(20), nullable=False, default="free")  # free/pro/enterprise
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
     updated_at = Column(
         DateTime,

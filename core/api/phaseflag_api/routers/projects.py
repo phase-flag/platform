@@ -1,12 +1,14 @@
 """Organization and project management endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from phaseflag_api.database import get_session
-from phaseflag_api.middleware.auth import require_api_key, require_role
-from phaseflag_api.models.projects import OrganizationDB, ProjectDB
+from phaseflag_api.middleware.auth import get_current_user, require_api_key, require_role
+from phaseflag_api.models.projects import OrgMemberDB, OrganizationDB, ProjectDB
+from phaseflag_api.models.users import UserDB
 from phaseflag_api.repositories import project_repository
 
 router = APIRouter(dependencies=[Depends(require_api_key)])
@@ -31,8 +33,21 @@ class OrgOut(BaseModel):
     slug: str
     name: str
     description: str | None
+    subscription_tier: str
     created_at: str
     updated_at: str
+
+
+class MemberInvite(BaseModel):
+    email: EmailStr
+    role: str = Field("member", pattern="^(owner|admin|member)$")
+
+
+class MemberOut(BaseModel):
+    org_id: str
+    user_id: str
+    role: str
+    joined_at: str
 
 
 class ProjectCreate(BaseModel):
@@ -76,6 +91,7 @@ def _org_to_out(org: OrganizationDB) -> OrgOut:
         slug=org.slug,
         name=org.name,
         description=org.description,
+        subscription_tier=org.subscription_tier,
         created_at=org.created_at.isoformat(),
         updated_at=org.updated_at.isoformat(),
     )
@@ -94,6 +110,58 @@ def _project_to_out(p: ProjectDB) -> ProjectOut:
 
 
 # --- Organization Endpoints ---
+
+
+@router.get("/organizations/me", response_model=list[OrgOut])
+async def my_organizations(
+    user: dict = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+):
+    """Return all organizations the current user belongs to."""
+    result = await session.execute(
+        select(OrgMemberDB).where(OrgMemberDB.user_id == user["id"])
+    )
+    memberships = result.scalars().all()
+    org_ids = [m.organization_id for m in memberships]
+    if not org_ids:
+        return []
+    orgs_result = await session.execute(
+        select(OrganizationDB).where(OrganizationDB.id.in_(org_ids))
+    )
+    return [_org_to_out(o) for o in orgs_result.scalars().all()]
+
+
+@router.post("/organizations/{org_id}/members", response_model=MemberOut, status_code=201)
+async def invite_member(
+    org_id: str,
+    body: MemberInvite,
+    session: AsyncSession = Depends(get_session),
+):
+    """Invite a user to an organization by email."""
+    org = await session.get(OrganizationDB, org_id)
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    user_result = await session.execute(select(UserDB).where(UserDB.email == body.email))
+    user = user_result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail=f"No user found with email {body.email}")
+    existing = await session.execute(
+        select(OrgMemberDB).where(
+            OrgMemberDB.organization_id == org_id,
+            OrgMemberDB.user_id == user.id,
+        )
+    )
+    if existing.scalar_one_or_none():
+        raise HTTPException(status_code=409, detail="User is already a member of this organization")
+    member = OrgMemberDB(organization_id=org_id, user_id=user.id, role=body.role)
+    session.add(member)
+    await session.flush()
+    return MemberOut(
+        org_id=member.organization_id,
+        user_id=member.user_id,
+        role=member.role,
+        joined_at=member.created_at.isoformat(),
+    )
 
 
 @router.get("/organizations", response_model=PaginatedOrgs)
