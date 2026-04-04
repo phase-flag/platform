@@ -46,7 +46,7 @@ import {
   type FlagDefinition,
   type PhaseFlagConfig,
   type Variation,
-} from '@phaseflag/sdk-js';
+} from '@phaseflag/js-sdk';
 
 // Re-export types from the JS SDK
 export type { EvaluationContext, FlagDefinition, PhaseFlagConfig, Variation, BootstrapData };
@@ -137,7 +137,7 @@ export function PhaseFlagProvider({
           setLoading(false);
         }
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Failed to connect to Phase Flag');
           setLoading(false);
@@ -204,7 +204,7 @@ export function useFeatureFlag(flagKey: string): {
     if (!client || !flag) return { value: undefined, variation: undefined };
     const result = client.getVariation(flagKey);
     if (!result) return { value: undefined, variation: undefined };
-    const variation = flag.variations.find((v) => v.id === result.variationId) ?? flag.variations[0];
+    const variation = flag.variations.find((v: Variation) => v.id === result.variationId) ?? flag.variations[0];
     return { value: result.value, variation };
   }, [client, flag, flagKey]);
 

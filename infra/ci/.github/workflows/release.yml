@@ -71,8 +71,8 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/phaseflag/api:${{ needs.create-release.outputs.version }}
-            ghcr.io/phaseflag/api:latest
+            ghcr.io/phase-flag/api:${{ needs.create-release.outputs.version }}
+            ghcr.io/phase-flag/api:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -100,8 +100,8 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/phaseflag/relay:${{ needs.create-release.outputs.version }}
-            ghcr.io/phaseflag/relay:latest
+            ghcr.io/phase-flag/relay:${{ needs.create-release.outputs.version }}
+            ghcr.io/phase-flag/relay:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

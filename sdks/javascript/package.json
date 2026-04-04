@@ -1,5 +1,5 @@
 {
-  "name": "@phaseflag/sdk-js",
+  "name": "@phaseflag/js-sdk",
   "version": "0.1.0",
   "description": "Phase Flag feature flag JavaScript/TypeScript SDK",
   "main": "dist/index.js",
