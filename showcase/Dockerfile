@@ -13,7 +13,7 @@ FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY <<'EOF' /etc/nginx/conf.d/default.conf
 server {
-    listen 5175;
+    listen 5176;
     root /usr/share/nginx/html;
     index index.html;
 
@@ -35,5 +35,5 @@ server {
     }
 }
 EOF
-EXPOSE 5175
+EXPOSE 5176
 CMD ["nginx", "-g", "daemon off;"]
