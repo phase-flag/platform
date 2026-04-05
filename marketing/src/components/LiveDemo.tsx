@@ -21,16 +21,16 @@ export default function LiveDemo() {
 
   return (
     <section id="live-demo" className="py-20 lg:py-28 relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-pf-mint/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-pf-primary/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-mint/10 text-pf-mint border border-pf-mint/20 mb-6">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-primary/10 text-pf-primary border border-pf-primary/20 mb-6">
             Interactive Playground
           </span>
           <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-light uppercase tracking-wider text-white mb-6">
-            See It <span className="text-pf-mint">Live</span>
+            See It <span className="text-pf-primary">Live</span>
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
             We built a demo app called <strong className="text-white">Nexus</strong> — a project management tool powered
@@ -41,7 +41,7 @@ export default function LiveDemo() {
         {/* Two-column: Access card + How it works */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           {/* Access Card */}
-          <div className="bg-pf-surface-light rounded-2xl border border-[rgba(91,186,167,0.15)] p-8 flex flex-col">
+          <div className="bg-pf-surface-light rounded-2xl border border-[rgba(99,102,241,0.15)] p-8 flex flex-col">
             <h3 className="text-xl font-semibold text-white mb-2">Try it yourself</h3>
             <p className="text-sm text-white/50 mb-6">Open both links side-by-side, toggle a flag, and watch the demo app update instantly.</p>
 
@@ -49,8 +49,8 @@ export default function LiveDemo() {
               {/* Demo App Link */}
               <div className="bg-[#0F1A20] rounded-xl p-5 border border-white/5">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-lg bg-pf-mint/15 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-pf-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-9 h-9 rounded-lg bg-pf-primary/15 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-pf-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -64,7 +64,7 @@ export default function LiveDemo() {
                   href="http://localhost:5176"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full text-center px-4 py-2.5 text-sm font-medium text-white bg-pf-mint rounded-lg hover:bg-pf-mint-light transition-colors"
+                  className="block w-full text-center px-4 py-2.5 text-sm font-medium text-white bg-pf-primary rounded-lg hover:bg-pf-primary-light transition-colors"
                 >
                   Open Demo App
                 </a>
@@ -106,11 +106,11 @@ export default function LiveDemo() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="text-[10px] uppercase tracking-wider text-white/30 mb-1">Email</div>
-                  <code className="text-sm text-pf-mint font-mono">demo@phaseflag.dev</code>
+                  <code className="text-sm text-pf-primary font-mono">demo@phaseflag.dev</code>
                 </div>
                 <div>
                   <div className="text-[10px] uppercase tracking-wider text-white/30 mb-1">Password</div>
-                  <code className="text-sm text-pf-mint font-mono">TryPhaseFlag!</code>
+                  <code className="text-sm text-pf-primary font-mono">TryPhaseFlag!</code>
                 </div>
               </div>
               <p className="mt-3 text-xs text-white/30">
@@ -120,7 +120,7 @@ export default function LiveDemo() {
           </div>
 
           {/* How it works */}
-          <div className="bg-pf-surface-light rounded-2xl border border-[rgba(91,186,167,0.15)] p-8">
+          <div className="bg-pf-surface-light rounded-2xl border border-[rgba(99,102,241,0.15)] p-8">
             <h3 className="text-xl font-semibold text-white mb-6">What to try</h3>
             <div className="space-y-5">
               {[
@@ -151,7 +151,7 @@ export default function LiveDemo() {
                 },
               ].map((item) => (
                 <div key={item.step} className="flex gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-pf-mint/15 flex items-center justify-center text-sm font-semibold text-pf-mint">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-pf-primary/15 flex items-center justify-center text-sm font-semibold text-pf-primary">
                     {item.step}
                   </div>
                   <div>
@@ -167,7 +167,7 @@ export default function LiveDemo() {
         {/* Flag table */}
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">Demo flags powering the app</h3>
-          <div className="bg-pf-surface-light rounded-2xl border border-[rgba(91,186,167,0.15)] overflow-hidden">
+          <div className="bg-pf-surface-light rounded-2xl border border-[rgba(99,102,241,0.15)] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -181,7 +181,7 @@ export default function LiveDemo() {
                   {flags.map((flag, i) => (
                     <tr key={flag.key} className={`border-b border-white/5 last:border-0 ${i % 2 === 0 ? 'bg-white/[0.02]' : ''}`}>
                       <td className="px-5 py-3">
-                        <code className="text-pf-mint font-mono text-xs">{flag.key}</code>
+                        <code className="text-pf-primary font-mono text-xs">{flag.key}</code>
                       </td>
                       <td className="px-5 py-3">
                         <span className={`inline-flex px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-medium border ${typeBadge[flag.type]}`}>

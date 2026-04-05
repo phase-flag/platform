@@ -26,12 +26,12 @@ export default function CookieConsent() {
       aria-label="Cookie consent"
       className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 sm:pb-6 animate-slide-up"
     >
-      <div className="max-w-3xl mx-auto bg-[#162029] border border-[rgba(52,211,153,0.2)] rounded-2xl shadow-2xl shadow-black/50 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div className="max-w-3xl mx-auto bg-[#162029] border border-[rgba(99,102,241,0.2)] rounded-2xl shadow-2xl shadow-black/50 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         {/* Cookie icon */}
-        <div className="shrink-0 w-9 h-9 rounded-xl bg-[rgba(52,211,153,0.1)] flex items-center justify-center">
+        <div className="shrink-0 w-9 h-9 rounded-xl bg-[rgba(99,102,241,0.1)] flex items-center justify-center">
           <svg
             className="w-5 h-5"
-            style={{ color: '#34D399' }}
+            style={{ color: '#6366F1' }}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -56,7 +56,7 @@ export default function CookieConsent() {
             target="_blank"
             rel="noopener noreferrer"
             className="underline underline-offset-2 transition-colors hover:text-white"
-            style={{ color: '#34D399' }}
+            style={{ color: '#6366F1' }}
           >
             Privacy Policy
           </a>
@@ -77,9 +77,9 @@ export default function CookieConsent() {
             onClick={handleAccept}
             className="px-5 py-2 text-sm font-semibold rounded-xl transition-colors shadow-lg"
             style={{
-              background: '#34D399',
-              color: '#0F1A20',
-              boxShadow: '0 4px 14px rgba(52,211,153,0.25)',
+              background: '#6366F1',
+              color: '#FFFFFF',
+              boxShadow: '0 4px 14px rgba(99,102,241,0.25)',
             }}
           >
             Accept

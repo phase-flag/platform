@@ -15,14 +15,14 @@ function DemoSection({ number, title, flagKey, icon: Icon, capability, descripti
     return (
         <section className="bg-surface rounded-xl border border-gray-800 p-6 mb-6">
             <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 rounded-full bg-pf-mint/10 text-pf-mint flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-pf-primary/10 text-pf-primary flex items-center justify-center flex-shrink-0">
                     <Icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-1">
                         <span className="text-xs text-gray-600 font-mono">#{number}</span>
                         <h2 className="text-lg font-semibold text-gray-100">{title}</h2>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-pf-mint/10 text-pf-mint border border-pf-mint/20">{capability}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-pf-primary/10 text-pf-primary border border-pf-primary/20">{capability}</span>
                     </div>
                     <p className="text-sm text-gray-400 mb-4">{description}</p>
                     <div className="bg-surface-light rounded-lg p-4 mb-3">
@@ -46,18 +46,18 @@ export default function Showcase() {
         <div className="p-8 max-w-4xl">
             <div className="mb-8">
                 <div className="flex items-center space-x-3 mb-2">
-                    <Flag className="w-8 h-8 text-pf-mint" />
+                    <Flag className="w-8 h-8 text-pf-primary" />
                     <h1 className="text-3xl font-bold text-gray-100">Phase Flag Showcase</h1>
                 </div>
                 <p className="text-gray-400">
                     This page demonstrates every Phase Flag capability. Switch users with the dropdown in the top-right
-                    and watch the UI change in real-time. Open the <span className="text-pf-mint">Flag Inspector</span> (bottom-right button) to see evaluation details.
+                    and watch the UI change in real-time. Open the <span className="text-pf-primary">Flag Inspector</span> (bottom-right button) to see evaluation details.
                 </p>
                 <div className="mt-4 flex items-center space-x-4 text-xs text-gray-500">
-                    <span>User: <span className="text-pf-mint">{currentUser.name}</span></span>
-                    <span>Plan: <span className="text-pf-mint">{currentUser.plan}</span></span>
-                    <span>Env: <span className="text-pf-mint">{environment}</span></span>
-                    <span>Flags loaded: <span className="text-pf-mint">{flagResults.length}</span></span>
+                    <span>User: <span className="text-pf-primary">{currentUser.name}</span></span>
+                    <span>Plan: <span className="text-pf-primary">{currentUser.plan}</span></span>
+                    <span>Env: <span className="text-pf-primary">{environment}</span></span>
+                    <span>Flags loaded: <span className="text-pf-primary">{flagResults.length}</span></span>
                 </div>
             </div>
 
@@ -70,7 +70,7 @@ export default function Showcase() {
                         {String(flagValues['nexus-dark-mode'] ?? 'undefined')}
                     </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Toggle this flag in the <a href="http://localhost:5173/flags" target="_blank" className="text-pf-mint hover:underline">dashboard</a> and watch this page update via SSE.</p>
+                <p className="text-xs text-gray-500 mt-2">Toggle this flag in the <a href="http://localhost:5173/flags" target="_blank" className="text-pf-primary hover:underline">dashboard</a> and watch this page update via SSE.</p>
             </DemoSection>
 
             {/* 2. String Multivariate */}
@@ -80,14 +80,14 @@ export default function Showcase() {
                     {['compact', 'standard', 'detailed'].map(v => (
                         <span key={v} className={`px-3 py-1.5 rounded-lg text-sm ${
                             flagValues['nexus-task-layout'] === v
-                                ? 'bg-pf-mint text-pf-dark font-medium'
+                                ? 'bg-pf-primary text-pf-dark font-medium'
                                 : 'bg-gray-800 text-gray-500'
                         }`}>
                             {v}
                         </span>
                     ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Reason: <span className="text-pf-mint-light">{getResult('nexus-task-layout')?.reason}</span></p>
+                <p className="text-xs text-gray-500 mt-2">Reason: <span className="text-pf-primary-light">{getResult('nexus-task-layout')?.reason}</span></p>
             </DemoSection>
 
             {/* 3. Number Variation */}
@@ -95,20 +95,20 @@ export default function Showcase() {
                 description="Number flag gated by plan tier. Free=3, Pro=10, Enterprise=unlimited. Switch users to see it change.">
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-300">Project limit for {currentUser.name}:</span>
-                    <span className="text-2xl font-bold text-pf-mint">
+                    <span className="text-2xl font-bold text-pf-primary">
                         {flagValues['nexus-max-projects'] === 999 ? '∞' : String(flagValues['nexus-max-projects'] ?? 3)}
                     </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                    Plan: <span className="text-pf-mint-light">{currentUser.plan}</span> —
-                    Reason: <span className="text-pf-mint-light">{getResult('nexus-max-projects')?.reason}</span>
+                    Plan: <span className="text-pf-primary-light">{currentUser.plan}</span> —
+                    Reason: <span className="text-pf-primary-light">{getResult('nexus-max-projects')?.reason}</span>
                 </p>
             </DemoSection>
 
             {/* 4. JSON Config */}
             <DemoSection number={4} title="Dashboard Widgets" flagKey="nexus-dashboard-widgets" icon={Layers} capability="JSON Variation"
                 description="A JSON flag that controls which widgets appear on the dashboard and their layout.">
-                <pre className="text-xs text-pf-mint-light font-mono overflow-x-auto">
+                <pre className="text-xs text-pf-primary-light font-mono overflow-x-auto">
                     {JSON.stringify(flagValues['nexus-dashboard-widgets'] ?? {}, null, 2)}
                 </pre>
             </DemoSection>
@@ -123,9 +123,9 @@ export default function Showcase() {
                     </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                    Your plan: <span className="text-pf-mint-light">{currentUser.plan}</span> —
-                    Email: <span className="text-pf-mint-light">{currentUser.email}</span> —
-                    Reason: <span className="text-pf-mint-light">{getResult('nexus-beta-features')?.reason}</span>
+                    Your plan: <span className="text-pf-primary-light">{currentUser.plan}</span> —
+                    Email: <span className="text-pf-primary-light">{currentUser.email}</span> —
+                    Reason: <span className="text-pf-primary-light">{getResult('nexus-beta-features')?.reason}</span>
                 </p>
             </DemoSection>
 
@@ -146,13 +146,13 @@ export default function Showcase() {
                 description="Shown to users with tasks_completed > 50 AND account_age_days > 30. Bob and Carol qualify.">
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-300">Power tools for {currentUser.name}:</span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${flagValues['nexus-power-tools'] ? 'bg-pf-mint/20 text-pf-mint' : 'bg-gray-800 text-gray-500'}`}>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${flagValues['nexus-power-tools'] ? 'bg-pf-primary/20 text-pf-primary' : 'bg-gray-800 text-gray-500'}`}>
                         {flagValues['nexus-power-tools'] ? 'Unlocked' : 'Locked'}
                     </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                    Tasks completed: <span className="text-pf-mint-light">{currentUser.tasksCompleted}</span> —
-                    Account age: <span className="text-pf-mint-light">{currentUser.accountAgeDays} days</span>
+                    Tasks completed: <span className="text-pf-primary-light">{currentUser.tasksCompleted}</span> —
+                    Account age: <span className="text-pf-primary-light">{currentUser.accountAgeDays} days</span>
                 </p>
             </DemoSection>
 
@@ -188,18 +188,18 @@ export default function Showcase() {
                     </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                    Try it: go to <a href="http://localhost:5173/flags" target="_blank" className="text-pf-mint hover:underline">Dashboard &gt; Flags</a>,
+                    Try it: go to <a href="http://localhost:5173/flags" target="_blank" className="text-pf-primary hover:underline">Dashboard &gt; Flags</a>,
                     toggle <code className="bg-gray-800 px-1 rounded">nexus-ai-summaries</code>, and watch this value change.
                 </p>
             </DemoSection>
 
             {/* Footer */}
             <div className="text-center py-8 text-gray-600 text-sm">
-                <p>Built with <span className="text-pf-mint">Phase Flag</span> — Open-source feature flag management</p>
+                <p>Built with <span className="text-pf-primary">Phase Flag</span> — Open-source feature flag management</p>
                 <div className="mt-2 flex items-center justify-center space-x-4 text-xs">
-                    <a href="http://localhost:5173" target="_blank" className="text-pf-mint hover:underline">Dashboard</a>
-                    <a href="http://localhost:5175" target="_blank" className="text-pf-mint hover:underline">Marketing</a>
-                    <a href="http://localhost:5174" target="_blank" className="text-pf-mint hover:underline">Portal</a>
+                    <a href="http://localhost:5173" target="_blank" className="text-pf-primary hover:underline">Dashboard</a>
+                    <a href="http://localhost:5175" target="_blank" className="text-pf-primary hover:underline">Marketing</a>
+                    <a href="http://localhost:5174" target="_blank" className="text-pf-primary hover:underline">Portal</a>
                 </div>
             </div>
         </div>

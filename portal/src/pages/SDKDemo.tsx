@@ -321,13 +321,13 @@ export default function SDKDemo() {
                 onClick={() => setActiveSDK(s.id)}
                 className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2.5 transition-colors ${
                   activeSDK === s.id
-                    ? 'bg-pf-mint/10 text-pf-mint'
+                    ? 'bg-pf-primary/10 text-pf-primary'
                     : 'text-[#8FA3AD] hover:text-[#E8F0F2] hover:bg-white/5'
                 }`}
               >
                 <span className={`inline-flex items-center justify-center w-7 h-7 rounded-md text-[10px] font-mono font-bold ${
                   activeSDK === s.id
-                    ? 'bg-pf-mint text-white'
+                    ? 'bg-pf-primary text-white'
                     : 'bg-[#1C2D38] text-[#8FA3AD]'
                 }`}>
                   {s.icon}
@@ -348,7 +348,7 @@ export default function SDKDemo() {
               </h3>
               <button
                 onClick={() => copyToClipboard(sdk.install, 'install')}
-                className="text-xs text-pf-mint hover:text-pf-mint-light transition-colors flex items-center gap-1"
+                className="text-xs text-pf-primary hover:text-pf-primary-light transition-colors flex items-center gap-1"
               >
                 {copied === 'install' ? (
                   <>
@@ -380,7 +380,7 @@ export default function SDKDemo() {
               </h3>
               <button
                 onClick={() => copyToClipboard(sdk.code, 'code')}
-                className="text-xs text-pf-mint hover:text-pf-mint-light transition-colors flex items-center gap-1"
+                className="text-xs text-pf-primary hover:text-pf-primary-light transition-colors flex items-center gap-1"
               >
                 {copied === 'code' ? (
                   <>
@@ -405,9 +405,9 @@ export default function SDKDemo() {
           </div>
 
           {/* SDK info */}
-          <div className="bg-pf-mint/5 border border-pf-mint/20 rounded-xl p-4">
+          <div className="bg-pf-primary/5 border border-pf-primary/20 rounded-xl p-4">
             <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-pf-mint shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-pf-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="text-sm text-[#E8F0F2]">

@@ -81,40 +81,40 @@ export default function FlagSimulator() {
         </h3>
         <button
           onClick={() => setShowCreate(!showCreate)}
-          className="px-4 py-2 text-sm font-medium text-white bg-pf-mint rounded-lg hover:bg-pf-mint-light transition-colors"
+          className="px-4 py-2 text-sm font-medium text-white bg-pf-primary rounded-lg hover:bg-pf-primary-light transition-colors"
         >
           + Create Flag
         </button>
       </div>
 
       {showCreate && (
-        <div className="bg-[#162029] border border-[rgba(91,186,167,0.15)] rounded-xl p-4 animate-fade-in-up">
+        <div className="bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-xl p-4 animate-fade-in-up">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
             <input
               type="text"
               placeholder="Flag key (e.g. new_feature)"
               value={newFlagKey}
               onChange={(e) => setNewFlagKey(e.target.value)}
-              className="px-3 py-2 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(91,186,167,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-mint/50 focus:border-pf-mint placeholder-[#8FA3AD]"
+              className="px-3 py-2 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-primary/50 focus:border-pf-primary placeholder-[#8FA3AD]"
             />
             <input
               type="text"
               placeholder="Display name"
               value={newFlagName}
               onChange={(e) => setNewFlagName(e.target.value)}
-              className="px-3 py-2 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(91,186,167,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-mint/50 focus:border-pf-mint placeholder-[#8FA3AD]"
+              className="px-3 py-2 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-primary/50 focus:border-pf-primary placeholder-[#8FA3AD]"
             />
           </div>
           <div className="flex gap-2">
             <button
               onClick={createFlag}
-              className="px-4 py-2 text-sm font-medium text-white bg-pf-mint rounded-lg hover:bg-pf-mint-light transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-pf-primary rounded-lg hover:bg-pf-primary-light transition-colors"
             >
               Create
             </button>
             <button
               onClick={() => setShowCreate(false)}
-              className="px-4 py-2 text-sm font-medium text-[#8FA3AD] bg-[#1C2D38] border border-[rgba(91,186,167,0.15)] rounded-lg hover:bg-[#243845] transition-colors"
+              className="px-4 py-2 text-sm font-medium text-[#8FA3AD] bg-[#1C2D38] border border-[rgba(99,102,241,0.15)] rounded-lg hover:bg-[#243845] transition-colors"
             >
               Cancel
             </button>
@@ -126,7 +126,7 @@ export default function FlagSimulator() {
         {flags.map((flag) => (
           <div
             key={flag.key}
-            className="bg-[#162029] border border-[rgba(91,186,167,0.15)] rounded-xl p-4 hover:border-pf-mint/30 transition-all"
+            className="bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-xl p-4 hover:border-pf-primary/30 transition-all"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
@@ -182,7 +182,7 @@ export default function FlagSimulator() {
               </div>
             </div>
 
-            <div className="mt-3 pt-3 border-t border-[rgba(91,186,167,0.15)]">
+            <div className="mt-3 pt-3 border-t border-[rgba(99,102,241,0.15)]">
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-[#8FA3AD]">Evaluation:</span>
                 <code className={`px-2 py-0.5 rounded font-mono ${

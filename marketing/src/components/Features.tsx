@@ -86,7 +86,7 @@ export default function Features() {
     <section id="features" className="py-20 lg:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-mint/10 text-pf-mint mb-4">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-primary/10 text-pf-primary mb-4">
             Platform Features
           </span>
           <h2 className="font-heading text-3xl sm:text-4xl font-light uppercase tracking-wider text-white mb-4">
@@ -102,7 +102,7 @@ export default function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="group bg-pf-surface border border-[rgba(91,186,167,0.15)] rounded-2xl p-6 hover:shadow-lg hover:shadow-pf-mint/5 hover:border-pf-mint/30 transition-all duration-300"
+              className="group bg-pf-surface border border-[rgba(99,102,241,0.15)] rounded-2xl p-6 hover:shadow-lg hover:shadow-pf-primary/5 hover:border-pf-primary/30 transition-all duration-300"
             >
               <div className={`inline-flex items-center justify-center w-11 h-11 rounded-xl ${feature.color} mb-4 group-hover:scale-110 transition-transform`}>
                 {feature.icon}

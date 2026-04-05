@@ -82,11 +82,11 @@ export default function AdminOverview() {
     const showBanner = isError || !rawData
 
     const stats = [
-        { label: 'Organizations', value: data.total_organizations, icon: Building2, gradient: 'from-[#2B4C5C] to-[#5BBAA7]' },
-        { label: 'Users', value: data.total_users, icon: Users, gradient: 'from-[#5BBAA7] to-[#7ED4C1]' },
-        { label: 'Total Flags', value: data.total_flags, icon: Flag, gradient: 'from-[#2B4C5C] to-[#1E3A4A]' },
-        { label: 'Total Evaluations', value: data.total_evaluations, icon: Activity, gradient: 'from-[#5BBAA7] to-[#22C55E]' },
-        { label: 'Active API Keys', value: data.active_api_keys, icon: Key, gradient: 'from-[#1E3A4A] to-[#2B4C5C]' },
+        { label: 'Organizations', value: data.total_organizations, icon: Building2, gradient: 'from-primary-800 to-primary-500' },
+        { label: 'Users', value: data.total_users, icon: Users, gradient: 'from-primary-500 to-primary-400' },
+        { label: 'Total Flags', value: data.total_flags, icon: Flag, gradient: 'from-primary-900 to-primary-950' },
+        { label: 'Total Evaluations', value: data.total_evaluations, icon: Activity, gradient: 'from-primary-500 to-green-500' },
+        { label: 'Active API Keys', value: data.active_api_keys, icon: Key, gradient: 'from-primary-950 to-primary-800' },
     ]
 
     return (
@@ -137,11 +137,11 @@ export default function AdminOverview() {
                             />
                             <defs>
                                 <linearGradient id="evalGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#5BBAA7" stopOpacity={0.4} />
-                                    <stop offset="95%" stopColor="#5BBAA7" stopOpacity={0} />
+                                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
+                                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
-                            <RArea type="monotone" dataKey="count" stroke="#5BBAA7" strokeWidth={2} fill="url(#evalGrad)" />
+                            <RArea type="monotone" dataKey="count" stroke="#6366F1" strokeWidth={2} fill="url(#evalGrad)" />
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>
@@ -156,7 +156,7 @@ export default function AdminOverview() {
                             <RTooltip
                                 contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#f3f4f6' }}
                             />
-                            <RBar dataKey="count" fill="#2B4C5C" radius={[4, 4, 0, 0]} />
+                            <RBar dataKey="count" fill="#4338CA" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

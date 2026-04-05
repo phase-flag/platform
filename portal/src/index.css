@@ -3,9 +3,9 @@
 @theme {
   --color-pf-navy: #2B4C5C;
   --color-pf-dark: #1E3A4A;
-  --color-pf-mint: #5BBAA7;
-  --color-pf-mint-light: #7ED4C1;
-  --color-pf-mint-pale: #E8F7F3;
+  --color-pf-primary: #6366F1;
+  --color-pf-primary-light: #818CF8;
+  --color-pf-primary-pale: #EEF2FF;
   --color-pf-white: #FFFFFF;
   --color-pf-gray-50: #F8FAFB;
   --color-pf-gray-100: #EDF1F3;
@@ -19,7 +19,7 @@
   --color-pf-surface: #1C2D38;
   --color-pf-text: #E8F0F2;
   --color-pf-text-muted: #8FA3AD;
-  --color-pf-border: rgba(91, 186, 167, 0.15);
+  --color-pf-border: rgba(99, 102, 241, 0.15);
 
   --font-heading: 'Josefin Sans', sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
@@ -66,6 +66,27 @@ html {
 .code-block .function { color: #82aaff; }
 .code-block .variable { color: #f78c6c; }
 .code-block .type { color: #ffcb6b; }
+
+/* Skeleton shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.10) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
 
 /* Fade-in animation */
 @keyframes fadeInUp {

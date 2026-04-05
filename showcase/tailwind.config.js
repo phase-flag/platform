@@ -11,9 +11,9 @@ export default {
                 pf: {
                     navy: '#2B4C5C',
                     dark: '#1E3A4A',
-                    mint: '#5BBAA7',
-                    'mint-light': '#7ED4C1',
-                    'mint-pale': '#E8F7F3',
+                    primary: '#6366F1',
+                    'primary-light': '#818CF8',
+                    'primary-pale': '#EEF2FF',
                 },
                 surface: {
                     DEFAULT: '#162029',

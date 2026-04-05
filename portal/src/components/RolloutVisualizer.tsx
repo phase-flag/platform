@@ -59,7 +59,7 @@ export default function RolloutVisualizer() {
           type="text"
           value={flagKey}
           onChange={(e) => setFlagKey(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(91,186,167,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-mint/50 focus:border-pf-mint placeholder-[#8FA3AD]"
+          className="w-full px-3 py-2 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-primary/50 focus:border-pf-primary placeholder-[#8FA3AD]"
         />
       </div>
 
@@ -68,7 +68,7 @@ export default function RolloutVisualizer() {
           <label className="text-sm font-medium text-[#E8F0F2]">
             Rollout Percentage
           </label>
-          <span className="text-2xl font-heading font-light text-pf-mint">
+          <span className="text-2xl font-heading font-light text-pf-primary">
             {percentage}%
           </span>
         </div>
@@ -78,7 +78,7 @@ export default function RolloutVisualizer() {
           max="100"
           value={percentage}
           onChange={(e) => setPercentage(Number(e.target.value))}
-          className="w-full h-2 bg-[#1C2D38] rounded-lg appearance-none cursor-pointer accent-pf-mint"
+          className="w-full h-2 bg-[#1C2D38] rounded-lg appearance-none cursor-pointer accent-pf-primary"
         />
         <div className="flex justify-between text-xs text-[#8FA3AD] mt-1">
           <span>0%</span>
@@ -94,7 +94,7 @@ export default function RolloutVisualizer() {
         <h4 className="text-sm font-medium text-[#E8F0F2] mb-3">Rollout Distribution</h4>
         <div className="h-8 rounded-lg overflow-hidden flex bg-[#1C2D38]">
           <div
-            className="bg-pf-mint transition-all duration-500 flex items-center justify-center text-white text-xs font-medium"
+            className="bg-pf-primary transition-all duration-500 flex items-center justify-center text-white text-xs font-medium"
             style={{ width: `${percentage}%` }}
           >
             {percentage > 10 && `${included.length} users`}
@@ -120,9 +120,9 @@ export default function RolloutVisualizer() {
                 <div
                   className={`w-full rounded-t transition-colors ${
                     isIncluded
-                      ? 'bg-pf-mint'
+                      ? 'bg-pf-primary'
                       : isPartial
-                        ? 'bg-pf-mint/50'
+                        ? 'bg-pf-primary/40'
                         : 'bg-[#1C2D38]'
                   }`}
                   style={{ height: `${Math.max(count * 12, 4)}px` }}
@@ -147,13 +147,13 @@ export default function RolloutVisualizer() {
                 key={user.id}
                 className={`flex flex-col items-center p-1.5 rounded-lg text-[10px] transition-all ${
                   isIn
-                    ? 'bg-pf-mint/10 text-pf-mint border border-pf-mint/30'
-                    : 'bg-[#1C2D38] text-[#8FA3AD] border border-[rgba(91,186,167,0.15)]'
+                    ? 'bg-pf-primary/10 text-pf-primary border border-pf-primary/30'
+                    : 'bg-[#1C2D38] text-[#8FA3AD] border border-[rgba(99,102,241,0.15)]'
                 }`}
                 title={`${user.name}: bucket ${user.bucket}`}
               >
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium mb-0.5 ${
-                  isIn ? 'bg-pf-mint text-white' : 'bg-[#0F1A20] text-[#8FA3AD]'
+                  isIn ? 'bg-pf-primary text-white' : 'bg-[#0F1A20] text-[#8FA3AD]'
                 }`}>
                   {user.name[0]}
                 </div>

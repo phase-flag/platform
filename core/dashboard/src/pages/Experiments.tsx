@@ -8,6 +8,8 @@ import {
     Calendar, ChevronRight, Square, ArrowRight, X
 } from 'lucide-react'
 import clsx from 'clsx'
+import EmptyState from '@/components/EmptyState'
+import Skeleton from '@/components/Skeleton'
 
 const STATUS_STYLES: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
@@ -93,22 +95,17 @@ export default function Experiments() {
 
             {/* Content */}
             {isLoading ? (
-                <div className="text-center py-16 text-gray-500 dark:text-gray-400">Loading experiments...</div>
+                <Skeleton variant="row" count={3} />
             ) : experiments.length === 0 ? (
-                <div className="card text-center py-16">
-                    <FlaskConical className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                        {statusFilter ? `No ${statusFilter} experiments` : 'No experiments yet'}
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400 mb-4">
-                        {statusFilter
-                            ? `There are no experiments with status "${statusFilter}".`
-                            : 'Create your first experiment to start A/B testing your feature flags.'}
-                    </p>
-                    {!statusFilter && (
-                        <button onClick={() => setShowCreate(true)} className="btn btn-primary">New Experiment</button>
-                    )}
-                </div>
+                <EmptyState
+                    icon={FlaskConical}
+                    title={statusFilter ? `No ${statusFilter} experiments` : 'No experiments yet'}
+                    description={statusFilter
+                        ? `There are no experiments with status "${statusFilter}".`
+                        : 'Create your first experiment to start A/B testing your feature flags.'}
+                    actionLabel={!statusFilter ? 'New Experiment' : undefined}
+                    onAction={!statusFilter ? () => setShowCreate(true) : undefined}
+                />
             ) : (
                 <div className="space-y-4">
                     {experiments.map(exp => (
@@ -164,7 +161,7 @@ function ExperimentCard({
     }
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-black/20 transition-shadow">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-black/20 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150">
             <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0">

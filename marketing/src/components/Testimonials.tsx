@@ -24,7 +24,7 @@ const testimonials = [
 
 export default function Testimonials() {
   return (
-    <section className="bg-pf-surface border-y border-[rgba(91,186,167,0.15)] py-20 lg:py-28">
+    <section className="bg-pf-surface border-y border-[rgba(99,102,241,0.15)] py-20 lg:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <h2 className="font-heading text-3xl sm:text-4xl font-light uppercase tracking-wider text-white mb-4">
@@ -39,16 +39,16 @@ export default function Testimonials() {
           {testimonials.map((t) => (
             <div
               key={t.name}
-              className="bg-[#162029] border border-[rgba(91,186,167,0.15)] rounded-2xl p-6 hover:shadow-lg hover:shadow-pf-mint/5 transition-shadow"
+              className="bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6 hover:shadow-lg hover:shadow-pf-primary/5 transition-shadow"
             >
-              <svg className="w-8 h-8 text-pf-mint/30 mb-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-pf-primary/30 mb-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151C7.563 6.068 6 8.789 6 11h4v10H0z" />
               </svg>
               <p className="text-pf-text leading-relaxed mb-6">
                 "{t.quote}"
               </p>
-              <div className="flex items-center gap-3 pt-4 border-t border-[rgba(91,186,167,0.1)]">
-                <div className="w-10 h-10 rounded-full bg-pf-mint flex items-center justify-center text-white text-sm font-medium">
+              <div className="flex items-center gap-3 pt-4 border-t border-[rgba(99,102,241,0.1)]">
+                <div className="w-10 h-10 rounded-full bg-pf-primary flex items-center justify-center text-white text-sm font-medium">
                   {t.avatar}
                 </div>
                 <div>

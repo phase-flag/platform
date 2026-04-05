@@ -141,7 +141,7 @@ export default function Governance() {
         <div className="p-6 max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
-                    <Shield className="w-8 h-8 text-[#5BBAA7]" />
+                    <Shield className="w-8 h-8 text-primary-500" />
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Governance</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Change requests, freeze windows, and service accounts</p>
@@ -161,7 +161,7 @@ export default function Governance() {
                         onClick={() => setTab(t.key)}
                         className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                             tab === t.key
-                                ? 'bg-white dark:bg-gray-700 text-[#2B4C5C] dark:text-gray-100 shadow-sm'
+                                ? 'bg-white dark:bg-gray-700 text-primary-700 dark:text-gray-100 shadow-sm'
                                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                         }`}
                     >
@@ -189,7 +189,7 @@ export default function Governance() {
                         </div>
                         <button
                             onClick={() => setShowCreateChange(true)}
-                            className="flex items-center px-4 py-2 text-sm font-medium text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896]"
+                            className="flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                         >
                             <Plus className="w-4 h-4 mr-2" /> New Change Request
                         </button>
@@ -207,7 +207,7 @@ export default function Governance() {
                             {changes.map(cr => (
                                 <div key={cr.id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                                     <div
-                                        className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700/50"
+                                        className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
                                         onClick={() => setExpandedChange(expandedChange === cr.id ? null : cr.id)}
                                     >
                                         <div className="flex items-center space-x-4">
@@ -216,7 +216,7 @@ export default function Governance() {
                                             </span>
                                             <div>
                                                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                    {cr.change_type} — <code className="text-[#5BBAA7]">{cr.flag_key}</code>
+                                                    {cr.change_type} — <code className="text-primary-500">{cr.flag_key}</code>
                                                 </p>
                                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                                     {cr.environment} &middot; by {cr.requested_by} &middot; {new Date(cr.created_at).toLocaleDateString()}
@@ -301,8 +301,8 @@ export default function Governance() {
                     ) : (
                         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                             <table className="w-full">
-                                <thead>
-                                    <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                                <thead className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                                    <tr className="bg-gray-50 dark:bg-gray-700/50">
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Environment</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Reason</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Frozen By</th>
@@ -312,7 +312,7 @@ export default function Governance() {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {freezes.map(f => (
-                                        <tr key={f.id}>
+                                        <tr key={f.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                                             <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">{f.environment}</td>
                                             <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{f.reason}</td>
                                             <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{f.frozen_by}</td>
@@ -343,7 +343,7 @@ export default function Governance() {
                     <div className="flex justify-end mb-4">
                         <button
                             onClick={() => setShowCreateAccount(true)}
-                            className="flex items-center px-4 py-2 text-sm font-medium text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896]"
+                            className="flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                         >
                             <Plus className="w-4 h-4 mr-2" /> New Service Account
                         </button>
@@ -385,8 +385,8 @@ export default function Governance() {
                     ) : (
                         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                             <table className="w-full">
-                                <thead>
-                                    <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                                <thead className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                                    <tr className="bg-gray-50 dark:bg-gray-700/50">
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Name</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Key Prefix</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Scopes</th>
@@ -397,13 +397,13 @@ export default function Governance() {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {accounts.map(sa => (
-                                        <tr key={sa.id}>
+                                        <tr key={sa.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                                             <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">{sa.name}</td>
                                             <td className="px-4 py-3 text-sm font-mono text-gray-600 dark:text-gray-400">{sa.key_prefix}...</td>
                                             <td className="px-4 py-3">
                                                 <div className="flex flex-wrap gap-1">
                                                     {sa.scopes.map(s => (
-                                                        <span key={s} className="px-1.5 py-0.5 text-xs bg-[#E8F7F3] text-[#2B4C5C] dark:bg-primary-900/30 dark:text-primary-300 rounded">
+                                                        <span key={s} className="px-1.5 py-0.5 text-xs bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 rounded">
                                                             {s}
                                                         </span>
                                                     ))}
@@ -503,7 +503,7 @@ export default function Governance() {
                                 <button type="button" onClick={() => setShowCreateChange(false)} className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
                                     Cancel
                                 </button>
-                                <button type="submit" disabled={createChangeMutation.isPending} className="px-4 py-2 text-sm text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896] disabled:opacity-50">
+                                <button type="submit" disabled={createChangeMutation.isPending} className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50">
                                     {createChangeMutation.isPending ? 'Creating...' : 'Create Request'}
                                 </button>
                             </div>
@@ -540,8 +540,8 @@ export default function Governance() {
                                             onClick={() => toggleScope(scope)}
                                             className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
                                                 saScopes.includes(scope)
-                                                    ? 'bg-[#5BBAA7] text-white border-[#5BBAA7]'
-                                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-[#5BBAA7]'
+                                                    ? 'bg-primary-600 text-white border-primary-600'
+                                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-primary-500'
                                             }`}
                                         >
                                             {scope}
@@ -553,7 +553,7 @@ export default function Governance() {
                                 <button type="button" onClick={() => setShowCreateAccount(false)} className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
                                     Cancel
                                 </button>
-                                <button type="submit" disabled={createAccountMutation.isPending || !saName.trim()} className="px-4 py-2 text-sm text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896] disabled:opacity-50">
+                                <button type="submit" disabled={createAccountMutation.isPending || !saName.trim()} className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50">
                                     {createAccountMutation.isPending ? 'Creating...' : 'Create Account'}
                                 </button>
                             </div>

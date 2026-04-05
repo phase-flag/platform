@@ -21,9 +21,9 @@ import Settings from './pages/Settings';
 function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center py-32 px-4 text-center">
-      <h1 className="text-6xl font-bold mb-4" style={{ color: '#34D399' }}>404</h1>
+      <h1 className="text-6xl font-bold mb-4" style={{ color: '#6366F1' }}>404</h1>
       <p className="text-xl text-white/70 mb-8">Page not found</p>
-      <Link to="/" className="px-6 py-3 rounded-xl hover:opacity-90 transition-opacity" style={{ background: '#34D399', color: '#0F1A20' }}>
+      <Link to="/" className="px-6 py-3 rounded-xl hover:opacity-90 transition-opacity" style={{ background: '#6366F1', color: '#FFFFFF' }}>
         Back to Home
       </Link>
     </div>

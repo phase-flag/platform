@@ -91,7 +91,7 @@ export default function RemoteConfig() {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-3">
-                    <Database className="w-8 h-8 text-[#5BBAA7]" />
+                    <Database className="w-8 h-8 text-primary-500" />
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Remote Config</h1>
                         <p className="mt-1 text-gray-600 dark:text-gray-400">Manage typed configuration values across environments</p>
@@ -99,7 +99,7 @@ export default function RemoteConfig() {
                 </div>
                 <button
                     onClick={() => setShowCreateModal(true)}
-                    className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896] transition-colors"
+                    className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
                 >
                     <Plus className="w-4 h-4" />
                     <span>New Config</span>
@@ -178,7 +178,7 @@ export default function RemoteConfig() {
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">No configs match your filters</h3>
                     <button
                         onClick={() => { setSearch(''); setTypeFilter('all'); setEnvFilter('all') }}
-                        className="text-sm text-[#5BBAA7] hover:underline mt-1"
+                        className="text-sm text-primary-500 hover:underline mt-1"
                     >
                         Clear filters
                     </button>
@@ -188,7 +188,7 @@ export default function RemoteConfig() {
                     {filteredEntries.map(entry => (
                         <div
                             key={entry.id}
-                            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-black/20 transition-shadow"
+                            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-black/20 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150"
                         >
                             <div className="flex items-center p-4">
                                 <Link
@@ -196,7 +196,7 @@ export default function RemoteConfig() {
                                     className="flex-1 min-w-0"
                                 >
                                     <div className="flex items-center space-x-3 mb-1.5">
-                                        <code className="text-sm font-semibold text-[#5BBAA7]">{entry.key}</code>
+                                        <code className="text-sm font-semibold text-primary-500">{entry.key}</code>
                                         <span className="px-2 py-0.5 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
                                             {entry.config_type}
                                         </span>
@@ -221,7 +221,7 @@ export default function RemoteConfig() {
                                 <div className="flex items-center space-x-1 ml-4">
                                     <Link
                                         to={`/remote-config/${entry.id}`}
-                                        className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-[#5BBAA7]"
+                                        className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-primary-500"
                                         title="Edit config"
                                     >
                                         <ChevronRight className="w-5 h-5" />
@@ -398,7 +398,7 @@ function CreateConfigModal({
                                     }}
                                     className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
                                         formType === vt
-                                            ? 'border-[#5BBAA7] bg-[#E8F7F3] text-[#2B4C5C] dark:bg-[#5BBAA7]/20 dark:text-[#5BBAA7]'
+                                            ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-500/20 dark:text-primary-400'
                                             : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-400'
                                     }`}
                                 >
@@ -489,7 +489,7 @@ function CreateConfigModal({
                                     type="checkbox"
                                     checked={formServerOnly}
                                     onChange={e => setFormServerOnly(e.target.checked)}
-                                    className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-[#5BBAA7]"
+                                    className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-500"
                                 />
                                 <span className="text-sm text-gray-700 dark:text-gray-300">Server-only (hide from client SDKs)</span>
                             </label>
@@ -519,7 +519,7 @@ function CreateConfigModal({
                         <button
                             type="submit"
                             disabled={createMutation.isPending}
-                            className="px-4 py-2 text-sm text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896] disabled:opacity-50"
+                            className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50"
                         >
                             {createMutation.isPending ? 'Creating...' : 'Create Config'}
                         </button>

@@ -5,7 +5,7 @@ export default function Privacy() {
         <div className="mb-10">
           <a
             href="#"
-            className="inline-flex items-center gap-2 text-sm text-[#5BBAA7] hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-[#6366F1] hover:text-white transition-colors mb-6"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -111,7 +111,7 @@ export default function Privacy() {
             </ul>
             <p>
               To exercise any of these rights, contact us at{' '}
-              <a href="mailto:privacy@phaseflag.com" className="text-[#5BBAA7] hover:text-white transition-colors">
+              <a href="mailto:privacy@phaseflag.com" className="text-[#6366F1] hover:text-white transition-colors">
                 privacy@phaseflag.com
               </a>
               . We will respond within 30 days. You also have the right to lodge a complaint with your local data
@@ -226,7 +226,7 @@ export default function Privacy() {
               <p><strong className="text-white">Hextrot</strong> (dba Phase Flag) — Data Controller</p>
               <p>
                 Email:{' '}
-                <a href="mailto:privacy@phaseflag.com" className="text-[#5BBAA7] hover:text-white transition-colors">
+                <a href="mailto:privacy@phaseflag.com" className="text-[#6366F1] hover:text-white transition-colors">
                   privacy@phaseflag.com
                 </a>
               </p>
@@ -242,8 +242,8 @@ export default function Privacy() {
           line-height: 1.75;
           margin-bottom: 1.5rem;
           padding: 1rem 1.25rem;
-          background: rgba(91,186,167,0.07);
-          border-left: 3px solid #5BBAA7;
+          background: rgba(99,102,241,0.07);
+          border-left: 3px solid #6366F1;
           border-radius: 0 0.5rem 0.5rem 0;
         }
         .prose-legal h2 {

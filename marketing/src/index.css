@@ -3,9 +3,9 @@
 @theme {
   --color-pf-navy: #2B4C5C;
   --color-pf-dark: #1E3A4A;
-  --color-pf-mint: #5BBAA7;
-  --color-pf-mint-light: #7ED4C1;
-  --color-pf-mint-pale: #E8F7F3;
+  --color-pf-primary: #6366F1;
+  --color-pf-primary-light: #818CF8;
+  --color-pf-primary-pale: #EEF2FF;
   --color-pf-white: #FFFFFF;
   --color-pf-gray-50: #F8FAFB;
   --color-pf-gray-100: #EDF1F3;
@@ -20,7 +20,7 @@
   --color-pf-surface-light: #1E3A4A;
   --color-pf-text: #E8F0F2;
   --color-pf-text-muted: #8FA3AD;
-  --color-pf-border: rgba(91, 186, 167, 0.15);
+  --color-pf-border: rgba(99, 102, 241, 0.15);
 
   --font-heading: 'Josefin Sans', sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;

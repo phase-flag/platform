@@ -8,7 +8,7 @@ import ConfirmDialog from '@/components/ConfirmDialog'
 
 const STAGE_STATUS_COLORS: Record<string, string> = {
     completed: 'bg-green-500',
-    active: 'bg-[#5BBAA7]',
+    active: 'bg-primary-500',
     pending: 'bg-gray-300 dark:bg-gray-600',
 }
 
@@ -141,7 +141,7 @@ export default function Pipelines() {
     function getStatusIcon(status: string) {
         switch (status) {
             case 'completed': return <CheckCircle className="w-4 h-4 text-green-500" />
-            case 'active': case 'running': return <Play className="w-4 h-4 text-[#5BBAA7]" />
+            case 'active': case 'running': return <Play className="w-4 h-4 text-primary-500" />
             case 'paused': return <Pause className="w-4 h-4 text-yellow-500" />
             case 'rolled_back': return <RotateCcw className="w-4 h-4 text-red-500" />
             case 'cancelled': return <X className="w-4 h-4 text-gray-400 dark:text-gray-500" />
@@ -153,7 +153,7 @@ export default function Pipelines() {
         <div className="p-6 max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
-                    <GitBranch className="w-8 h-8 text-[#5BBAA7]" />
+                    <GitBranch className="w-8 h-8 text-primary-500" />
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Rollout Pipelines</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Progressive rollout management with staged deployments</p>
@@ -161,7 +161,7 @@ export default function Pipelines() {
                 </div>
                 <button
                     onClick={() => setShowCreate(true)}
-                    className="flex items-center px-4 py-2 text-sm font-medium text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896]"
+                    className="flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                 >
                     <Plus className="w-4 h-4 mr-2" /> New Pipeline
                 </button>
@@ -178,13 +178,13 @@ export default function Pipelines() {
             ) : (
                 <div className="space-y-4">
                     {pipelines.map(pipeline => (
-                        <div key={pipeline.id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+                        <div key={pipeline.id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center space-x-3">
                                     {getStatusIcon(pipeline.status)}
                                     <div>
                                         <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                            <code className="text-[#5BBAA7]">{pipeline.flag_key}</code>
+                                            <code className="text-primary-500">{pipeline.flag_key}</code>
                                         </p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">
                                             Status: {pipeline.status} &middot; Stage {pipeline.current_stage_index + 1} of {pipeline.stages.length}
@@ -198,7 +198,7 @@ export default function Pipelines() {
                                             {pipeline.current_stage_index < pipeline.stages.length - 1 && (
                                                 <button
                                                     onClick={() => setConfirmAction({ type: 'advance', flagKey: pipeline.flag_key })}
-                                                    className="flex items-center px-3 py-1.5 text-xs font-medium text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896]"
+                                                    className="flex items-center px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                                                 >
                                                     <SkipForward className="w-3 h-3 mr-1" /> Advance
                                                 </button>
@@ -221,7 +221,7 @@ export default function Pipelines() {
                                         <>
                                             <button
                                                 onClick={() => resumeMutation.mutate(pipeline.flag_key)}
-                                                className="flex items-center px-3 py-1.5 text-xs font-medium text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896]"
+                                                className="flex items-center px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                                             >
                                                 <Play className="w-3 h-3 mr-1" /> Resume
                                             </button>
@@ -304,8 +304,8 @@ export default function Pipelines() {
                                                 onClick={() => applyTemplate(i)}
                                                 className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
                                                     selectedTemplate === i
-                                                        ? 'border-[#5BBAA7] bg-[#E8F7F3] text-[#2B4C5C] dark:bg-primary-900/30 dark:text-primary-300 dark:border-primary-500'
-                                                        : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-[#5BBAA7]'
+                                                        ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 dark:border-primary-500'
+                                                        : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-primary-500'
                                                 }`}
                                             >
                                                 {t.name}
@@ -347,7 +347,7 @@ export default function Pipelines() {
                                         </div>
                                     ))}
                                 </div>
-                                <button type="button" onClick={addStage} className="mt-2 text-sm text-[#5BBAA7] hover:text-[#4AA896] flex items-center">
+                                <button type="button" onClick={addStage} className="mt-2 text-sm text-primary-500 hover:text-primary-600 flex items-center">
                                     <Plus className="w-4 h-4 mr-1" /> Add Stage
                                 </button>
                             </div>
@@ -356,7 +356,7 @@ export default function Pipelines() {
                                 <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
                                     Cancel
                                 </button>
-                                <button type="submit" disabled={createMutation.isPending || !selectedFlag} className="px-4 py-2 text-sm text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896] disabled:opacity-50">
+                                <button type="submit" disabled={createMutation.isPending || !selectedFlag} className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50">
                                     {createMutation.isPending ? 'Creating...' : 'Create Pipeline'}
                                 </button>
                             </div>

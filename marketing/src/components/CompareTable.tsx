@@ -4,12 +4,12 @@ import { comparisonCategories, competitors, type FeatureValue } from '../data/co
 // ─── Cell ─────────────────────────────────────────────────────────────────────
 
 function Cell({ value, isSelf }: { value: FeatureValue; isSelf?: boolean }) {
-  const base = isSelf ? 'bg-pf-mint/5' : '';
+  const base = isSelf ? 'bg-pf-primary/5' : '';
 
   if (typeof value === 'string') {
     return (
       <td className={`px-4 py-3 text-center ${base}`}>
-        <span className={`text-xs font-medium ${isSelf ? 'text-pf-mint' : 'text-pf-text-muted'}`}>
+        <span className={`text-xs font-medium ${isSelf ? 'text-pf-primary' : 'text-pf-text-muted'}`}>
           {value}
         </span>
       </td>
@@ -20,7 +20,7 @@ function Cell({ value, isSelf }: { value: FeatureValue; isSelf?: boolean }) {
     <td className={`px-4 py-3 text-center ${base}`}>
       {value ? (
         <svg
-          className={`w-5 h-5 mx-auto ${isSelf ? 'text-pf-mint' : 'text-white/40'}`}
+          className={`w-5 h-5 mx-auto ${isSelf ? 'text-pf-primary' : 'text-white/40'}`}
           fill="currentColor"
           viewBox="0 0 24 24"
           aria-label="Yes"
@@ -74,7 +74,7 @@ export default function CompareTable({ categoryId, showHeaders = true }: Compare
               onClick={() => setActiveCategory(cat.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 activeCategory === cat.id
-                  ? 'bg-pf-mint text-white'
+                  ? 'bg-pf-primary text-white'
                   : 'bg-white/5 text-pf-text-muted hover:text-white hover:bg-white/10'
               }`}
             >
@@ -84,19 +84,19 @@ export default function CompareTable({ categoryId, showHeaders = true }: Compare
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-[rgba(91,186,167,0.15)]">
+      <div className="overflow-x-auto rounded-xl border border-[rgba(99,102,241,0.15)]">
         <table className="w-full text-sm">
           {showHeaders && (
             <thead>
-              <tr className="border-b-2 border-[rgba(91,186,167,0.15)]">
+              <tr className="border-b-2 border-[rgba(99,102,241,0.15)]">
                 <th className="text-left px-4 py-4 font-heading text-xs font-medium uppercase tracking-wider text-pf-text-muted min-w-[180px]">
                   {displayCategory.label}
                 </th>
                 {competitors.map((c) => (
-                  <th key={c.id} className={`px-4 py-4 text-center ${c.isSelf ? 'bg-pf-mint/5' : ''}`}>
+                  <th key={c.id} className={`px-4 py-4 text-center ${c.isSelf ? 'bg-pf-primary/5' : ''}`}>
                     <span
                       className={`font-heading text-xs font-medium uppercase tracking-wider ${
-                        c.isSelf ? 'text-pf-mint' : 'text-pf-text-muted'
+                        c.isSelf ? 'text-pf-primary' : 'text-pf-text-muted'
                       }`}
                     >
                       {c.name}
@@ -110,7 +110,7 @@ export default function CompareTable({ categoryId, showHeaders = true }: Compare
             {displayCategory.features.map((feature, i) => (
               <tr
                 key={feature.name}
-                className={`border-b border-[rgba(91,186,167,0.08)] ${
+                className={`border-b border-[rgba(99,102,241,0.08)] ${
                   i % 2 === 0 ? 'bg-white/[0.01]' : ''
                 }`}
               >

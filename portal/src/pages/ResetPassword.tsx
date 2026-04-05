@@ -12,8 +12,8 @@ function PasswordStrength({ password }: { password: string }) {
 
   const score = [hasLength, hasNumber, hasUpper].filter(Boolean).length;
   const label = score === 3 ? 'Strong' : score === 2 ? 'Fair' : 'Weak';
-  const color = score === 3 ? 'text-[#34D399]' : score === 2 ? 'text-yellow-400' : 'text-red-400';
-  const barColor = score === 3 ? 'bg-[#34D399]' : score === 2 ? 'bg-yellow-400' : 'bg-red-400';
+  const color = score === 3 ? 'text-green-400' : score === 2 ? 'text-yellow-400' : 'text-red-400';
+  const barColor = score === 3 ? 'bg-green-400' : score === 2 ? 'bg-yellow-400' : 'bg-red-400';
 
   return (
     <div className="mt-2 space-y-2">
@@ -26,13 +26,13 @@ function PasswordStrength({ password }: { password: string }) {
         ))}
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
-        <span className={`text-xs ${hasLength ? 'text-[#34D399]' : 'text-white/30'}`}>
+        <span className={`text-xs ${hasLength ? 'text-green-400' : 'text-white/30'}`}>
           {hasLength ? '✓' : '○'} 8+ characters
         </span>
-        <span className={`text-xs ${hasNumber ? 'text-[#34D399]' : 'text-white/30'}`}>
+        <span className={`text-xs ${hasNumber ? 'text-green-400' : 'text-white/30'}`}>
           {hasNumber ? '✓' : '○'} Contains number
         </span>
-        <span className={`text-xs ${hasUpper ? 'text-[#34D399]' : 'text-white/30'}`}>
+        <span className={`text-xs ${hasUpper ? 'text-green-400' : 'text-white/30'}`}>
           {hasUpper ? '✓' : '○'} Uppercase letter
         </span>
       </div>
@@ -89,7 +89,7 @@ export default function ResetPassword() {
       <div className="min-h-screen flex items-center justify-center bg-[#0F1A20] px-4">
         <div className="w-full max-w-md text-center space-y-4">
           <p className="text-red-400">Invalid or expired reset link.</p>
-          <Link to="/forgot-password" className="text-[#34D399] hover:underline text-sm">
+          <Link to="/forgot-password" className="text-pf-primary hover:underline text-sm">
             Request a new reset link
           </Link>
         </div>
@@ -127,7 +127,7 @@ export default function ResetPassword() {
               required
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
               placeholder="••••••••"
             />
             <PasswordStrength password={newPassword} />
@@ -140,7 +140,7 @@ export default function ResetPassword() {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
               placeholder="••••••••"
             />
           </div>
@@ -148,13 +148,13 @@ export default function ResetPassword() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#34D399] hover:bg-[#6EE7B7] disabled:opacity-50 text-[#0F1A20] font-semibold py-3 rounded-xl transition-colors"
+            className="w-full bg-pf-primary hover:bg-pf-primary-light disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors"
           >
             {isLoading ? 'Resetting…' : 'Reset password'}
           </button>
 
           <p className="text-center text-sm text-white/50">
-            <Link to="/login" className="text-[#34D399] hover:underline">
+            <Link to="/login" className="text-pf-primary hover:underline">
               Back to sign in
             </Link>
           </p>

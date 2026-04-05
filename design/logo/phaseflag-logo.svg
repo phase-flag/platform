@@ -6,8 +6,8 @@
   <!-- PHASE -->
   <text x="20" y="70" class="logo-text">PHASE</text>
   <!-- Toggle switch icon -->
-  <rect x="273" y="18" rx="20" ry="20" width="30" height="56" stroke="#5BBAA7" stroke-width="2.5" fill="none"/>
-  <circle cx="288" cy="38" r="8" stroke="#5BBAA7" stroke-width="2" fill="none"/>
+  <rect x="273" y="18" rx="20" ry="20" width="30" height="56" stroke="#6366F1" stroke-width="2.5" fill="none"/>
+  <circle cx="288" cy="38" r="8" stroke="#6366F1" stroke-width="2" fill="none"/>
   <!-- FLAG -->
   <text x="315" y="70" class="logo-text">FLAG</text>
 </svg>

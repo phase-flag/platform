@@ -35,8 +35,8 @@ export default function Navbar() {
               PHASE
             </span>
             <svg className="w-[13px] h-[22px]" viewBox="0 0 12 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="1" y="1" width="10" height="22" rx="5" stroke="#5BBAA7" strokeWidth="1.4" />
-              <circle cx="6" cy="7.5" r="3" stroke="#5BBAA7" strokeWidth="1.4" />
+              <rect x="1" y="1" width="10" height="22" rx="5" stroke="#6366F1" strokeWidth="1.4" />
+              <circle cx="6" cy="7.5" r="3" stroke="#6366F1" strokeWidth="1.4" />
             </svg>
             <span className="font-heading text-xl font-light tracking-widest uppercase text-white">
               FLAG
@@ -76,7 +76,7 @@ export default function Navbar() {
               href="https://app.phaseflag.dev"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2.5 text-sm font-medium text-white bg-pf-mint rounded-xl hover:bg-pf-mint-light transition-colors shadow-lg shadow-pf-mint/20"
+              className="px-5 py-2.5 text-sm font-medium text-white bg-pf-primary rounded-xl hover:bg-pf-primary-light transition-colors shadow-lg shadow-pf-primary/20"
             >
               Get Started
             </a>
@@ -99,7 +99,7 @@ export default function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="lg:hidden bg-[#0F1A20] border-t border-[rgba(91,186,167,0.15)] shadow-lg">
+        <div className="lg:hidden bg-[#0F1A20] border-t border-[rgba(99,102,241,0.15)] shadow-lg">
           <div className="px-4 py-4 space-y-1">
             {navLinks.map((link) => (
               <a
@@ -111,7 +111,7 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
-            <div className="pt-3 border-t border-[rgba(91,186,167,0.15)] space-y-2">
+            <div className="pt-3 border-t border-[rgba(99,102,241,0.15)] space-y-2">
               <a
                 href="https://docs.phaseflag.dev"
                 className="block px-3 py-2 text-sm font-medium text-pf-text-muted"
@@ -120,7 +120,7 @@ export default function Navbar() {
               </a>
               <a
                 href="https://app.phaseflag.dev"
-                className="block px-3 py-2.5 text-sm font-medium text-center text-white bg-pf-mint rounded-xl"
+                className="block px-3 py-2.5 text-sm font-medium text-center text-white bg-pf-primary rounded-xl"
               >
                 Get Started
               </a>

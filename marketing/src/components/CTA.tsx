@@ -2,15 +2,15 @@ export default function CTA() {
   return (
     <section className="py-20 lg:py-28">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative bg-gradient-to-br from-pf-surface-light to-pf-dark rounded-3xl p-10 sm:p-16 text-center overflow-hidden border border-[rgba(91,186,167,0.15)]">
+        <div className="relative bg-gradient-to-br from-pf-surface-light to-pf-dark rounded-3xl p-10 sm:p-16 text-center overflow-hidden border border-[rgba(99,102,241,0.15)]">
           {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-pf-mint/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-pf-mint/5 rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-pf-primary/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-pf-primary/5 rounded-full blur-3xl" />
 
           <div className="relative">
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-light uppercase tracking-wider text-white mb-6">
               Start Shipping<br />
-              <span className="text-pf-mint">Fearlessly</span>
+              <span className="text-pf-primary">Fearlessly</span>
             </h2>
             <p className="text-lg text-white/60 mb-10 max-w-xl mx-auto leading-relaxed">
               Join thousands of engineering teams using Phase Flag to ship features
@@ -19,7 +19,7 @@ export default function CTA() {
             <div className="flex flex-wrap items-center justify-center gap-4">
               <a
                 href="https://app.phaseflag.dev"
-                className="px-8 py-4 text-sm font-medium text-pf-dark bg-pf-mint rounded-xl hover:bg-pf-mint-light transition-all shadow-lg shadow-pf-mint/30 hover:-translate-y-0.5"
+                className="px-8 py-4 text-sm font-medium text-pf-dark bg-pf-primary rounded-xl hover:bg-pf-primary-light transition-all shadow-lg shadow-pf-primary/30 hover:-translate-y-0.5"
               >
                 Get Started Free
               </a>

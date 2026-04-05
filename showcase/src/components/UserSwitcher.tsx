@@ -28,7 +28,7 @@ export default function UserSwitcher() {
                 onClick={() => setOpen(!open)}
                 className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-surface-light hover:bg-surface-lighter transition-colors"
             >
-                <div className="w-8 h-8 rounded-full bg-pf-mint/20 text-pf-mint flex items-center justify-center text-xs font-bold">
+                <div className="w-8 h-8 rounded-full bg-pf-primary/20 text-pf-primary flex items-center justify-center text-xs font-bold">
                     {currentUser.avatar}
                 </div>
                 <div className="text-left">
@@ -48,10 +48,10 @@ export default function UserSwitcher() {
                             key={user.id}
                             onClick={() => { setCurrentUser(user); setOpen(false) }}
                             className={`w-full flex items-center space-x-3 px-3 py-3 hover:bg-surface-lighter transition-colors ${
-                                currentUser.id === user.id ? 'bg-pf-mint/10 border-l-2 border-pf-mint' : ''
+                                currentUser.id === user.id ? 'bg-pf-primary/10 border-l-2 border-pf-primary' : ''
                             }`}
                         >
-                            <div className="w-9 h-9 rounded-full bg-pf-navy text-pf-mint flex items-center justify-center text-xs font-bold">
+                            <div className="w-9 h-9 rounded-full bg-pf-navy text-pf-primary flex items-center justify-center text-xs font-bold">
                                 {user.avatar}
                             </div>
                             <div className="flex-1 text-left">

@@ -5,9 +5,9 @@
 :root {
     --pf-navy: #2B4C5C;
     --pf-dark: #1E3A4A;
-    --pf-mint: #5BBAA7;
-    --pf-mint-light: #7ED4C1;
-    --pf-mint-pale: #E8F7F3;
+    --pf-primary: #6366F1;
+    --pf-primary-light: #818CF8;
+    --pf-primary-pale: #EEF2FF;
     --pf-white: #FFFFFF;
     --pf-gray-50: #F8FAFB;
     --pf-gray-100: #EDF1F3;
@@ -31,6 +31,15 @@
     @apply font-semibold;
     font-family: 'Inter', system-ui, sans-serif;
   }
+
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    @apply outline-none ring-2 ring-primary-400 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 rounded;
+  }
 }
 
 @layer components {
@@ -39,7 +48,7 @@
   }
 
   .btn-primary {
-    @apply bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-400;
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-400;
   }
 
   .btn-secondary {

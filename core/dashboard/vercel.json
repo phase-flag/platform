@@ -1,0 +1,8 @@
+{
+  "buildCommand": "node node_modules/vite/dist/node/cli.js build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

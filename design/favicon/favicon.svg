@@ -2,7 +2,7 @@
   <!-- Background -->
   <rect width="64" height="64" rx="14" fill="#2B4C5C"/>
   <!-- Toggle track -->
-  <rect x="17" y="8" rx="15" ry="15" width="30" height="48" stroke="#5BBAA7" stroke-width="3.5" fill="none"/>
+  <rect x="17" y="8" rx="15" ry="15" width="30" height="48" stroke="#6366F1" stroke-width="3.5" fill="none"/>
   <!-- Toggle knob (on position) -->
-  <circle cx="32" cy="24" r="9" fill="#5BBAA7"/>
+  <circle cx="32" cy="24" r="9" fill="#6366F1"/>
 </svg>

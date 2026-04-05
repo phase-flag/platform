@@ -102,7 +102,7 @@ export const MOCK_TASKS: Task[] = [
 ]
 
 export const MOCK_PROJECTS: Project[] = [
-    { id: 'p1', name: 'Nexus Core', description: 'Core platform features', color: '#5BBAA7', taskCount: 42, memberCount: 5 },
+    { id: 'p1', name: 'Nexus Core', description: 'Core platform features', color: '#6366F1', taskCount: 42, memberCount: 5 },
     { id: 'p2', name: 'Mobile App', description: 'iOS and Android apps', color: '#818CF8', taskCount: 28, memberCount: 3 },
     { id: 'p3', name: 'Data Pipeline', description: 'ETL and analytics infrastructure', color: '#F59E0B', taskCount: 15, memberCount: 2 },
     { id: 'p4', name: 'Marketing Site', description: 'Landing pages and blog', color: '#EC4899', taskCount: 8, memberCount: 2 },

@@ -114,7 +114,7 @@ export default function Environments() {
                         <div key={env.id} className={clsx('card', env.is_frozen && 'border-amber-300 dark:border-amber-700 bg-amber-50/50 dark:bg-amber-900/10')}>
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center space-x-3">
-                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: env.color || '#5BBAA7' }} />
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: env.color || '#6366F1' }} />
                                     <h3 className="font-semibold text-gray-900 dark:text-gray-100">{env.name}</h3>
                                 </div>
                                 {env.is_frozen && (
@@ -139,7 +139,7 @@ export default function Environments() {
                                         <span>Freeze</span>
                                     </button>
                                 )}
-                                <button onClick={() => setCloneEnv(env)} className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#5BBAA7] flex items-center space-x-1">
+                                <button onClick={() => setCloneEnv(env)} className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 flex items-center space-x-1">
                                     <Copy className="w-4 h-4" />
                                     <span>Clone</span>
                                 </button>
@@ -171,7 +171,7 @@ function CreateEnvModal({ projectId, onClose }: { projectId: string; onClose: ()
     const { toast } = useToast()
     const [key, setKey] = useState('')
     const [name, setName] = useState('')
-    const [color, setColor] = useState('#5BBAA7')
+    const [color, setColor] = useState('#6366F1')
 
     const createMutation = useMutation({
         mutationFn: () => environmentsApi.create(projectId, { key, name, color }),

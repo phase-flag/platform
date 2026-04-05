@@ -73,7 +73,7 @@ export default function Projects() {
                             <div key={org.id} className="card">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center space-x-3">
-                                        <Building2 className="w-5 h-5 text-[#5BBAA7]" />
+                                        <Building2 className="w-5 h-5 text-primary-500" />
                                         <h3 className="font-semibold text-gray-900 dark:text-gray-100">{org.name}</h3>
                                     </div>
                                     <button
@@ -109,7 +109,7 @@ export default function Projects() {
                         <div key={project.id} className="card hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center space-x-3">
-                                    <FolderKanban className="w-5 h-5 text-[#5BBAA7]" />
+                                    <FolderKanban className="w-5 h-5 text-primary-500" />
                                     <h3 className="font-semibold text-gray-900 dark:text-gray-100">{project.name}</h3>
                                 </div>
                                 <div className="flex items-center space-x-1">

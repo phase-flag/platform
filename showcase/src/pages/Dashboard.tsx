@@ -20,7 +20,7 @@ export default function Dashboard() {
     const isAdvanced = dashConfig.layout === '4-col'
 
     const stats = [
-        { name: 'Total Tasks', value: MOCK_TASKS.length, icon: CheckSquare, color: 'text-pf-mint' },
+        { name: 'Total Tasks', value: MOCK_TASKS.length, icon: CheckSquare, color: 'text-pf-primary' },
         { name: 'In Progress', value: tasksByStatus.in_progress, icon: TrendingUp, color: 'text-blue-400' },
         ...(isAdvanced ? [
             { name: 'Velocity', value: '12.4', icon: Flame, color: 'text-orange-400' },
@@ -87,7 +87,7 @@ export default function Dashboard() {
                             })}
                         </div>
                         {maxProjects < MOCK_PROJECTS.length && (
-                            <p className="mt-3 text-xs text-pf-mint cursor-pointer hover:underline">
+                            <p className="mt-3 text-xs text-pf-primary cursor-pointer hover:underline">
                                 Upgrade to {currentUser.plan === 'free' ? 'Pro' : 'Enterprise'} for more projects
                             </p>
                         )}
@@ -145,8 +145,8 @@ export default function Dashboard() {
 
             {/* AI Summaries */}
             {showAI && (
-                <div className="mt-8 bg-pf-mint/5 border border-pf-mint/20 rounded-xl p-6">
-                    <h2 className="text-lg font-semibold text-pf-mint mb-2">AI Summary</h2>
+                <div className="mt-8 bg-pf-primary/5 border border-pf-primary/20 rounded-xl p-6">
+                    <h2 className="text-lg font-semibold text-pf-primary mb-2">AI Summary</h2>
                     <p className="text-sm text-gray-400">Your team completed 6 tasks this week, 2 more than last week. The SSO integration is at risk of missing its deadline.</p>
                 </div>
             )}

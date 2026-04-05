@@ -77,12 +77,12 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-[#0F1A20] via-[#162029] to-[#0F1A20]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="text-center max-w-3xl mx-auto">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-mint/10 text-pf-mint border border-pf-mint/20 mb-6">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-primary/10 text-pf-primary border border-pf-primary/20 mb-6">
               Interactive Demo -- No Sign-up Required
             </span>
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-[#E8F0F2] mb-6">
               Try Phase Flag<br />
-              <span className="text-pf-mint">Right Now</span>
+              <span className="text-pf-primary">Right Now</span>
             </h1>
             <p className="text-lg text-[#8FA3AD] mb-10 max-w-2xl mx-auto leading-relaxed">
               Explore feature flags, targeting rules, percentage rollouts, and SDK integration
@@ -91,13 +91,13 @@ export default function Home() {
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
                 to="/flags"
-                className="px-6 py-3 text-sm font-medium text-white bg-pf-mint rounded-xl hover:bg-pf-mint-light transition-colors shadow-lg shadow-pf-mint/20"
+                className="px-6 py-3 text-sm font-medium text-white bg-pf-primary rounded-xl hover:bg-pf-primary-light transition-colors shadow-lg shadow-pf-primary/20"
               >
                 Start with Flags
               </Link>
               <Link
                 to="/evaluation"
-                className="px-6 py-3 text-sm font-medium text-[#E8F0F2] bg-[#1C2D38] border border-[rgba(91,186,167,0.15)] rounded-xl hover:bg-[#243845] transition-colors"
+                className="px-6 py-3 text-sm font-medium text-[#E8F0F2] bg-[#1C2D38] border border-[rgba(99,102,241,0.15)] rounded-xl hover:bg-[#243845] transition-colors"
               >
                 Try Evaluation Engine
               </Link>
@@ -122,7 +122,7 @@ export default function Home() {
             <Link
               key={feature.title}
               to={feature.link}
-              className="group bg-[#162029] border border-[rgba(91,186,167,0.15)] rounded-2xl p-6 hover:border-pf-mint/30 hover:shadow-lg hover:shadow-pf-mint/5 transition-all duration-300"
+              className="group bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6 hover:border-pf-primary/30 hover:shadow-lg hover:shadow-pf-primary/5 transition-all duration-300"
             >
               <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl ${feature.color} mb-4 group-hover:scale-110 transition-transform`}>
                 {feature.icon}
@@ -133,7 +133,7 @@ export default function Home() {
               <p className="text-sm text-[#8FA3AD] leading-relaxed">
                 {feature.description}
               </p>
-              <div className="mt-4 text-sm font-medium text-pf-mint group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+              <div className="mt-4 text-sm font-medium text-pf-primary group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                 Try it
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -145,7 +145,7 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section className="bg-[#162029] border-y border-[rgba(91,186,167,0.15)]">
+      <section className="bg-[#162029] border-y border-[rgba(99,102,241,0.15)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <h2 className="font-heading text-2xl sm:text-3xl font-light uppercase tracking-wider text-[#E8F0F2] text-center mb-12">
             How Evaluation Works
@@ -158,7 +158,7 @@ export default function Home() {
               { step: '4', title: 'Return Value', desc: 'Return the matched variation with a full evaluation reason trace for debugging.' },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-pf-mint text-white text-lg font-heading font-light mb-4">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-pf-primary text-white text-lg font-heading font-light mb-4">
                   {item.step}
                 </div>
                 <h3 className="font-heading text-sm font-medium uppercase tracking-wider text-[#E8F0F2] mb-2">

@@ -96,7 +96,7 @@ export default function CodeExample() {
           </p>
         </div>
 
-        <div className="bg-pf-dark rounded-2xl shadow-2xl shadow-black/30 overflow-hidden border border-[rgba(91,186,167,0.15)]">
+        <div className="bg-pf-dark rounded-2xl shadow-2xl shadow-black/30 overflow-hidden border border-[rgba(99,102,241,0.15)]">
           {/* Tab bar */}
           <div className="flex items-center border-b border-white/10 px-1">
             {tabs.map((t) => (
@@ -105,13 +105,13 @@ export default function CodeExample() {
                 onClick={() => setActiveTab(t.id)}
                 className={`px-5 py-3.5 text-sm font-medium transition-colors relative ${
                   activeTab === t.id
-                    ? 'text-pf-mint'
+                    ? 'text-pf-primary'
                     : 'text-white/50 hover:text-white/80'
                 }`}
               >
                 {t.label}
                 {activeTab === t.id && (
-                  <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-pf-mint rounded-full" />
+                  <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-pf-primary rounded-full" />
                 )}
               </button>
             ))}
@@ -131,8 +131,8 @@ export default function CodeExample() {
             { metric: '19', label: 'SDK targets' },
             { metric: '0', label: 'Network calls during evaluation' },
           ].map((item) => (
-            <div key={item.label} className="text-center bg-pf-surface border border-[rgba(91,186,167,0.15)] rounded-xl p-4">
-              <div className="text-2xl font-heading font-light text-pf-mint">{item.metric}</div>
+            <div key={item.label} className="text-center bg-pf-surface border border-[rgba(99,102,241,0.15)] rounded-xl p-4">
+              <div className="text-2xl font-heading font-light text-pf-primary">{item.metric}</div>
               <div className="text-xs text-pf-text-muted mt-1">{item.label}</div>
             </div>
           ))}

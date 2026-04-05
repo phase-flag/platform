@@ -79,42 +79,42 @@ export default function PlatformHealth() {
             value: data.uptime_percent + '%',
             icon: Activity,
             sub: 'Last 30 days',
-            gradient: 'from-[#22C55E] to-[#5BBAA7]',
+            gradient: 'from-green-500 to-primary-500',
         },
         {
             label: 'Active SSE',
             value: data.active_sse_connections,
             icon: Wifi,
             sub: 'Connections',
-            gradient: 'from-[#5BBAA7] to-[#7ED4C1]',
+            gradient: 'from-primary-500 to-primary-400',
         },
         {
             label: 'DB Size',
             value: (data.database_size_mb / 1024).toFixed(1) + ' GB',
             icon: Database,
             sub: 'PostgreSQL',
-            gradient: 'from-[#2B4C5C] to-[#5BBAA7]',
+            gradient: 'from-primary-800 to-primary-500',
         },
         {
             label: 'Cache Hit Rate',
             value: data.cache_hit_rate + '%',
             icon: Zap,
             sub: 'Redis',
-            gradient: 'from-[#1E3A4A] to-[#2B4C5C]',
+            gradient: 'from-primary-950 to-primary-800',
         },
         {
             label: 'Requests (24h)',
             value: formatNumber(data.total_requests_24h),
             icon: Clock,
             sub: `${data.error_count_24h} errors`,
-            gradient: 'from-[#2B4C5C] to-[#1E3A4A]',
+            gradient: 'from-primary-900 to-primary-950',
         },
         {
             label: 'Error Rate (24h)',
             value: ((data.error_count_24h / data.total_requests_24h) * 100).toFixed(3) + '%',
             icon: AlertTriangle,
             sub: `${data.error_count_24h} total errors`,
-            gradient: data.error_count_24h > 1000 ? 'from-[#EF4444] to-[#F59E0B]' : 'from-[#5BBAA7] to-[#22C55E]',
+            gradient: data.error_count_24h > 1000 ? 'from-red-500 to-amber-500' : 'from-primary-500 to-green-500',
         },
     ]
 
@@ -175,13 +175,13 @@ export default function PlatformHealth() {
                                     <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
                                 </linearGradient>
                                 <linearGradient id="p50Grad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#5BBAA7" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#5BBAA7" stopOpacity={0} />
+                                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
                             <RArea type="monotone" dataKey="p99" stroke="#EF4444" strokeWidth={1.5} fill="url(#p99Grad)" />
                             <RArea type="monotone" dataKey="p95" stroke="#F59E0B" strokeWidth={1.5} fill="url(#p95Grad)" />
-                            <RArea type="monotone" dataKey="p50" stroke="#5BBAA7" strokeWidth={2} fill="url(#p50Grad)" />
+                            <RArea type="monotone" dataKey="p50" stroke="#6366F1" strokeWidth={2} fill="url(#p50Grad)" />
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>

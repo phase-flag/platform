@@ -80,7 +80,7 @@ export default function CodeRefs() {
         <div className="p-6 max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
-                    <Code2 className="w-8 h-8 text-[#5BBAA7]" />
+                    <Code2 className="w-8 h-8 text-primary-500" />
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Code References</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Track where feature flags are used in your codebase</p>
@@ -112,7 +112,7 @@ export default function CodeRefs() {
                         onClick={() => setTab(t.key)}
                         className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                             tab === t.key
-                                ? 'bg-white dark:bg-gray-700 text-[#2B4C5C] dark:text-gray-100 shadow-sm'
+                                ? 'bg-white dark:bg-gray-700 text-primary-700 dark:text-gray-100 shadow-sm'
                                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                         }`}
                     >
@@ -176,7 +176,7 @@ export default function CodeRefs() {
                                     {refs.map((ref, i) => (
                                         <tr key={ref.id || i} className="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700/50">
                                             <td className="px-4 py-3">
-                                                <code className="text-sm text-[#5BBAA7]">{ref.flag_key}</code>
+                                                <code className="text-sm text-primary-500">{ref.flag_key}</code>
                                             </td>
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center space-x-1">
@@ -261,13 +261,13 @@ export default function CodeRefs() {
                             ))}
                         </div>
                         <div className="flex items-center justify-between">
-                            <button type="button" onClick={addUploadRow} className="text-sm text-[#5BBAA7] hover:text-[#4AA896] flex items-center">
+                            <button type="button" onClick={addUploadRow} className="text-sm text-primary-500 hover:text-primary-600 flex items-center">
                                 <Plus className="w-4 h-4 mr-1" /> Add Row
                             </button>
                             <button
                                 type="submit"
                                 disabled={uploadMutation.isPending || uploadRefs.every(r => !r.flag_key || !r.file_path)}
-                                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896] disabled:opacity-50"
+                                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50"
                             >
                                 <Upload className="w-4 h-4 mr-2" />
                                 {uploadMutation.isPending ? 'Uploading...' : 'Upload References'}
@@ -308,11 +308,11 @@ export default function CodeRefs() {
                                     <div key={flagKey} className="flex items-center justify-between px-4 py-3">
                                         <div className="flex items-center space-x-3">
                                             <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                                            <code className="text-sm text-[#5BBAA7] font-medium">{flagKey}</code>
+                                            <code className="text-sm text-primary-500 font-medium">{flagKey}</code>
                                         </div>
                                         <a
                                             href={`/flags/${flagKey}`}
-                                            className="text-sm text-[#5BBAA7] hover:text-[#4AA896] flex items-center"
+                                            className="text-sm text-primary-500 hover:text-primary-600 flex items-center"
                                         >
                                             View Flag <ExternalLink className="w-3 h-3 ml-1" />
                                         </a>

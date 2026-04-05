@@ -5,8 +5,8 @@
 :root {
     --pf-navy: #2B4C5C;
     --pf-dark: #1E3A4A;
-    --pf-mint: #5BBAA7;
-    --pf-mint-light: #7ED4C1;
+    --pf-primary: #6366F1;
+    --pf-primary-light: #818CF8;
 }
 
 body {
@@ -24,7 +24,7 @@ body {
 
 /* Flag change animation */
 @keyframes flagFlash {
-    0% { outline: 2px solid #5BBAA7; outline-offset: 2px; }
+    0% { outline: 2px solid #6366F1; outline-offset: 2px; }
     100% { outline: 2px solid transparent; outline-offset: 6px; }
 }
 .flag-changed {

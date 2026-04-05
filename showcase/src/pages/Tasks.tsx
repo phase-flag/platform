@@ -41,7 +41,7 @@ function TaskCardStandard({ task }: { task: typeof MOCK_TASKS[0] }) {
                 </div>
                 <div className="flex items-center space-x-2">
                     {task.dueDate && <span className="text-[10px] text-gray-500 flex items-center"><Calendar className="w-2.5 h-2.5 mr-0.5" />{task.dueDate.slice(5)}</span>}
-                    <div className="w-6 h-6 rounded-full bg-pf-navy text-pf-mint flex items-center justify-center text-[9px] font-bold">
+                    <div className="w-6 h-6 rounded-full bg-pf-navy text-pf-primary flex items-center justify-center text-[9px] font-bold">
                         {assignee?.avatar}
                     </div>
                 </div>
@@ -59,7 +59,7 @@ function TaskCardDetailed({ task }: { task: typeof MOCK_TASKS[0] }) {
         urgent: 'bg-red-900/50 text-red-300',
     }
     return (
-        <div className="bg-surface-light rounded-xl p-5 border border-gray-700 hover:border-pf-mint/30 transition-colors cursor-pointer">
+        <div className="bg-surface-light rounded-xl p-5 border border-gray-700 hover:border-pf-primary/30 transition-colors cursor-pointer">
             <div className="flex items-start justify-between mb-3">
                 <h3 className="text-sm font-semibold text-gray-100">{task.title}</h3>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${priorityBadge[task.priority]}`}>
@@ -80,7 +80,7 @@ function TaskCardDetailed({ task }: { task: typeof MOCK_TASKS[0] }) {
                 </div>
                 <div className="flex items-center space-x-1.5">
                     {task.tags.map(t => (
-                        <span key={t} className="text-[10px] text-pf-mint bg-pf-mint/10 rounded px-1.5 py-0.5">{t}</span>
+                        <span key={t} className="text-[10px] text-pf-primary bg-pf-primary/10 rounded px-1.5 py-0.5">{t}</span>
                     ))}
                 </div>
             </div>
@@ -119,7 +119,7 @@ export default function Tasks() {
                 <div>
                     <h1 className="text-3xl font-bold text-gray-100">Tasks</h1>
                     <p className="text-gray-500 mt-1">
-                        Layout: <span className="text-pf-mint font-medium">{taskLayout}</span>
+                        Layout: <span className="text-pf-primary font-medium">{taskLayout}</span>
                         <span className="text-gray-700 mx-2">|</span>
                         <span className="text-xs text-gray-600">Controlled by <code className="bg-gray-800 px-1 rounded">nexus-task-layout</code></span>
                     </p>
@@ -148,9 +148,9 @@ export default function Tasks() {
             {showPowerTools && (
                 <div className="mt-8 bg-surface border border-gray-800 rounded-xl p-6">
                     <div className="flex items-center space-x-2 mb-4">
-                        <Keyboard className="w-5 h-5 text-pf-mint" />
+                        <Keyboard className="w-5 h-5 text-pf-primary" />
                         <h2 className="text-lg font-semibold text-gray-100">Keyboard Shortcuts</h2>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-pf-mint/10 text-pf-mint border border-pf-mint/20">POWER USER</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-pf-primary/10 text-pf-primary border border-pf-primary/20">POWER USER</span>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
                         {[
@@ -169,7 +169,7 @@ export default function Tasks() {
             {/* Chat Widget */}
             {showChat && (
                 <div className="fixed bottom-20 right-20 z-40 w-80 bg-surface border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
-                    <div className="bg-pf-mint px-4 py-3 flex items-center space-x-2">
+                    <div className="bg-pf-primary px-4 py-3 flex items-center space-x-2">
                         <MessageSquare className="w-4 h-4 text-pf-dark" />
                         <span className="text-sm font-semibold text-pf-dark">Support Chat</span>
                         <span className="ml-auto text-[10px] bg-pf-dark/20 text-pf-dark px-1.5 py-0.5 rounded-full">30% rollout</span>
@@ -181,7 +181,7 @@ export default function Tasks() {
                         </div>
                         <input
                             placeholder="Type a message..."
-                            className="w-full text-xs bg-surface-light border border-gray-700 rounded-lg px-3 py-2 text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-pf-mint"
+                            className="w-full text-xs bg-surface-light border border-gray-700 rounded-lg px-3 py-2 text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-pf-primary"
                         />
                     </div>
                 </div>

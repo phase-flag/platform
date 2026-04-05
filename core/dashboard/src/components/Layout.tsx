@@ -64,36 +64,20 @@ export default function Layout() {
             {/* Logo */}
             <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-1">
-                    <span className="brand-text text-xl text-[#2B4C5C] dark:text-[#7ED4C1]">
+                    <span className="brand-text text-xl text-primary-700 dark:text-primary-300">
                         PHASE
                     </span>
                     <svg className="w-[13px] h-[22px]" viewBox="0 0 12 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="1" y="1" width="10" height="22" rx="5" stroke="#5BBAA7" strokeWidth="1.4" />
-                        <circle cx="6" cy="7.5" r="3" stroke="#5BBAA7" strokeWidth="1.4" />
+                        <rect x="1" y="1" width="10" height="22" rx="5" stroke="#6366F1" strokeWidth="1.4" />
+                        <circle cx="6" cy="7.5" r="3" stroke="#6366F1" strokeWidth="1.4" />
                     </svg>
-                    <span className="brand-text text-xl text-[#2B4C5C] dark:text-[#7ED4C1]">
+                    <span className="brand-text text-xl text-primary-700 dark:text-primary-300">
                         FLAG
                     </span>
                 </div>
                 <button onClick={closeMobile} className="md:hidden p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
                     <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
-            </div>
-
-            {/* Environment Selector */}
-            <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Environment</label>
-                <select
-                    value={environment}
-                    onChange={(e) => setEnvironment(e.target.value as typeof environment)}
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 dark:bg-gray-800 dark:text-gray-100"
-                >
-                    {ENVIRONMENTS.map(env => (
-                        <option key={env} value={env}>
-                            {env.charAt(0).toUpperCase() + env.slice(1)}
-                        </option>
-                    ))}
-                </select>
             </div>
 
             {/* Navigation */}
@@ -108,11 +92,11 @@ export default function Layout() {
                             className={clsx(
                                 'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                                 isActive
-                                    ? 'bg-[#E8F7F3] text-[#2B4C5C] dark:bg-primary-900/30 dark:text-primary-300'
+                                    ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
                                     : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                             )}
                         >
-                            <item.icon className={clsx('w-4 h-4 mr-3', isActive ? 'text-[#5BBAA7]' : 'text-gray-500 dark:text-gray-400')} />
+                            <item.icon className={clsx('w-4 h-4 mr-3', isActive ? 'text-primary-500' : 'text-gray-500 dark:text-gray-400')} />
                             {item.name}
                         </Link>
                     )
@@ -144,11 +128,11 @@ export default function Layout() {
                                     className={clsx(
                                         'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                                         isActive
-                                            ? 'bg-[#E8F7F3] text-[#2B4C5C] dark:bg-primary-900/30 dark:text-primary-300'
+                                            ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
                                             : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                                     )}
                                 >
-                                    <item.icon className={clsx('w-4 h-4 mr-3', isActive ? 'text-[#5BBAA7]' : 'text-gray-500 dark:text-gray-400')} />
+                                    <item.icon className={clsx('w-4 h-4 mr-3', isActive ? 'text-primary-500' : 'text-gray-500 dark:text-gray-400')} />
                                     {item.name}
                                 </Link>
                             )
@@ -156,39 +140,6 @@ export default function Layout() {
                     </>
                 )}
             </nav>
-
-            {/* Footer */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between px-3 py-2 mb-2">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {dark ? 'Dark Mode' : 'Light Mode'}
-                    </span>
-                    <button
-                        onClick={toggleDark}
-                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                        title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-                    >
-                        {dark ? (
-                            <Sun className="w-5 h-5 text-yellow-500" />
-                        ) : (
-                            <Moon className="w-5 h-5 text-gray-500" />
-                        )}
-                    </button>
-                </div>
-                {user && (
-                    <div className="px-3 py-2 mb-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{user.name}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
-                    </div>
-                )}
-                <button
-                    onClick={logout}
-                    className="flex items-center space-x-3 px-3 py-2.5 w-full text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                    <LogOut className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                    <span className="text-sm font-medium">Sign Out</span>
-                </button>
-            </div>
         </div>
     )
 
@@ -200,12 +151,12 @@ export default function Layout() {
                     <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
                 </button>
                 <div className="flex items-center space-x-1 ml-3">
-                    <span className="brand-text text-lg text-[#2B4C5C] dark:text-[#7ED4C1]">PHASE</span>
+                    <span className="brand-text text-lg text-primary-700 dark:text-primary-300">PHASE</span>
                     <svg className="w-[12px] h-[20px]" viewBox="0 0 12 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="1" y="1" width="10" height="22" rx="5" stroke="#5BBAA7" strokeWidth="1.4" />
-                        <circle cx="6" cy="7.5" r="3" stroke="#5BBAA7" strokeWidth="1.4" />
+                        <rect x="1" y="1" width="10" height="22" rx="5" stroke="#6366F1" strokeWidth="1.4" />
+                        <circle cx="6" cy="7.5" r="3" stroke="#6366F1" strokeWidth="1.4" />
                     </svg>
-                    <span className="brand-text text-lg text-[#2B4C5C] dark:text-[#7ED4C1]">FLAG</span>
+                    <span className="brand-text text-lg text-primary-700 dark:text-primary-300">FLAG</span>
                 </div>
             </div>
 
@@ -220,12 +171,62 @@ export default function Layout() {
             )}
 
             {/* Desktop sidebar */}
-            <div className="hidden md:block fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+            <div className="hidden md:block fixed inset-y-0 left-0 md:w-56 lg:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
                 {sidebarContent}
             </div>
 
             {/* Main content */}
-            <div className="md:pl-64 pt-16 md:pt-0">
+            <div className="md:pl-56 lg:pl-64 pt-16 md:pt-0">
+                {/* Top header bar */}
+                <header className="sticky top-0 z-20 h-14 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-end px-6 gap-4">
+                    {/* Environment selector */}
+                    <div className="flex items-center gap-2">
+                        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 hidden sm:block">Environment</label>
+                        <select
+                            value={environment}
+                            onChange={(e) => setEnvironment(e.target.value as typeof environment)}
+                            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 dark:bg-gray-800 dark:text-gray-100"
+                        >
+                            {ENVIRONMENTS.map(env => (
+                                <option key={env} value={env}>
+                                    {env.charAt(0).toUpperCase() + env.slice(1)}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Dark mode toggle */}
+                    <button
+                        onClick={toggleDark}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+                    >
+                        {dark ? (
+                            <Sun className="w-5 h-5 text-yellow-500" />
+                        ) : (
+                            <Moon className="w-5 h-5 text-gray-500" />
+                        )}
+                    </button>
+
+                    {/* User info & logout */}
+                    {user && (
+                        <div className="flex items-center gap-3">
+                            <div className="hidden sm:block text-right">
+                                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight truncate max-w-[140px]">{user.name}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[140px]">{user.email}</p>
+                            </div>
+                            <button
+                                onClick={logout}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                title="Sign out"
+                            >
+                                <LogOut className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                <span className="hidden sm:inline font-medium">Sign Out</span>
+                            </button>
+                        </div>
+                    )}
+                </header>
+
                 <main className="min-h-screen">
                     <Outlet />
                 </main>

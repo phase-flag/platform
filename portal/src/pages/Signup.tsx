@@ -50,7 +50,7 @@ export default function Signup() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
               placeholder="Jane Smith"
             />
           </div>
@@ -62,7 +62,7 @@ export default function Signup() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
               placeholder="you@company.com"
             />
           </div>
@@ -75,7 +75,7 @@ export default function Signup() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
               placeholder="Min. 8 characters"
             />
           </div>
@@ -83,14 +83,14 @@ export default function Signup() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#34D399] hover:bg-[#6EE7B7] disabled:opacity-50 text-[#0F1A20] font-semibold py-3 rounded-xl transition-colors"
+            className="w-full bg-pf-primary hover:bg-pf-primary-light disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors"
           >
             {isLoading ? 'Creating account…' : 'Create free account'}
           </button>
 
           <p className="text-center text-sm text-white/50">
             Already have an account?{' '}
-            <Link to="/login" className="text-[#34D399] hover:underline">
+            <Link to="/login" className="text-pf-primary hover:underline">
               Sign in
             </Link>
           </p>

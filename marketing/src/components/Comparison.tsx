@@ -35,7 +35,7 @@ export default function Comparison() {
     <section id="compare" className="py-20 lg:py-28">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-mint/10 text-pf-mint mb-4">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-primary/10 text-pf-primary mb-4">
             Comparison
           </span>
           <h2 className="font-heading text-3xl sm:text-4xl font-light uppercase tracking-wider text-white mb-4">
@@ -49,12 +49,12 @@ export default function Comparison() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b-2 border-[rgba(91,186,167,0.15)]">
+              <tr className="border-b-2 border-[rgba(99,102,241,0.15)]">
                 <th className="text-left py-4 pr-4 font-heading text-xs font-medium uppercase tracking-wider text-pf-text-muted">
                   Feature
                 </th>
                 <th className="px-4 py-4 text-center">
-                  <div className="font-heading text-sm font-medium uppercase tracking-wider text-pf-mint">Phase Flag</div>
+                  <div className="font-heading text-sm font-medium uppercase tracking-wider text-pf-primary">Phase Flag</div>
                 </th>
                 <th className="px-4 py-4 text-center">
                   <div className="font-heading text-xs font-medium uppercase tracking-wider text-pf-text-muted">LaunchDarkly</div>
@@ -71,10 +71,10 @@ export default function Comparison() {
               {features.map((feature, i) => (
                 <tr
                   key={feature.name}
-                  className={`border-b border-[rgba(91,186,167,0.1)] ${i % 2 === 0 ? 'bg-white/[0.02]' : ''}`}
+                  className={`border-b border-[rgba(99,102,241,0.1)] ${i % 2 === 0 ? 'bg-white/[0.02]' : ''}`}
                 >
                   <td className="py-3.5 pr-4 text-pf-text font-medium">{feature.name}</td>
-                  <td className="px-4 py-3.5 text-center bg-pf-mint/5">
+                  <td className="px-4 py-3.5 text-center bg-pf-primary/5">
                     <Cell value={feature.phaseflag} />
                   </td>
                   <td className="px-4 py-3.5 text-center">

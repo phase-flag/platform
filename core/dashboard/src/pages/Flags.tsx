@@ -2,10 +2,12 @@ import { useState, useMemo } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { flagsApi } from '@/lib/api'
-import { Plus, Search, ToggleLeft, ToggleRight, X, Archive, GitCompare, ChevronLeft, ChevronRight, Download, Upload } from 'lucide-react'
+import { Plus, Search, ToggleLeft, ToggleRight, X, Archive, GitCompare, ChevronLeft, ChevronRight, Download, Upload, Flag } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 import CreateFlagModal from '@/components/CreateFlagModal'
+import EmptyState from '@/components/EmptyState'
+import Skeleton from '@/components/Skeleton'
 import { useEnvironment } from '@/contexts/EnvironmentContext'
 import { useToast } from '@/contexts/ToastContext'
 
@@ -164,7 +166,17 @@ export default function Flags() {
     }
 
     if (isLoading) {
-        return <div className="p-8 dark:text-gray-300">Loading...</div>
+        return (
+            <div className="p-8">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Feature Flags</h1>
+                        <p className="mt-2 text-gray-600 dark:text-gray-400">Manage feature flags and targeting rules</p>
+                    </div>
+                </div>
+                <Skeleton variant="row" count={3} />
+            </div>
+        )
     }
 
     return (
@@ -315,7 +327,7 @@ export default function Flags() {
                 {filteredFlags.map((flag) => {
                     const isActive = flag.status === 'active'
                     return (
-                        <div key={flag.id} className="card hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/20 transition-shadow duration-200 flex items-start space-x-3">
+                        <div key={flag.id} className="card hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/20 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150 flex items-start space-x-3">
                             <input
                                 type="checkbox"
                                 checked={selectedKeys.has(flag.key)}
@@ -425,14 +437,13 @@ export default function Flags() {
             )}
 
             {flags?.length === 0 && (
-                <div className="card text-center py-12">
-                    <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                        <Plus className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No feature flags yet</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">Get started by creating your first feature flag</p>
-                    <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">Create Flag</button>
-                </div>
+                <EmptyState
+                    icon={Flag}
+                    title="No feature flags yet"
+                    description="Get started by creating your first feature flag"
+                    actionLabel="Create Flag"
+                    onAction={() => setShowCreateModal(true)}
+                />
             )}
 
             <CreateFlagModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />

@@ -208,12 +208,12 @@ export default function SegmentModal({ isOpen, onClose, segment }: Props) {
                                         value={c.attribute}
                                         onChange={(e) => updateCondition(i, 'attribute', e.target.value)}
                                         placeholder="Attribute"
-                                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-primary-400 focus:border-primary-400 focus:outline-none"
                                     />
                                     <select
                                         value={c.operator}
                                         onChange={(e) => updateCondition(i, 'operator', e.target.value)}
-                                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-primary-400 focus:border-primary-400 focus:outline-none"
                                     >
                                         {OPERATORS.map(op => (
                                             <option key={op} value={op}>{op}</option>
@@ -224,7 +224,7 @@ export default function SegmentModal({ isOpen, onClose, segment }: Props) {
                                         value={c.value}
                                         onChange={(e) => updateCondition(i, 'value', e.target.value)}
                                         placeholder="Value"
-                                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-primary-400 focus:border-primary-400 focus:outline-none"
                                     />
                                     <button type="button" onClick={() => removeCondition(i)} className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500">
                                         <Trash2 className="w-4 h-4" />

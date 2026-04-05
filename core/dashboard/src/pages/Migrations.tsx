@@ -107,7 +107,7 @@ export default function Migrations() {
         <div className="p-6 max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
-                    <ArrowRightLeft className="w-8 h-8 text-[#5BBAA7]" />
+                    <ArrowRightLeft className="w-8 h-8 text-primary-500" />
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Migrations</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Manage system-to-system migrations with staged rollouts</p>
@@ -115,7 +115,7 @@ export default function Migrations() {
                 </div>
                 <button
                     onClick={() => setShowCreate(true)}
-                    className="flex items-center px-4 py-2 text-sm font-medium text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896]"
+                    className="flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                 >
                     <Plus className="w-4 h-4 mr-2" /> New Migration
                 </button>
@@ -139,12 +139,12 @@ export default function Migrations() {
                                     <div>
                                         <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">{m.name}</h3>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            <code className="text-[#5BBAA7]">{m.key}</code>
+                                            <code className="text-primary-500">{m.key}</code>
                                             {m.description && <span className="ml-2">— {m.description}</span>}
                                         </p>
                                         <div className="flex items-center mt-2 text-sm text-gray-600 dark:text-gray-400">
                                             <span className="font-medium">{m.source_system}</span>
-                                            <ArrowRight className="w-4 h-4 mx-2 text-[#5BBAA7]" />
+                                            <ArrowRight className="w-4 h-4 mx-2 text-primary-500" />
                                             <span className="font-medium">{m.target_system}</span>
                                         </div>
                                     </div>
@@ -152,7 +152,7 @@ export default function Migrations() {
                                         {!isLastStage(m) && (
                                             <button
                                                 onClick={() => setConfirmAction({ type: 'advance', key: m.key })}
-                                                className="flex items-center px-3 py-1.5 text-xs font-medium text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896]"
+                                                className="flex items-center px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                                             >
                                                 <SkipForward className="w-3 h-3 mr-1" /> Advance
                                             </button>
@@ -179,12 +179,12 @@ export default function Migrations() {
                                     {m.stages.map((stage, i) => {
                                         let bg = 'bg-gray-200 dark:bg-gray-600'
                                         if (i < stageIdx) bg = 'bg-green-400'
-                                        else if (i === stageIdx) bg = 'bg-[#5BBAA7]'
+                                        else if (i === stageIdx) bg = 'bg-primary-500'
                                         return (
                                             <div key={stage} className="flex-1 flex items-center">
                                                 <div className="flex-1 flex flex-col items-center">
                                                     <div className={`h-2.5 w-full rounded-full ${bg}`} />
-                                                    <span className={`mt-1 text-xs ${i === stageIdx ? 'font-semibold text-[#2B4C5C] dark:text-[#7ED4C1]' : 'text-gray-400 dark:text-gray-500'}`}>
+                                                    <span className={`mt-1 text-xs ${i === stageIdx ? 'font-semibold text-primary-700 dark:text-primary-300' : 'text-gray-400 dark:text-gray-500'}`}>
                                                         {stage.replace('_', ' ')}
                                                     </span>
                                                 </div>
@@ -299,7 +299,7 @@ export default function Migrations() {
                                 <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
                                     Cancel
                                 </button>
-                                <button type="submit" disabled={createMutation.isPending} className="px-4 py-2 text-sm text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896] disabled:opacity-50">
+                                <button type="submit" disabled={createMutation.isPending} className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50">
                                     {createMutation.isPending ? 'Creating...' : 'Create Migration'}
                                 </button>
                             </div>

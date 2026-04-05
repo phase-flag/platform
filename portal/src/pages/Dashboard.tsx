@@ -1,8 +1,17 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import Skeleton from '../components/Skeleton';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate async data fetch; replace with real data calls as needed
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#0F1A20] px-6 py-8">
@@ -28,26 +37,32 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-            <p className="text-white/50 text-sm">Feature flags</p>
-            <p className="text-3xl font-bold text-white mt-1">0</p>
+        {loading ? (
+          <div className="mb-8">
+            <Skeleton variant="card" count={3} />
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-            <p className="text-white/50 text-sm">Environments</p>
-            <p className="text-3xl font-bold text-white mt-1">0</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+              <p className="text-white/50 text-sm">Feature flags</p>
+              <p className="text-3xl font-bold text-white mt-1">0</p>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+              <p className="text-white/50 text-sm">Environments</p>
+              <p className="text-3xl font-bold text-white mt-1">0</p>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+              <p className="text-white/50 text-sm">Evaluations today</p>
+              <p className="text-3xl font-bold text-white mt-1">0</p>
+            </div>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-            <p className="text-white/50 text-sm">Evaluations today</p>
-            <p className="text-3xl font-bold text-white mt-1">0</p>
-          </div>
-        </div>
+        )}
 
         <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-center">
           <p className="text-white/60 mb-4">No flags yet. Start by setting up your first project.</p>
           <Link
             to="/onboarding"
-            className="inline-block bg-[#34D399] hover:bg-[#6EE7B7] text-[#0F1A20] font-semibold px-6 py-3 rounded-xl transition-colors"
+            className="inline-block bg-pf-primary hover:bg-pf-primary-light text-white font-semibold px-6 py-3 rounded-xl transition-colors"
           >
             Set up your first project
           </Link>

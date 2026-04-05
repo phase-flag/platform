@@ -69,7 +69,7 @@ function ErrorBanner({ message }: { message: string }) {
 function CodeBlock({ code, onCopy, copied }: { code: string; onCopy: () => void; copied: boolean }) {
   return (
     <div className="relative bg-black/40 rounded-xl p-4">
-      <pre className="text-sm text-[#34D399] font-mono whitespace-pre-wrap overflow-x-auto pr-16">{code}</pre>
+      <pre className="text-sm text-pf-primary font-mono whitespace-pre-wrap overflow-x-auto pr-16">{code}</pre>
       <button
         onClick={onCopy}
         className="absolute top-3 right-3 px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
@@ -96,7 +96,7 @@ function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="w-full bg-[#34D399] hover:bg-[#6EE7B7] disabled:opacity-50 text-[#0F1A20] font-semibold py-3 rounded-xl transition-colors"
+      className="w-full bg-pf-primary hover:bg-pf-primary-light disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors"
     >
       {children}
     </button>
@@ -338,16 +338,16 @@ export default function Onboarding() {
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                   s < step
-                    ? 'bg-[#34D399] text-[#0F1A20]'
+                    ? 'bg-pf-primary text-white'
                     : s === step
-                    ? 'bg-[#34D399]/30 border-2 border-[#34D399] text-[#34D399]'
+                    ? 'bg-pf-primary/30 border-2 border-pf-primary text-pf-primary'
                     : 'bg-white/10 text-white/30'
                 }`}
               >
                 {s < step ? '✓' : s}
               </div>
               {s < TOTAL_STEPS && (
-                <div className={`w-8 h-0.5 ${s < step ? 'bg-[#34D399]' : 'bg-white/10'}`} />
+                <div className={`w-8 h-0.5 ${s < step ? 'bg-pf-primary' : 'bg-white/10'}`} />
               )}
             </div>
           ))}
@@ -373,7 +373,7 @@ export default function Onboarding() {
                 required
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
                 placeholder="Acme Corp"
               />
             </div>
@@ -393,7 +393,7 @@ export default function Onboarding() {
               <h2 className="text-2xl font-bold text-white">Create your first project</h2>
               <p className="text-white/50 mt-1">
                 A project organizes your flags. We'll auto-create{' '}
-                <span className="text-[#34D399]">dev / staging / prod</span> environments for you.
+                <span className="text-pf-primary">dev / staging / prod</span> environments for you.
               </p>
             </div>
             <ErrorBanner message={error} />
@@ -404,7 +404,7 @@ export default function Onboarding() {
                 required
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
                 placeholder="My App"
               />
             </div>
@@ -420,7 +420,7 @@ export default function Onboarding() {
             <div>
               <h2 className="text-2xl font-bold text-white">Choose your SDK</h2>
               <p className="text-white/50 mt-1">
-                Project <span className="text-[#34D399] font-mono">{projectKey}</span> is ready. Pick
+                Project <span className="text-pf-primary font-mono">{projectKey}</span> is ready. Pick
                 your language.
               </p>
             </div>
@@ -431,13 +431,13 @@ export default function Onboarding() {
                   onClick={() => setSelectedSdk(sdk)}
                   className={`w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl border transition-colors ${
                     selectedSdk.id === sdk.id
-                      ? 'border-[#34D399] bg-[#34D399]/10 text-white'
+                      ? 'border-pf-primary bg-pf-primary/10 text-white'
                       : 'border-white/10 text-white/60 hover:border-white/30 hover:text-white'
                   }`}
                 >
                   <span
                     className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                      selectedSdk.id === sdk.id ? 'bg-[#34D399] text-[#0F1A20]' : 'bg-white/10 text-white/60'
+                      selectedSdk.id === sdk.id ? 'bg-pf-primary text-white' : 'bg-white/10 text-white/60'
                     }`}
                   >
                     {sdk.icon}
@@ -448,7 +448,7 @@ export default function Onboarding() {
             </div>
             <div className="bg-black/30 rounded-xl p-4">
               <p className="text-white/40 text-xs mb-2">Install</p>
-              <code className="text-[#34D399] text-sm font-mono">{selectedSdk.install}</code>
+              <code className="text-pf-primary text-sm font-mono">{selectedSdk.install}</code>
             </div>
             <PrimaryButton onClick={() => setStep(4)}>Next →</PrimaryButton>
           </div>
@@ -466,7 +466,7 @@ export default function Onboarding() {
             <div>
               <label className="block text-sm font-medium text-white/70 mb-1.5">Your API key</label>
               <div className="flex gap-2">
-                <code className="flex-1 bg-black/40 rounded-xl px-4 py-3 text-[#34D399] font-mono text-sm truncate">
+                <code className="flex-1 bg-black/40 rounded-xl px-4 py-3 text-pf-primary font-mono text-sm truncate">
                   {apiKey || token || 'YOUR_API_KEY'}
                 </code>
                 <button
@@ -501,7 +501,7 @@ export default function Onboarding() {
               <h2 className="text-2xl font-bold text-white">Create your first flag</h2>
               <p className="text-white/50 mt-1">
                 We'll create a boolean flag called{' '}
-                <span className="text-[#34D399] font-mono">my-first-flag</span> so you can test the
+                <span className="text-pf-primary font-mono">my-first-flag</span> so you can test the
                 integration.
               </p>
             </div>
@@ -534,7 +534,7 @@ export default function Onboarding() {
               <button
                 onClick={toggleFlag}
                 className={`relative w-12 h-6 rounded-full transition-colors focus:outline-none ${
-                  flagEnabled ? 'bg-[#34D399]' : 'bg-white/20'
+                  flagEnabled ? 'bg-pf-primary' : 'bg-white/20'
                 }`}
               >
                 <span
@@ -570,7 +570,7 @@ export default function Onboarding() {
                   <button
                     onClick={toggleFlag}
                     className={`relative w-12 h-6 rounded-full transition-colors focus:outline-none ${
-                      flagEnabled ? 'bg-[#34D399]' : 'bg-white/20'
+                      flagEnabled ? 'bg-pf-primary' : 'bg-white/20'
                     }`}
                   >
                     <span
@@ -581,7 +581,7 @@ export default function Onboarding() {
                   </button>
                 </div>
                 <p className="text-white/40 text-xs">
-                  Status: <span className={flagEnabled ? 'text-[#34D399]' : 'text-white/40'}>{flagEnabled ? 'ON' : 'OFF'}</span>
+                  Status: <span className={flagEnabled ? 'text-pf-primary' : 'text-white/40'}>{flagEnabled ? 'ON' : 'OFF'}</span>
                 </p>
               </div>
             )}
@@ -590,16 +590,16 @@ export default function Onboarding() {
             <div
               className={`flex items-center gap-3 rounded-xl px-5 py-4 border ${
                 connected
-                  ? 'border-[#34D399]/30 bg-[#34D399]/10'
+                  ? 'border-pf-primary/30 bg-pf-primary/10'
                   : 'border-white/10 bg-white/5'
               }`}
             >
               {connected ? (
-                <span className="w-3 h-3 rounded-full bg-[#34D399] flex-shrink-0" />
+                <span className="w-3 h-3 rounded-full bg-pf-primary flex-shrink-0" />
               ) : (
                 <span className="w-3 h-3 rounded-full bg-white/30 flex-shrink-0 animate-pulse" />
               )}
-              <span className={`text-sm ${connected ? 'text-[#34D399]' : 'text-white/50'}`}>
+              <span className={`text-sm ${connected ? 'text-pf-primary' : 'text-white/50'}`}>
                 {connected ? 'API reachable — connection verified' : 'Polling API every 3 seconds…'}
               </span>
             </div>

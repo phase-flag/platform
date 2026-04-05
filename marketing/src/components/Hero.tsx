@@ -3,18 +3,18 @@ export default function Hero() {
     <section className="relative overflow-hidden pt-20 lg:pt-24">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0F1A20] via-[#162029] to-[#0F1A20]" />
-      <div className="absolute top-20 right-0 w-96 h-96 bg-pf-mint/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-pf-mint/5 rounded-full blur-3xl" />
+      <div className="absolute top-20 right-0 w-96 h-96 bg-pf-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-pf-primary/5 rounded-full blur-3xl" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="animate-fade-in-up">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-mint/10 text-pf-mint border border-pf-mint/20 mb-6">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-primary/10 text-pf-primary border border-pf-primary/20 mb-6">
               Open Source -- Apache 2.0
             </span>
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light tracking-tight text-white leading-[1.1] mb-6">
               Feature Flags.<br />
-              <span className="text-pf-mint">Reimagined.</span>
+              <span className="text-pf-primary">Reimagined.</span>
             </h1>
             <p className="text-lg lg:text-xl text-pf-text-muted mb-10 max-w-lg leading-relaxed">
               Ship features safely with local evaluation, progressive rollouts,
@@ -23,15 +23,15 @@ export default function Hero() {
             <div className="flex flex-wrap items-center gap-4">
               <a
                 href="https://app.phaseflag.dev"
-                className="px-7 py-3.5 text-sm font-medium text-white bg-pf-mint rounded-xl hover:bg-pf-mint-light transition-all shadow-lg shadow-pf-mint/25 hover:shadow-xl hover:shadow-pf-mint/30 hover:-translate-y-0.5"
+                className="px-7 py-3.5 text-sm font-medium text-white bg-pf-primary rounded-xl hover:bg-pf-primary-light transition-all shadow-lg shadow-pf-primary/25 hover:shadow-xl hover:shadow-pf-primary/30 hover:-translate-y-0.5"
               >
                 Get Started Free
               </a>
               <a
                 href="#live-demo"
-                className="px-7 py-3.5 text-sm font-medium text-pf-text bg-white/5 border border-[rgba(91,186,167,0.15)] rounded-xl hover:bg-white/10 transition-all hover:-translate-y-0.5 flex items-center gap-2"
+                className="px-7 py-3.5 text-sm font-medium text-pf-text bg-white/5 border border-[rgba(99,102,241,0.15)] rounded-xl hover:bg-white/10 transition-all hover:-translate-y-0.5 flex items-center gap-2"
               >
-                <svg className="w-4 h-4 text-pf-mint" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-pf-primary" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
                 Try Live Demo
@@ -61,7 +61,7 @@ export default function Hero() {
 
           {/* Code preview card */}
           <div className="animate-fade-in-up animate-delay-200 animate-float">
-            <div className="bg-pf-dark rounded-2xl shadow-2xl shadow-black/30 overflow-hidden border border-[rgba(91,186,167,0.15)]">
+            <div className="bg-pf-dark rounded-2xl shadow-2xl shadow-black/30 overflow-hidden border border-[rgba(99,102,241,0.15)]">
               <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
                 <span className="w-3 h-3 rounded-full bg-red-400" />
                 <span className="w-3 h-3 rounded-full bg-yellow-400" />

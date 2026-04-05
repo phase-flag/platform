@@ -95,10 +95,10 @@ export default function Billing() {
     }
 
     const stats = [
-        { label: 'MRR', value: formatCurrency(data.mrr), icon: DollarSign, gradient: 'from-[#5BBAA7] to-[#22C55E]' },
-        { label: 'Total Customers', value: data.total_customers, icon: Users, gradient: 'from-[#2B4C5C] to-[#5BBAA7]' },
-        { label: 'Pro Plans', value: data.pro_count, icon: CreditCard, gradient: 'from-[#2B4C5C] to-[#1E3A4A]' },
-        { label: 'Enterprise Plans', value: data.enterprise_count, icon: TrendingUp, gradient: 'from-[#1E3A4A] to-[#5BBAA7]' },
+        { label: 'MRR', value: formatCurrency(data.mrr), icon: DollarSign, gradient: 'from-primary-500 to-green-500' },
+        { label: 'Total Customers', value: data.total_customers, icon: Users, gradient: 'from-primary-800 to-primary-500' },
+        { label: 'Pro Plans', value: data.pro_count, icon: CreditCard, gradient: 'from-primary-900 to-primary-950' },
+        { label: 'Enterprise Plans', value: data.enterprise_count, icon: TrendingUp, gradient: 'from-primary-950 to-primary-500' },
     ]
 
     return (
@@ -146,7 +146,7 @@ export default function Billing() {
                             formatter={(v: number) => [v.toLocaleString(), 'Evaluations']}
                             contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#f3f4f6' }}
                         />
-                        <RBar dataKey="evaluations" fill="#5BBAA7" radius={[0, 4, 4, 0]} />
+                        <RBar dataKey="evaluations" fill="#6366F1" radius={[0, 4, 4, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
@@ -195,7 +195,7 @@ export default function Billing() {
                                                         <div
                                                             className={clsx(
                                                                 'h-2 rounded-full transition-all',
-                                                                isOverLimit ? 'bg-red-500' : 'bg-[#5BBAA7]'
+                                                                isOverLimit ? 'bg-red-500' : 'bg-primary-500'
                                                             )}
                                                             style={{ width: `${usagePct}%` }}
                                                         />
@@ -221,7 +221,7 @@ export default function Billing() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-8">
                 {[
                     { name: 'Free', limit: '10K evals/mo', price: '$0', color: 'border-gray-300 dark:border-gray-600' },
-                    { name: 'Pro', limit: '1M evals/mo', price: '$99/mo', color: 'border-[#5BBAA7]' },
+                    { name: 'Pro', limit: '1M evals/mo', price: '$99/mo', color: 'border-primary-500' },
                     { name: 'Enterprise', limit: 'Unlimited', price: 'Custom', color: 'border-purple-500' },
                 ].map(plan => (
                     <div key={plan.name} className={clsx('card border-t-4', plan.color)}>

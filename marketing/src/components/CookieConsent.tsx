@@ -31,10 +31,10 @@ export default function CookieConsent({ onLearnMore }: CookieConsentProps) {
       aria-label="Cookie consent"
       className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 sm:pb-6 animate-slide-up"
     >
-      <div className="max-w-3xl mx-auto bg-[#162029] border border-[rgba(91,186,167,0.2)] rounded-2xl shadow-2xl shadow-black/50 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div className="max-w-3xl mx-auto bg-[#162029] border border-[rgba(99,102,241,0.2)] rounded-2xl shadow-2xl shadow-black/50 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         {/* Cookie icon */}
-        <div className="shrink-0 w-9 h-9 rounded-xl bg-[rgba(91,186,167,0.1)] flex items-center justify-center">
-          <svg className="w-5 h-5 text-[#5BBAA7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="shrink-0 w-9 h-9 rounded-xl bg-[rgba(99,102,241,0.1)] flex items-center justify-center">
+          <svg className="w-5 h-5 text-[#6366F1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -52,7 +52,7 @@ export default function CookieConsent({ onLearnMore }: CookieConsentProps) {
           We use cookies to improve your experience and analyze site usage. By continuing, you agree to our{' '}
           <button
             onClick={onLearnMore}
-            className="text-[#5BBAA7] hover:text-white underline underline-offset-2 transition-colors"
+            className="text-[#6366F1] hover:text-white underline underline-offset-2 transition-colors"
           >
             Privacy Policy
           </button>
@@ -71,7 +71,7 @@ export default function CookieConsent({ onLearnMore }: CookieConsentProps) {
           )}
           <button
             onClick={handleAccept}
-            className="px-5 py-2 text-sm font-semibold text-[#0F1A20] bg-[#5BBAA7] hover:bg-[#6DCBB8] rounded-xl transition-colors shadow-lg shadow-[#5BBAA7]/20"
+            className="px-5 py-2 text-sm font-semibold text-[#0F1A20] bg-[#6366F1] hover:bg-[#818CF8] rounded-xl transition-colors shadow-lg shadow-[#6366F1]/20"
           >
             Accept
           </button>

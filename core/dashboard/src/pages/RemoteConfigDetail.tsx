@@ -150,7 +150,7 @@ export default function RemoteConfigDetail() {
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div className="flex items-center space-x-3">
-                        <Database className="w-6 h-6 text-[#5BBAA7]" />
+                        <Database className="w-6 h-6 text-primary-500" />
                         <div>
                             <div className="flex items-center space-x-3">
                                 <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{config.name}</h1>
@@ -181,7 +181,7 @@ export default function RemoteConfigDetail() {
                     <button
                         onClick={handleSaveClick}
                         disabled={!!jsonError || updateMutation.isPending}
-                        className="flex items-center space-x-2 px-4 py-2 text-sm bg-[#5BBAA7] text-white rounded-lg hover:bg-[#4AA896] disabled:opacity-50"
+                        className="flex items-center space-x-2 px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                     >
                         <Save className="w-4 h-4" />
                         <span>{updateMutation.isPending ? 'Saving...' : 'Save'}</span>
@@ -242,7 +242,7 @@ export default function RemoteConfigDetail() {
                             onChange={e => handleValueChange(e.target.value)}
                             rows={config.config_type === 'json' ? 16 : 4}
                             className={clsx(
-                                'w-full px-3 py-3 border rounded-lg font-mono text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 resize-y focus:outline-none focus:ring-2 focus:ring-[#5BBAA7] transition-colors',
+                                'w-full px-3 py-3 border rounded-lg font-mono text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 resize-y focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors',
                                 jsonError
                                     ? 'border-red-400 dark:border-red-600'
                                     : 'border-gray-300 dark:border-gray-600'
@@ -307,7 +307,7 @@ export default function RemoteConfigDetail() {
                                         className={clsx(
                                             'w-full text-left px-3 py-2.5 rounded-lg border transition-colors text-sm',
                                             selectedHistoryVersion === entry.version
-                                                ? 'border-[#5BBAA7] bg-[#E8F7F3] dark:bg-[#5BBAA7]/10 dark:border-[#5BBAA7]'
+                                                ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/10 dark:border-primary-500'
                                                 : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50'
                                         )}
                                     >
@@ -315,7 +315,7 @@ export default function RemoteConfigDetail() {
                                             <span className="font-medium text-gray-900 dark:text-gray-100">
                                                 v{entry.version}
                                                 {entry.is_current && (
-                                                    <span className="ml-2 text-xs text-[#5BBAA7] font-normal">current</span>
+                                                    <span className="ml-2 text-xs text-primary-500 font-normal">current</span>
                                                 )}
                                             </span>
                                         </div>
@@ -341,7 +341,7 @@ export default function RemoteConfigDetail() {
                                                         }
                                                     }
                                                 }}
-                                                className="mt-2 text-xs text-[#5BBAA7] hover:text-[#4AA896] font-medium"
+                                                className="mt-2 text-xs text-primary-500 hover:text-primary-600 font-medium"
                                             >
                                                 Restore this version
                                             </button>
@@ -392,7 +392,7 @@ export default function RemoteConfigDetail() {
                             <button
                                 onClick={() => updateMutation.mutate()}
                                 disabled={updateMutation.isPending}
-                                className="px-4 py-2 text-sm text-white bg-[#5BBAA7] rounded-lg hover:bg-[#4AA896] disabled:opacity-50"
+                                className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50"
                             >
                                 {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                             </button>

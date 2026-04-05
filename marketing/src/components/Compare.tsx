@@ -11,13 +11,13 @@ function CompetitorCard({ competitor }: { competitor: typeof competitors[number]
   return (
     <a
       href={`#compare-${competitor.id}`}
-      className="block p-5 rounded-xl bg-white/[0.03] border border-[rgba(91,186,167,0.12)] hover:border-pf-mint/30 hover:bg-white/[0.06] transition-all group"
+      className="block p-5 rounded-xl bg-white/[0.03] border border-[rgba(99,102,241,0.12)] hover:border-pf-primary/30 hover:bg-white/[0.06] transition-all group"
     >
       <div className="flex items-start justify-between gap-3 mb-2">
-        <h3 className="font-heading text-sm font-medium uppercase tracking-wider text-white group-hover:text-pf-mint transition-colors">
+        <h3 className="font-heading text-sm font-medium uppercase tracking-wider text-white group-hover:text-pf-primary transition-colors">
           Phase Flag vs {competitor.name}
         </h3>
-        <svg className="w-4 h-4 text-pf-text-muted group-hover:text-pf-mint transition-colors shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-pf-text-muted group-hover:text-pf-primary transition-colors shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </div>
@@ -35,7 +35,7 @@ export default function Compare() {
 
         {/* ── Header ── */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-mint/10 text-pf-mint mb-4">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-primary/10 text-pf-primary mb-4">
             Detailed Comparison
           </span>
           <h2 className="font-heading text-3xl sm:text-4xl font-light uppercase tracking-wider text-white mb-4">
@@ -48,14 +48,14 @@ export default function Compare() {
         </div>
 
         {/* ── Why Phase Flag — advantage bullets ── */}
-        <div className="mb-14 p-6 rounded-2xl bg-pf-mint/5 border border-pf-mint/20">
-          <h3 className="font-heading text-sm font-medium uppercase tracking-wider text-pf-mint mb-4">
+        <div className="mb-14 p-6 rounded-2xl bg-pf-primary/5 border border-pf-primary/20">
+          <h3 className="font-heading text-sm font-medium uppercase tracking-wider text-pf-primary mb-4">
             Key Advantages
           </h3>
           <ul className="grid sm:grid-cols-2 gap-3">
             {phaseAdvantages.map((adv) => (
               <li key={adv} className="flex items-start gap-2.5 text-sm text-pf-text">
-                <svg className="w-4 h-4 text-pf-mint shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-pf-primary shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                 </svg>
                 {adv}
@@ -97,7 +97,7 @@ export default function Compare() {
                     href={competitor.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-pf-text-muted hover:text-pf-mint transition-colors"
+                    className="text-xs text-pf-text-muted hover:text-pf-primary transition-colors"
                   >
                     {competitor.url.replace('https://', '')} ↗
                   </a>
@@ -114,14 +114,14 @@ export default function Compare() {
                       <p className="text-xs font-medium text-pf-text-muted uppercase tracking-wider mb-2 px-1">
                         {cat.label}
                       </p>
-                      <div className="overflow-x-auto rounded-xl border border-[rgba(91,186,167,0.12)]">
+                      <div className="overflow-x-auto rounded-xl border border-[rgba(99,102,241,0.12)]">
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className="border-b border-[rgba(91,186,167,0.15)]">
+                            <tr className="border-b border-[rgba(99,102,241,0.15)]">
                               <th className="text-left px-4 py-3 text-xs text-pf-text-muted font-medium uppercase tracking-wider min-w-[180px]">
                                 Feature
                               </th>
-                              <th className="px-4 py-3 text-center bg-pf-mint/5 text-xs font-heading font-medium uppercase tracking-wider text-pf-mint">
+                              <th className="px-4 py-3 text-center bg-pf-primary/5 text-xs font-heading font-medium uppercase tracking-wider text-pf-primary">
                                 Phase Flag
                               </th>
                               <th className="px-4 py-3 text-center text-xs font-heading font-medium uppercase tracking-wider text-pf-text-muted">
@@ -138,7 +138,7 @@ export default function Compare() {
                               .map((feature, i) => (
                                 <tr
                                   key={feature.name}
-                                  className={`border-b border-[rgba(91,186,167,0.08)] ${
+                                  className={`border-b border-[rgba(99,102,241,0.08)] ${
                                     i % 2 === 0 ? 'bg-white/[0.01]' : ''
                                   }`}
                                 >
@@ -147,15 +147,15 @@ export default function Compare() {
                                   </td>
                                   {/* Phase Flag cell */}
                                   {typeof feature.phaseflag === 'string' ? (
-                                    <td className="px-4 py-3 text-center bg-pf-mint/5">
-                                      <span className="text-xs font-medium text-pf-mint">
+                                    <td className="px-4 py-3 text-center bg-pf-primary/5">
+                                      <span className="text-xs font-medium text-pf-primary">
                                         {feature.phaseflag}
                                       </span>
                                     </td>
                                   ) : (
-                                    <td className="px-4 py-3 text-center bg-pf-mint/5">
+                                    <td className="px-4 py-3 text-center bg-pf-primary/5">
                                       {feature.phaseflag ? (
-                                        <svg className="w-5 h-5 mx-auto text-pf-mint" fill="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-5 h-5 mx-auto text-pf-primary" fill="currentColor" viewBox="0 0 24 24">
                                           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                                         </svg>
                                       ) : (
@@ -205,7 +205,7 @@ export default function Compare() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="https://app.phaseflag.dev"
-              className="px-6 py-3 text-sm font-medium text-white bg-pf-mint rounded-xl hover:bg-pf-mint-light transition-colors shadow-lg shadow-pf-mint/20"
+              className="px-6 py-3 text-sm font-medium text-white bg-pf-primary rounded-xl hover:bg-pf-primary-light transition-colors shadow-lg shadow-pf-primary/20"
             >
               Get Started Free
             </a>

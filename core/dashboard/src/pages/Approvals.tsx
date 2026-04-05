@@ -72,7 +72,7 @@ export default function Approvals() {
             ) : (
                 <div className="space-y-3">
                     {approvals.map((req: ApprovalRequest) => (
-                        <div key={req.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                        <div key={req.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="flex items-center gap-3">

@@ -4,6 +4,8 @@ import { webhooksApi, type Webhook } from '@/lib/api'
 import { Webhook as WebhookIcon, Plus, Trash2, X, ToggleLeft, ToggleRight, Globe, Pencil } from 'lucide-react'
 import clsx from 'clsx'
 import { useToast } from '@/contexts/ToastContext'
+import EmptyState from '@/components/EmptyState'
+import Skeleton from '@/components/Skeleton'
 
 const AVAILABLE_EVENTS = [
     'flag.created',
@@ -63,7 +65,17 @@ export default function Webhooks() {
     }
 
     if (isLoading) {
-        return <div className="p-8">Loading...</div>
+        return (
+            <div className="p-8">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Webhooks</h1>
+                        <p className="mt-2 text-gray-600 dark:text-gray-400">Manage webhook endpoints for event notifications</p>
+                    </div>
+                </div>
+                <Skeleton variant="row" count={3} />
+            </div>
+        )
     }
 
     return (
@@ -83,7 +95,7 @@ export default function Webhooks() {
             {/* Webhooks List */}
             <div className="space-y-4">
                 {webhooks?.map((webhook) => (
-                    <div key={webhook.id} className="card hover:shadow-md transition-shadow duration-200">
+                    <div key={webhook.id} className="card hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150">
                         <div className="flex items-center justify-between">
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center space-x-3 mb-2">
@@ -145,14 +157,13 @@ export default function Webhooks() {
 
             {/* Empty State */}
             {webhooks?.length === 0 && (
-                <div className="card text-center py-12">
-                    <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                        <WebhookIcon className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No webhooks yet</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">Create your first webhook to receive event notifications</p>
-                    <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">Create Webhook</button>
-                </div>
+                <EmptyState
+                    icon={WebhookIcon}
+                    title="No webhooks yet"
+                    description="Create your first webhook to receive event notifications"
+                    actionLabel="Create Webhook"
+                    onAction={() => setShowCreateModal(true)}
+                />
             )}
 
             {/* Create Modal */}

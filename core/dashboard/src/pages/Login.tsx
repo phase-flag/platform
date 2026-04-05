@@ -74,17 +74,17 @@ export default function Login() {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-700/50 flex items-center justify-center px-4">
             <div className="max-w-md w-full">
                 <div className="text-center mb-8">
-                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-[#5BBAA7] to-[#2B4C5C] rounded-2xl flex items-center justify-center mb-4">
+                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-800 rounded-2xl flex items-center justify-center mb-4">
                         <svg className="w-7 h-10" viewBox="0 0 12 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect x="1" y="1" width="10" height="22" rx="5" stroke="white" strokeWidth="1.4" />
                             <circle cx="6" cy="7.5" r="3" stroke="white" strokeWidth="1.4" />
                         </svg>
                     </div>
-                    <h1 className="flex items-center justify-center gap-2 text-3xl brand-text text-[#2B4C5C] dark:text-[#7ED4C1]">
+                    <h1 className="flex items-center justify-center gap-2 text-3xl brand-text text-primary-700 dark:text-primary-300">
                         PHASE
                         <svg className="w-[18px] h-[32px]" viewBox="0 0 12 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="1" y="1" width="10" height="22" rx="5" stroke="#5BBAA7" strokeWidth="1.4" />
-                            <circle cx="6" cy="7.5" r="3" stroke="#5BBAA7" strokeWidth="1.4" />
+                            <rect x="1" y="1" width="10" height="22" rx="5" stroke="#6366F1" strokeWidth="1.4" />
+                            <circle cx="6" cy="7.5" r="3" stroke="#6366F1" strokeWidth="1.4" />
                         </svg>
                         FLAG
                     </h1>

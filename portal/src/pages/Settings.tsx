@@ -1,6 +1,7 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Skeleton from '../components/Skeleton';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -15,7 +16,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function SuccessBanner({ message }: { message: string }) {
   return (
-    <div className="bg-[#34D399]/10 border border-[#34D399]/30 text-[#34D399] rounded-lg px-4 py-3 text-sm">
+    <div className="bg-green-500/10 border border-green-500/30 text-green-400 rounded-lg px-4 py-3 text-sm">
       {message}
     </div>
   );
@@ -40,7 +41,7 @@ function DeleteAccountModal({ onClose }: { onClose: () => void }) {
         </p>
         <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white/70">
           To delete your account, email{' '}
-          <a href="mailto:support@phaseflag.com" className="text-[#34D399] hover:underline">
+          <a href="mailto:support@phaseflag.com" className="text-pf-primary hover:underline">
             support@phaseflag.com
           </a>{' '}
           from your registered address.
@@ -82,6 +83,9 @@ export default function Settings() {
   // Delete modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  // Page loading state
+  const [pageLoading, setPageLoading] = useState(true);
+
   // Sync user into form fields when user object changes
   useEffect(() => {
     if (user) {
@@ -102,7 +106,8 @@ export default function Settings() {
           setCurrentTier(orgs[0].subscription_tier);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setPageLoading(false));
   }, [token]);
 
   async function handleProfileSave(e: FormEvent) {
@@ -169,6 +174,16 @@ export default function Settings() {
     }
   }
 
+  if (pageLoading) {
+    return (
+      <div className="min-h-screen bg-[#0F1A20] px-6 py-8">
+        <div className="max-w-2xl mx-auto">
+          <Skeleton variant="card" count={2} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0F1A20] px-6 py-8">
       {showDeleteModal && <DeleteAccountModal onClose={() => setShowDeleteModal(false)} />}
@@ -209,7 +224,7 @@ export default function Settings() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
                 placeholder="Your name"
               />
             </div>
@@ -221,7 +236,7 @@ export default function Settings() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
                 placeholder="you@company.com"
               />
             </div>
@@ -230,7 +245,7 @@ export default function Settings() {
               <button
                 type="submit"
                 disabled={profileLoading}
-                className="bg-[#34D399] hover:bg-[#6EE7B7] disabled:opacity-50 text-[#0F1A20] font-semibold px-6 py-2.5 rounded-xl transition-colors text-sm"
+                className="bg-pf-primary hover:bg-pf-primary-light disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors text-sm"
               >
                 {profileLoading ? 'Saving…' : 'Save changes'}
               </button>
@@ -251,7 +266,7 @@ export default function Settings() {
                 required
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -264,7 +279,7 @@ export default function Settings() {
                 minLength={8}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -276,7 +291,7 @@ export default function Settings() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#34D399] transition-colors"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-pf-primary transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -285,7 +300,7 @@ export default function Settings() {
               <button
                 type="submit"
                 disabled={passwordLoading}
-                className="bg-[#34D399] hover:bg-[#6EE7B7] disabled:opacity-50 text-[#0F1A20] font-semibold px-6 py-2.5 rounded-xl transition-colors text-sm"
+                className="bg-pf-primary hover:bg-pf-primary-light disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors text-sm"
               >
                 {passwordLoading ? 'Updating…' : 'Change password'}
               </button>
@@ -300,7 +315,7 @@ export default function Settings() {
               <p className="text-sm text-white/70">Subscription plan</p>
               <p className="text-white font-semibold capitalize mt-0.5">
                 {currentTier}{' '}
-                <span className="text-[#34D399] text-xs font-normal ml-1">Active</span>
+                <span className="text-pf-primary text-xs font-normal ml-1">Active</span>
               </p>
             </div>
             <Link

@@ -195,7 +195,7 @@ export default function TargetingPlayground() {
           </h3>
           <button
             onClick={addRule}
-            className="px-3 py-1.5 text-sm font-medium text-pf-mint border border-pf-mint rounded-lg hover:bg-pf-mint/10 transition-colors"
+            className="px-3 py-1.5 text-sm font-medium text-pf-primary border border-pf-primary rounded-lg hover:bg-pf-primary/10 transition-colors"
           >
             + Add Rule
           </button>
@@ -207,7 +207,7 @@ export default function TargetingPlayground() {
             className={`border rounded-xl p-4 transition-all ${
               result.matchedRule === rule.id
                 ? 'border-pf-success bg-green-900/20 shadow-sm'
-                : 'border-[rgba(91,186,167,0.15)] bg-[#162029]'
+                : 'border-[rgba(99,102,241,0.15)] bg-[#162029]'
             }`}
           >
             <div className="flex items-center justify-between mb-3">
@@ -217,7 +217,7 @@ export default function TargetingPlayground() {
                   type="text"
                   value={rule.name}
                   onChange={(e) => updateRuleName(rule.id, e.target.value)}
-                  className="font-medium text-sm text-[#E8F0F2] bg-transparent border-b border-transparent hover:border-[rgba(91,186,167,0.15)] focus:border-pf-mint focus:outline-none"
+                  className="font-medium text-sm text-[#E8F0F2] bg-transparent border-b border-transparent hover:border-[rgba(99,102,241,0.15)] focus:border-pf-primary focus:outline-none"
                 />
                 {result.matchedRule === rule.id && (
                   <span className="text-xs px-2 py-0.5 rounded-full bg-pf-success text-white font-medium">
@@ -239,19 +239,19 @@ export default function TargetingPlayground() {
               {rule.conditions.map((cond, ci) => (
                 <div key={ci} className="flex items-center gap-2 flex-wrap">
                   {ci > 0 && (
-                    <span className="text-xs font-medium text-pf-mint uppercase">AND</span>
+                    <span className="text-xs font-medium text-pf-primary uppercase">AND</span>
                   )}
                   <input
                     type="text"
                     placeholder="attribute"
                     value={cond.attribute}
                     onChange={(e) => updateCondition(rule.id, ci, 'attribute', e.target.value)}
-                    className="flex-1 min-w-[80px] px-2 py-1.5 text-xs bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(91,186,167,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-mint/50 placeholder-[#8FA3AD]"
+                    className="flex-1 min-w-[80px] px-2 py-1.5 text-xs bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-primary/50 placeholder-[#8FA3AD]"
                   />
                   <select
                     value={cond.operator}
                     onChange={(e) => updateCondition(rule.id, ci, 'operator', e.target.value)}
-                    className="px-2 py-1.5 text-xs bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(91,186,167,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-mint/50"
+                    className="px-2 py-1.5 text-xs bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-primary/50"
                   >
                     {operators.map((op) => (
                       <option key={op.value} value={op.value}>{op.label}</option>
@@ -262,7 +262,7 @@ export default function TargetingPlayground() {
                     placeholder="value"
                     value={cond.value}
                     onChange={(e) => updateCondition(rule.id, ci, 'value', e.target.value)}
-                    className="flex-1 min-w-[80px] px-2 py-1.5 text-xs bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(91,186,167,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-mint/50 placeholder-[#8FA3AD]"
+                    className="flex-1 min-w-[80px] px-2 py-1.5 text-xs bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-primary/50 placeholder-[#8FA3AD]"
                   />
                   {rule.conditions.length > 1 && (
                     <button
@@ -280,7 +280,7 @@ export default function TargetingPlayground() {
 
             <button
               onClick={() => addCondition(rule.id)}
-              className="mt-2 text-xs text-pf-mint hover:text-pf-mint-light transition-colors"
+              className="mt-2 text-xs text-pf-primary hover:text-pf-primary-light transition-colors"
             >
               + Add condition
             </button>
@@ -294,7 +294,7 @@ export default function TargetingPlayground() {
           User Context
         </h3>
 
-        <div className="bg-[#162029] border border-[rgba(91,186,167,0.15)] rounded-xl p-4 space-y-2">
+        <div className="bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-xl p-4 space-y-2">
           {Object.entries(context).map(([key, value]) => (
             <div key={key} className="flex items-center gap-2">
               <code className="text-xs text-[#8FA3AD] font-mono w-20 truncate">{key}</code>
@@ -302,7 +302,7 @@ export default function TargetingPlayground() {
                 type="text"
                 value={value}
                 onChange={(e) => updateContext(key, e.target.value)}
-                className="flex-1 px-2 py-1.5 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(91,186,167,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-mint/50 font-mono"
+                className="flex-1 px-2 py-1.5 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-primary/50 font-mono"
               />
               <button
                 onClick={() => removeAttribute(key)}
@@ -315,24 +315,24 @@ export default function TargetingPlayground() {
             </div>
           ))}
 
-          <div className="flex items-center gap-2 pt-2 border-t border-[rgba(91,186,167,0.15)]">
+          <div className="flex items-center gap-2 pt-2 border-t border-[rgba(99,102,241,0.15)]">
             <input
               type="text"
               placeholder="key"
               value={newAttrKey}
               onChange={(e) => setNewAttrKey(e.target.value)}
-              className="w-20 px-2 py-1.5 text-xs bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(91,186,167,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-mint/50 placeholder-[#8FA3AD]"
+              className="w-20 px-2 py-1.5 text-xs bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-primary/50 placeholder-[#8FA3AD]"
             />
             <input
               type="text"
               placeholder="value"
               value={newAttrValue}
               onChange={(e) => setNewAttrValue(e.target.value)}
-              className="flex-1 px-2 py-1.5 text-xs bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(91,186,167,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-mint/50 placeholder-[#8FA3AD]"
+              className="flex-1 px-2 py-1.5 text-xs bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-1 focus:ring-pf-primary/50 placeholder-[#8FA3AD]"
             />
             <button
               onClick={addAttribute}
-              className="px-2.5 py-1.5 text-xs font-medium text-pf-mint border border-pf-mint rounded-lg hover:bg-pf-mint/10 transition-colors"
+              className="px-2.5 py-1.5 text-xs font-medium text-pf-primary border border-pf-primary rounded-lg hover:bg-pf-primary/10 transition-colors"
             >
               Add
             </button>
@@ -343,7 +343,7 @@ export default function TargetingPlayground() {
         <div className={`rounded-xl p-5 border-2 transition-all ${
           result.matchedRule
             ? 'border-pf-success bg-green-900/20'
-            : 'border-[rgba(91,186,167,0.15)] bg-[#162029]'
+            : 'border-[rgba(99,102,241,0.15)] bg-[#162029]'
         }`}>
           <h4 className="font-heading text-sm font-medium uppercase tracking-wider text-[#E8F0F2] mb-3">
             Evaluation Result
@@ -366,7 +366,7 @@ export default function TargetingPlayground() {
 
         {/* Evaluation trace */}
         <div className="bg-pf-dark rounded-xl p-4">
-          <h4 className="text-xs font-mono text-pf-mint mb-2">// Evaluation trace</h4>
+          <h4 className="text-xs font-mono text-pf-primary mb-2">// Evaluation trace</h4>
           <pre className="text-xs text-white/80 font-mono leading-relaxed overflow-x-auto">
 {`evaluate("new_feature", context)
 ${rules.map((rule) => {

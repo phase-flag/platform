@@ -196,7 +196,7 @@ export default function Billing() {
           <h1 className="text-2xl font-bold text-white">Billing</h1>
           <p className="text-white/50 mt-1">
             Current plan:{' '}
-            <span className="text-[#34D399] font-semibold capitalize">{currentTier}</span>
+            <span className="text-pf-primary font-semibold capitalize">{currentTier}</span>
           </p>
         </div>
 
@@ -211,7 +211,7 @@ export default function Billing() {
         )}
 
         {new URLSearchParams(window.location.search).get('success') && (
-          <div className="mb-6 bg-[#34D399]/10 border border-[#34D399]/30 text-[#34D399] rounded-xl px-4 py-3 text-sm">
+          <div className="mb-6 bg-green-500/10 border border-green-500/30 text-green-400 rounded-xl px-4 py-3 text-sm">
             Subscription activated! Your plan will be reflected shortly.
           </div>
         )}
@@ -225,13 +225,13 @@ export default function Billing() {
                 key={plan.id}
                 className={`relative rounded-2xl border p-6 flex flex-col ${
                   isPro
-                    ? 'border-[#34D399] bg-[#34D399]/5'
+                    ? 'border-pf-primary bg-pf-primary/5'
                     : 'border-white/10 bg-white/5'
                 }`}
               >
                 {isPro && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-[#34D399] text-[#0F1A20] text-xs font-bold px-3 py-1 rounded-full">
+                    <span className="bg-pf-primary text-white text-xs font-bold px-3 py-1 rounded-full">
                       Most popular
                     </span>
                   </div>
@@ -256,7 +256,7 @@ export default function Billing() {
                 <ul className="space-y-2 flex-1 mb-6">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-white/70">
-                      <span className="text-[#34D399] mt-0.5">✓</span>
+                      <span className="text-pf-primary mt-0.5">✓</span>
                       {f}
                     </li>
                   ))}
@@ -282,7 +282,7 @@ export default function Billing() {
                     disabled={isLoading}
                     className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 ${
                       isPro
-                        ? 'bg-[#34D399] hover:bg-[#6EE7B7] text-[#0F1A20]'
+                        ? 'bg-pf-primary hover:bg-pf-primary-light text-white'
                         : 'border border-white/20 text-white hover:bg-white/5'
                     }`}
                   >

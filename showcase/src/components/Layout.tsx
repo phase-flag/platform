@@ -31,7 +31,7 @@ export default function Layout() {
                 {/* Logo */}
                 <div className="px-5 py-5 border-b border-gray-800">
                     <Link to="/" className="flex items-center space-x-2">
-                        <Zap className="w-7 h-7 text-pf-mint" />
+                        <Zap className="w-7 h-7 text-pf-primary" />
                         <span className="text-xl font-bold text-gray-100">Nexus</span>
                     </Link>
                     <p className="text-[10px] text-gray-600 mt-1">Powered by Phase Flag</p>
@@ -50,7 +50,7 @@ export default function Layout() {
                                 className={clsx(
                                     'flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                                     isActive
-                                        ? 'bg-pf-mint/10 text-pf-mint'
+                                        ? 'bg-pf-primary/10 text-pf-primary'
                                         : 'text-gray-400 hover:text-gray-200 hover:bg-surface-light'
                                 )}
                             >
@@ -72,7 +72,7 @@ export default function Layout() {
                                 className={clsx(
                                     'flex-1 px-2 py-1.5 rounded text-xs font-medium transition-colors',
                                     environment === env
-                                        ? 'bg-surface-lighter text-gray-200 ring-1 ring-pf-mint/30'
+                                        ? 'bg-surface-lighter text-gray-200 ring-1 ring-pf-primary/30'
                                         : 'text-gray-500 hover:text-gray-300 hover:bg-surface-light'
                                 )}
                             >

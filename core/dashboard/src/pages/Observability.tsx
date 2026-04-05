@@ -4,7 +4,7 @@ import { analyticsApi, type SystemMetrics, type FlagHealth } from '@/lib/api'
 import { Gauge, Activity, Zap, Server, Clock, AlertTriangle, CheckCircle, BarChart3, RefreshCw } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
-const HEALTH_COLORS = ['#5BBAA7', '#F59E0B', '#EF4444', '#6B7F8A']
+const HEALTH_COLORS = ['#6366F1', '#F59E0B', '#EF4444', '#6B7F8A']
 
 export default function Observability() {
     const [healthLimit, setHealthLimit] = useState(20)
@@ -64,7 +64,7 @@ export default function Observability() {
         <div className="p-6 max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
-                    <Gauge className="w-8 h-8 text-[#5BBAA7]" />
+                    <Gauge className="w-8 h-8 text-primary-500" />
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Observability</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400">System metrics, flag health, and inventory overview</p>
@@ -84,7 +84,7 @@ export default function Observability() {
             ) : metrics ? (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                     <MetricCard
-                        icon={<Activity className="w-5 h-5 text-[#5BBAA7]" />}
+                        icon={<Activity className="w-5 h-5 text-primary-500" />}
                         label="Total Evaluations"
                         value={formatNumber(metrics.total_evaluations)}
                     />
@@ -105,7 +105,7 @@ export default function Observability() {
                         value={formatUptime(metrics.uptime_seconds)}
                     />
                     <MetricCard
-                        icon={<BarChart3 className="w-5 h-5 text-[#2B4C5C]" />}
+                        icon={<BarChart3 className="w-5 h-5 text-primary-700" />}
                         label="Total Flags"
                         value={metrics.total_flags.toString()}
                         subtitle={`${metrics.active_flags} active`}
@@ -180,7 +180,7 @@ export default function Observability() {
                                 <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                                 <YAxis tick={{ fontSize: 11 }} />
                                 <Tooltip />
-                                <Bar dataKey="value" fill="#5BBAA7" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="value" fill="#6366F1" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     ) : (
@@ -223,7 +223,7 @@ export default function Observability() {
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead>
+                            <thead className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                                 <tr className="bg-gray-50 dark:bg-gray-700/50">
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Flag Key</th>
                                     <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Evaluations</th>
@@ -235,9 +235,9 @@ export default function Observability() {
                             </thead>
                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                 {healthFlags.map(f => (
-                                    <tr key={f.flag_key} className="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700/50">
+                                    <tr key={f.flag_key} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                                         <td className="px-4 py-3">
-                                            <code className="text-sm text-[#5BBAA7]">{f.flag_key}</code>
+                                            <code className="text-sm text-primary-500">{f.flag_key}</code>
                                         </td>
                                         <td className="px-4 py-3 text-right text-sm text-gray-700 dark:text-gray-300">
                                             {formatNumber(f.evaluation_count)}

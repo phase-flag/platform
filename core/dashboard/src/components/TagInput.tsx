@@ -31,13 +31,13 @@ export default function TagInput({ tags, onChange, placeholder = 'Add tag...' }:
                 {tags.map(tag => (
                     <span
                         key={tag}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E8F7F3] text-[#2B4C5C] dark:bg-primary-900/30 dark:text-primary-300"
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
                     >
                         {tag}
                         <button
                             type="button"
                             onClick={() => removeTag(tag)}
-                            className="ml-1 hover:text-[#5BBAA7]"
+                            className="ml-1 hover:text-primary-500"
                         >
                             <X className="w-3 h-3" />
                         </button>

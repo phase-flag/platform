@@ -4,6 +4,8 @@ import { segmentsApi } from '@/lib/api'
 import { Users, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import SegmentModal from '@/components/SegmentModal'
+import EmptyState from '@/components/EmptyState'
+import Skeleton from '@/components/Skeleton'
 
 export default function Segments() {
     const [showCreateModal, setShowCreateModal] = useState(false)
@@ -16,7 +18,17 @@ export default function Segments() {
     const segments = paginatedData?.items
 
     if (isLoading) {
-        return <div className="p-8">Loading...</div>
+        return (
+            <div className="p-8">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Segments</h1>
+                        <p className="mt-2 text-gray-600 dark:text-gray-400">Manage audience segments for targeting rules</p>
+                    </div>
+                </div>
+                <Skeleton variant="row" count={3} />
+            </div>
+        )
     }
 
     return (
@@ -39,7 +51,7 @@ export default function Segments() {
                     <Link
                         key={segment.id}
                         to={`/segments/${segment.key}`}
-                        className="card hover:shadow-md transition-shadow duration-200 block"
+                        className="card hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150 block"
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex-1">
@@ -68,14 +80,13 @@ export default function Segments() {
             </div>
 
             {segments?.length === 0 && (
-                <div className="card text-center py-12">
-                    <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                        <Users className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No segments yet</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">Create your first audience segment for targeting</p>
-                    <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">Create Segment</button>
-                </div>
+                <EmptyState
+                    icon={Users}
+                    title="No segments yet"
+                    description="Create your first audience segment for targeting"
+                    actionLabel="Create Segment"
+                    onAction={() => setShowCreateModal(true)}
+                />
             )}
 
             <SegmentModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />

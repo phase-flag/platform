@@ -9,25 +9,25 @@ export default {
         extend: {
             colors: {
                 primary: {
-                    50: '#E8F7F3',
-                    100: '#D1EFE7',
-                    200: '#A3DFCF',
-                    300: '#7ED4C1',
-                    400: '#5BBAA7',
-                    500: '#5BBAA7',
-                    600: '#4AA896',
-                    700: '#3D9685',
-                    800: '#2B4C5C',
-                    900: '#1E3A4A',
+                    50: '#EEF2FF',
+                    100: '#E0E7FF',
+                    200: '#C7D2FE',
+                    300: '#A5B4FC',
+                    400: '#818CF8',
+                    500: '#6366F1',
+                    600: '#4F46E5',
+                    700: '#4338CA',
+                    800: '#3730A3',
+                    900: '#312E81',
                 },
                 navy: {
                     DEFAULT: '#2B4C5C',
                     dark: '#1E3A4A',
                 },
-                mint: {
-                    DEFAULT: '#5BBAA7',
-                    light: '#7ED4C1',
-                    pale: '#E8F7F3',
+                indigo: {
+                    DEFAULT: '#6366F1',
+                    light: '#818CF8',
+                    pale: '#EEF2FF',
                 },
                 success: {
                     50: '#f0fdf4',

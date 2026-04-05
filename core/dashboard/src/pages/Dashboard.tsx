@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import clsx from 'clsx'
 import { useEnvironment } from '@/contexts/EnvironmentContext'
+import Skeleton from '@/components/Skeleton'
 
 /* Recharts 2.x class components have type issues with @types/react 18 */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -37,19 +38,7 @@ export default function Dashboard() {
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">Welcome to Phase Flag</p>
                 </div>
-                <div className="grid grid-cols-1 gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-4">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="card animate-pulse">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-                                    <div className="h-8 w-12 bg-gray-200 dark:bg-gray-700 rounded" />
-                                </div>
-                                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg" />
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <Skeleton variant="stat" count={4} className="mb-8" />
             </div>
         )
     }
@@ -78,7 +67,7 @@ export default function Dashboard() {
         }))
     }, [flags])
 
-    const BAR_COLORS = ['#5BBAA7', '#22c55e', '#f59e0b', '#ef4444']
+    const BAR_COLORS = ['#6366F1', '#22c55e', '#f59e0b', '#ef4444']
 
     return (
         <div className="p-8">
@@ -113,7 +102,7 @@ export default function Dashboard() {
                             <BarChart data={envChartData}>
                                 <RXAxis dataKey="environment" tick={{ fontSize: 12, fill: '#8FA3AD' }} />
                                 <RYAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#8FA3AD' }} />
-                                <RTooltip contentStyle={{ backgroundColor: '#1C2D38', border: '1px solid #2B4C5C', color: '#E8F0F2' }} />
+                                <RTooltip contentStyle={{ backgroundColor: '#1e1b4b', border: '1px solid #4338CA', color: '#E0E7FF' }} />
                                 <RBar dataKey="count" radius={[4, 4, 0, 0]}>
                                     {envChartData.map((_: unknown, index: number) => (
                                         <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
@@ -132,7 +121,7 @@ export default function Dashboard() {
                     {auditLogs && auditLogs.length > 0 ? (
                         <div className="space-y-3">
                             {auditLogs.map((entry) => (
-                                <div key={entry.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                <div key={entry.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150">
                                     <div className="flex items-center space-x-3">
                                         <span className={clsx(
                                             'badge text-xs',
@@ -175,7 +164,7 @@ export default function Dashboard() {
                             <Link
                                 key={flag.id}
                                 to={`/flags/${flag.key}`}
-                                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
                             >
                                 <div className="flex items-center space-x-3">
                                     <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-success-500' : 'bg-gray-400'}`} />

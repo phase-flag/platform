@@ -4,12 +4,12 @@
 
   "brand": {
     "primary": {
-      "value": "#34D399",
-      "comment": "Emerald green — canonical brand primary, used as accent in portal/marketing"
+      "value": "#6366F1",
+      "comment": "Electric Indigo — canonical brand primary"
     },
     "mint": {
-      "DEFAULT": { "value": "#5BBAA7" },
-      "light":   { "value": "#7ED4C1" },
+      "DEFAULT": { "value": "#6366F1" },
+      "light":   { "value": "#818CF8" },
       "pale":    { "value": "#E8F7F3" }
     },
     "navy": {
@@ -33,8 +33,8 @@
   },
 
   "border": {
-    "mint":    { "value": "rgba(91, 186, 167, 0.15)" },
-    "mintDim": { "value": "rgba(91, 186, 167, 0.10)" }
+    "mint":    { "value": "rgba(99, 102, 241, 0.15)" },
+    "mintDim": { "value": "rgba(99, 102, 241, 0.10)" }
   },
 
   "gray": {
