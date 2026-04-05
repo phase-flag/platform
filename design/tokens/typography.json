@@ -1,0 +1,53 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "description": "Phase Flag unified typography tokens — consistent across dashboard (Tailwind 3), portal, and marketing (Tailwind 4).",
+
+  "fontFamily": {
+    "body":    { "value": "'Inter', system-ui, sans-serif",         "comment": "Primary body text" },
+    "heading": { "value": "'Josefin Sans', system-ui, sans-serif",  "comment": "Brand headings, nav, badges" },
+    "mono":    { "value": "'JetBrains Mono', monospace",            "comment": "Code blocks, SDK examples" }
+  },
+
+  "googleFontsUrl": {
+    "value": "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Josefin+Sans:wght@100;200;300;400;600&family=JetBrains+Mono:wght@400;500&display=swap",
+    "comment": "Single import URL — use in all three app index.html <head>"
+  },
+
+  "fontSize": {
+    "xs":   { "value": "0.75rem",  "px": "12" },
+    "sm":   { "value": "0.875rem", "px": "14" },
+    "base": { "value": "1rem",     "px": "16" },
+    "lg":   { "value": "1.125rem", "px": "18" },
+    "xl":   { "value": "1.25rem",  "px": "20" },
+    "2xl":  { "value": "1.5rem",   "px": "24" },
+    "3xl":  { "value": "1.875rem", "px": "30" },
+    "4xl":  { "value": "2.25rem",  "px": "36" },
+    "5xl":  { "value": "3rem",     "px": "48" }
+  },
+
+  "fontWeight": {
+    "thin":       { "value": "100" },
+    "extralight": { "value": "200" },
+    "light":      { "value": "300" },
+    "normal":     { "value": "400" },
+    "medium":     { "value": "500" },
+    "semibold":   { "value": "600" },
+    "bold":       { "value": "700" }
+  },
+
+  "letterSpacing": {
+    "tight":   { "value": "-0.025em" },
+    "normal":  { "value": "0em" },
+    "wide":    { "value": "0.025em" },
+    "wider":   { "value": "0.05em",  "comment": "brand-text / heading labels" },
+    "widest":  { "value": "0.1em",   "comment": "nav brand name" }
+  },
+
+  "lineHeight": {
+    "tight":   { "value": "1.25" },
+    "snug":    { "value": "1.375" },
+    "normal":  { "value": "1.5" },
+    "relaxed": { "value": "1.625" },
+    "loose":   { "value": "2" }
+  }
+}

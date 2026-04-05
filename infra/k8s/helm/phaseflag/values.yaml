@@ -1,4 +1,5 @@
 # Phase Flag Helm Chart - Default Values
+# These are sensible production defaults. Override in your values-production.yaml.
 
 replicaCount: 2
 
@@ -11,17 +12,25 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+# ---------------------------------------------------------------------------
 # API configuration
+# ---------------------------------------------------------------------------
 api:
   port: 8000
   logLevel: INFO
-  deploymentMode: oss  # oss, saas, enterprise
-  corsOrigins: "*"
+  deploymentMode: saas  # oss, saas, enterprise
+  corsOrigins: "https://app.phaseflag.com,https://portal.phaseflag.com"
 
+# ---------------------------------------------------------------------------
 # Secrets — reference a Kubernetes Secret
+# ---------------------------------------------------------------------------
 secrets:
   # Name of existing Secret containing database URL, JWT secret, API secret
-  existingSecret: ""
+  # Create with: kubectl create secret generic phaseflag-secrets \
+  #   --from-literal=database-url='postgresql+asyncpg://...' \
+  #   --from-literal=jwt-secret='...' \
+  #   --from-literal=api-secret='...'
+  existingSecret: "phaseflag-secrets"
   # Keys within the secret
   databaseUrlKey: database-url
   jwtSecretKey: jwt-secret
@@ -31,7 +40,20 @@ secrets:
   jwtSecret: ""
   apiSecret: ""
 
+# ---------------------------------------------------------------------------
+# Stripe billing (SaaS/Enterprise mode)
+# Store in the same secret or a separate phaseflag-stripe-secrets secret.
+# ---------------------------------------------------------------------------
+stripe:
+  existingSecret: "phaseflag-stripe-secrets"
+  secretKeyKey: stripe-secret-key
+  webhookSecretKey: stripe-webhook-secret
+  proPriceIdKey: stripe-pro-price-id
+  enterprisePriceIdKey: stripe-enterprise-price-id
+
+# ---------------------------------------------------------------------------
 # Relay proxy
+# ---------------------------------------------------------------------------
 relay:
   enabled: true
   replicaCount: 2
@@ -45,90 +67,167 @@ relay:
   resources:
     limits:
       cpu: 500m
-      memory: 128Mi
+      memory: 256Mi
     requests:
       cpu: 100m
       memory: 64Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 70
 
+# ---------------------------------------------------------------------------
 # Dashboard
+# ---------------------------------------------------------------------------
 dashboard:
   enabled: true
-  replicaCount: 1
+  replicaCount: 2
   image:
     repository: ghcr.io/phaseflag/dashboard
     tag: ""
     pullPolicy: IfNotPresent
   port: 3000
-  apiUrl: ""  # Auto-set to API service URL if empty
+  apiUrl: "https://api.phaseflag.com"
+  relayUrl: "https://relay.phaseflag.com"
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
 
-# PostgreSQL (using Bitnami subchart or external)
+# ---------------------------------------------------------------------------
+# PostgreSQL (using Bitnami subchart)
+# Recommended: use an external managed database (RDS, Cloud SQL, etc.)
+# ---------------------------------------------------------------------------
 postgresql:
-  enabled: false  # Set true to deploy PostgreSQL in-cluster
+  enabled: false  # Set true to deploy PostgreSQL in-cluster (not recommended for production)
   auth:
     username: phaseflag
-    password: ""
+    password: ""  # Use existingSecret instead
     database: phaseflag
+    existingSecret: "phaseflag-db-secret"
+    secretKeys:
+      adminPasswordKey: postgres-password
+      userPasswordKey: password
   primary:
     persistence:
-      size: 10Gi
+      size: 20Gi
+      storageClass: ""  # Use default or specify your storage class
+    resources:
+      limits:
+        cpu: "2"
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 512Mi
 
-# External database (when postgresql.enabled=false)
+# External database (when postgresql.enabled=false — recommended for production)
 externalDatabase:
-  host: ""
+  host: ""         # e.g. phaseflag.cluster-xyz.us-east-1.rds.amazonaws.com
   port: 5432
   user: phaseflag
-  password: ""
+  password: ""     # Use existingSecret instead
   database: phaseflag
   sslMode: require
+  existingSecret: "phaseflag-secrets"
+  urlKey: database-url
 
+# ---------------------------------------------------------------------------
+# Service account
+# ---------------------------------------------------------------------------
 serviceAccount:
   create: true
   annotations: {}
   name: ""
 
+# ---------------------------------------------------------------------------
+# Service
+# ---------------------------------------------------------------------------
 service:
   type: ClusterIP
   port: 80
   targetPort: 8000
 
+# ---------------------------------------------------------------------------
+# Ingress — configure for your ingress controller
+# ---------------------------------------------------------------------------
 ingress:
-  enabled: false
-  className: ""
-  annotations: {}
+  enabled: true
+  className: "nginx"  # or "traefik", "alb", etc.
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
   hosts:
-    - host: phaseflag.example.com
+    - host: api.phaseflag.com
       paths:
         - path: /
           pathType: Prefix
-  tls: []
+  tls:
+    - secretName: phaseflag-api-tls
+      hosts:
+        - api.phaseflag.com
 
+# ---------------------------------------------------------------------------
+# Resource limits (API pods)
+# ---------------------------------------------------------------------------
 resources:
   limits:
-    cpu: "1"
-    memory: 512Mi
+    cpu: "2"
+    memory: 768Mi
   requests:
     cpu: 250m
     memory: 256Mi
 
+# ---------------------------------------------------------------------------
+# Autoscaling (API)
+# ---------------------------------------------------------------------------
 autoscaling:
-  enabled: false
+  enabled: true
   minReplicas: 2
-  maxReplicas: 10
+  maxReplicas: 20
   targetCPUUtilizationPercentage: 70
   targetMemoryUtilizationPercentage: 80
 
+# ---------------------------------------------------------------------------
+# Scheduling
+# ---------------------------------------------------------------------------
 nodeSelector: {}
 
 tolerations: []
 
-affinity: {}
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - phaseflag
+          topologyKey: kubernetes.io/hostname
 
+# ---------------------------------------------------------------------------
+# Pod disruption budget
+# ---------------------------------------------------------------------------
 podDisruptionBudget:
   enabled: true
   minAvailable: 1
 
-podAnnotations: {}
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8000"
+  prometheus.io/path: "/metrics"
 
+# ---------------------------------------------------------------------------
+# Security context
+# ---------------------------------------------------------------------------
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
@@ -140,3 +239,32 @@ securityContext:
   capabilities:
     drop:
       - ALL
+
+# ---------------------------------------------------------------------------
+# Liveness / readiness probes
+# ---------------------------------------------------------------------------
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# ---------------------------------------------------------------------------
+# Database migration job (runs as a Helm hook)
+# ---------------------------------------------------------------------------
+migrations:
+  enabled: true
+  # Run before every deployment
+  hook: pre-upgrade,pre-install

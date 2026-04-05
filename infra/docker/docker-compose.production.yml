@@ -1,69 +1,198 @@
 version: '3.8'
 
-# Production compose file — uses pre-built GHCR images, not local builds
-# Required env vars (set in /opt/phaseflag/.env on the server):
-#   PHASEFLAG_DB_PASSWORD, PHASEFLAG_JWT_SECRET_KEY, PHASEFLAG_API_SECRET_KEY
+# Production compose file — uses pre-built GHCR images, not local builds.
+# Load secrets and config from .env.production (copy .env.production.example and fill in values).
+#
+# Usage:
+#   docker compose -f docker-compose.production.yml --env-file /opt/phaseflag/.env.production up -d
 
 services:
-  api:
-    image: ghcr.io/phase-flag/api:dev
+  # ---------------------------------------------------------------------------
+  # Nginx reverse proxy — SSL termination and routing
+  # ---------------------------------------------------------------------------
+  nginx:
+    image: nginx:1.25-alpine
     ports:
-      - "8000:8000"
-    env_file: .env
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.production.conf:/etc/nginx/nginx.conf:ro
+      - ${SSL_CERT_DIR:-/etc/letsencrypt}:/etc/letsencrypt:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      api:
+        condition: service_healthy
+      dashboard:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: '0.25'
+
+  # ---------------------------------------------------------------------------
+  # API — FastAPI backend
+  # ---------------------------------------------------------------------------
+  api:
+    image: ghcr.io/phaseflag/api:${PHASEFLAG_IMAGE_TAG:-latest}
+    expose:
+      - "8000"
+    env_file: /opt/phaseflag/.env.production
     environment:
       - PHASEFLAG_DATABASE_URL=postgresql+asyncpg://phaseflag:${PHASEFLAG_DB_PASSWORD}@db:5432/phaseflag
-      - PHASEFLAG_DEPLOYMENT_MODE=saas
-      - PHASEFLAG_CORS_ORIGINS=${PHASEFLAG_CORS_ORIGINS:-https://app.phaseflag.io,https://portal.phaseflag.io}
+      - PHASEFLAG_DEPLOYMENT_MODE=${PHASEFLAG_DEPLOYMENT_MODE:-saas}
+      - PHASEFLAG_CORS_ORIGINS=${PHASEFLAG_CORS_ORIGINS:-https://app.phaseflag.com,https://portal.phaseflag.com}
       - PHASEFLAG_LOG_LEVEL=${PHASEFLAG_LOG_LEVEL:-INFO}
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
-      interval: 10s
-      timeout: 5s
+      interval: 15s
+      timeout: 10s
       retries: 5
+      start_period: 30s
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+          cpus: '1.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
 
+  # ---------------------------------------------------------------------------
+  # Relay — Edge evaluation proxy
+  # ---------------------------------------------------------------------------
   relay:
-    image: ghcr.io/phase-flag/relay:dev
-    ports:
-      - "8081:8081"
-    env_file: .env
+    image: ghcr.io/phaseflag/relay:${PHASEFLAG_IMAGE_TAG:-latest}
+    expose:
+      - "8081"
+    env_file: /opt/phaseflag/.env.production
     environment:
       - PHASEFLAG_RELAY_UPSTREAM=http://api:8000
-      - PHASEFLAG_RELAY_POLL_INTERVAL=30s
-      - PHASEFLAG_RELAY_CACHE_TTL=5m
+      - PHASEFLAG_RELAY_API_KEY=${PHASEFLAG_RELAY_API_KEY}
+      - PHASEFLAG_RELAY_POLL_INTERVAL=${PHASEFLAG_RELAY_POLL_INTERVAL:-30s}
+      - PHASEFLAG_RELAY_CACHE_TTL=${PHASEFLAG_RELAY_CACHE_TTL:-5m}
+      - PHASEFLAG_RELAY_LOG_LEVEL=${PHASEFLAG_LOG_LEVEL:-info}
     depends_on:
       api:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 64M
+          cpus: '0.1'
 
+  # ---------------------------------------------------------------------------
+  # Dashboard — Admin UI (served as static files by nginx in production)
+  # ---------------------------------------------------------------------------
   dashboard:
-    image: ghcr.io/phase-flag/dashboard:dev
-    ports:
-      - "3000:3000"
+    image: ghcr.io/phaseflag/dashboard:${PHASEFLAG_IMAGE_TAG:-latest}
+    expose:
+      - "3000"
     environment:
-      - VITE_API_URL=https://api.phaseflag.io
+      - VITE_API_URL=https://${API_DOMAIN:-api.phaseflag.com}
+      - VITE_RELAY_URL=https://${RELAY_DOMAIN:-relay.phaseflag.com}
     depends_on:
       - api
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
 
+  # ---------------------------------------------------------------------------
+  # PostgreSQL 16
+  # ---------------------------------------------------------------------------
   db:
     image: postgres:16-alpine
-    env_file: .env
+    expose:
+      - "5432"
+    env_file: /opt/phaseflag/.env.production
     environment:
       POSTGRES_USER: phaseflag
       POSTGRES_PASSWORD: ${PHASEFLAG_DB_PASSWORD}
       POSTGRES_DB: phaseflag
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U phaseflag"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 20s
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+
+  # ---------------------------------------------------------------------------
+  # DB migration job — runs migrations then exits
+  # ---------------------------------------------------------------------------
+  migrate:
+    image: ghcr.io/phaseflag/api:${PHASEFLAG_IMAGE_TAG:-latest}
+    env_file: /opt/phaseflag/.env.production
+    environment:
+      - PHASEFLAG_DATABASE_URL=postgresql+asyncpg://phaseflag:${PHASEFLAG_DB_PASSWORD}@db:5432/phaseflag
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
 
 volumes:
   pgdata:
+    driver: local
+  nginx_logs:
+    driver: local

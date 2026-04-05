@@ -1,0 +1,231 @@
+# Phase Flag CircleCI Orb
+#
+# Orb slug:    phaseflag/flag-check
+# Description: Commands and jobs for managing Phase Flag feature flags in CircleCI pipelines.
+#
+# To use this orb, publish it via:
+#   circleci orb publish integrations/circleci/orb.yml phaseflag/flag-check@dev:first
+#
+# Then reference it in your config.yml:
+#   orbs:
+#     phaseflag: phaseflag/flag-check@1.0.0
+
+version: 2.1
+
+description: |
+  Integrate Phase Flag feature flag checks into your CircleCI pipelines.
+  Gate deployments, toggle flags after successful releases, and archive
+  flags when features are fully rolled out.
+
+  Source: https://github.com/phaseflag/integrations
+  Docs:   https://docs.phaseflag.com/integrations/circleci
+
+display:
+  home_url: https://phaseflag.com
+  source_url: https://github.com/phaseflag/integrations
+
+# ---------------------------------------------------------------------------
+# Executors
+# ---------------------------------------------------------------------------
+executors:
+  default:
+    description: Minimal Alpine executor with curl and jq for Phase Flag API calls.
+    docker:
+      - image: alpine:3.19
+    resource_class: small
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+commands:
+  check-flag:
+    description: |
+      Check whether a feature flag is enabled. Fails the step if the flag
+      is disabled, allowing you to gate jobs in your workflow.
+    parameters:
+      api-url:
+        type: string
+        description: Phase Flag API base URL (e.g. https://api.phaseflag.com)
+        default: ${PHASEFLAG_API_URL}
+      api-key:
+        type: string
+        description: Phase Flag API key (use an environment variable reference)
+        default: ${PHASEFLAG_API_KEY}
+      flag-key:
+        type: string
+        description: The flag key to check (e.g. "enable-new-checkout")
+      fail-if-disabled:
+        type: boolean
+        description: Fail the step if the flag is disabled
+        default: true
+    steps:
+      - run:
+          name: Install dependencies
+          command: apk add --no-cache curl jq
+      - run:
+          name: Check Phase Flag — << parameters.flag-key >>
+          command: |
+            API_URL="<< parameters.api-url >>"
+            API_KEY="<< parameters.api-key >>"
+            FLAG_KEY="<< parameters.flag-key >>"
+
+            if [ -z "$API_URL" ]; then
+              echo "ERROR: api-url / PHASEFLAG_API_URL is required" >&2
+              exit 1
+            fi
+            if [ -z "$API_KEY" ]; then
+              echo "ERROR: api-key / PHASEFLAG_API_KEY is required" >&2
+              exit 1
+            fi
+
+            echo "Fetching flag: $FLAG_KEY"
+
+            HTTP_STATUS=$(curl --silent --output /tmp/pf_response.json \
+              --write-out "%{http_code}" \
+              --header "Authorization: Bearer $API_KEY" \
+              --header "Content-Type: application/json" \
+              "$API_URL/api/v1/flags/$FLAG_KEY")
+
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              echo "ERROR: API returned HTTP $HTTP_STATUS" >&2
+              cat /tmp/pf_response.json >&2
+              exit 1
+            fi
+
+            ENABLED=$(jq -r '.enabled // .default_value // false' /tmp/pf_response.json)
+            echo "Flag '$FLAG_KEY' enabled=$ENABLED"
+
+            if [ "<< parameters.fail-if-disabled >>" = "true" ] && [ "$ENABLED" != "true" ]; then
+              echo "GATE: Flag '$FLAG_KEY' is disabled — failing step."
+              exit 1
+            fi
+
+            echo "GATE: Flag '$FLAG_KEY' check passed (enabled=$ENABLED)."
+
+  toggle-flag:
+    description: |
+      Toggle a feature flag on or off. Use after a successful deployment
+      to enable or disable a flag programmatically.
+    parameters:
+      api-url:
+        type: string
+        description: Phase Flag API base URL
+        default: ${PHASEFLAG_API_URL}
+      api-key:
+        type: string
+        description: Phase Flag API key
+        default: ${PHASEFLAG_API_KEY}
+      flag-key:
+        type: string
+        description: The flag key to toggle
+      enabled:
+        type: boolean
+        description: Set to true to enable, false to disable
+        default: true
+    steps:
+      - run:
+          name: Install dependencies
+          command: apk add --no-cache curl jq
+      - run:
+          name: Toggle Phase Flag — << parameters.flag-key >> (<< parameters.enabled >>)
+          command: |
+            API_URL="<< parameters.api-url >>"
+            API_KEY="<< parameters.api-key >>"
+            FLAG_KEY="<< parameters.flag-key >>"
+            ENABLED="<< parameters.enabled >>"
+
+            echo "Toggling flag '$FLAG_KEY' to enabled=$ENABLED"
+
+            HTTP_STATUS=$(curl --silent --output /tmp/pf_response.json \
+              --write-out "%{http_code}" \
+              --request PATCH \
+              --header "Authorization: Bearer $API_KEY" \
+              --header "Content-Type: application/json" \
+              --data "{\"enabled\": $ENABLED}" \
+              "$API_URL/api/v1/flags/$FLAG_KEY")
+
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              echo "ERROR: Toggle failed — HTTP $HTTP_STATUS" >&2
+              cat /tmp/pf_response.json >&2
+              exit 1
+            fi
+
+            echo "Flag '$FLAG_KEY' toggled successfully:"
+            jq . /tmp/pf_response.json
+
+  archive-flag:
+    description: |
+      Archive a feature flag after its feature is fully rolled out.
+      Archived flags are soft-deleted and excluded from evaluations.
+    parameters:
+      api-url:
+        type: string
+        description: Phase Flag API base URL
+        default: ${PHASEFLAG_API_URL}
+      api-key:
+        type: string
+        description: Phase Flag API key
+        default: ${PHASEFLAG_API_KEY}
+      flag-key:
+        type: string
+        description: The flag key to archive
+    steps:
+      - run:
+          name: Install dependencies
+          command: apk add --no-cache curl jq
+      - run:
+          name: Archive Phase Flag — << parameters.flag-key >>
+          command: |
+            API_URL="<< parameters.api-url >>"
+            API_KEY="<< parameters.api-key >>"
+            FLAG_KEY="<< parameters.flag-key >>"
+
+            echo "Archiving flag: $FLAG_KEY"
+
+            HTTP_STATUS=$(curl --silent --output /tmp/pf_response.json \
+              --write-out "%{http_code}" \
+              --request POST \
+              --header "Authorization: Bearer $API_KEY" \
+              --header "Content-Type: application/json" \
+              "$API_URL/api/v1/flags/$FLAG_KEY/archive")
+
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              echo "ERROR: Archive failed — HTTP $HTTP_STATUS" >&2
+              cat /tmp/pf_response.json >&2
+              exit 1
+            fi
+
+            echo "Flag '$FLAG_KEY' archived successfully."
+            jq . /tmp/pf_response.json
+
+# ---------------------------------------------------------------------------
+# Jobs
+# ---------------------------------------------------------------------------
+jobs:
+  flag-gate:
+    description: |
+      Standalone job that checks a feature flag and fails if it is disabled.
+      Use this as a gate in your workflow before deployment jobs.
+    executor: default
+    parameters:
+      api-url:
+        type: string
+        description: Phase Flag API base URL
+        default: ${PHASEFLAG_API_URL}
+      api-key:
+        type: string
+        description: Phase Flag API key
+        default: ${PHASEFLAG_API_KEY}
+      flag-key:
+        type: string
+        description: The flag key to check
+      fail-if-disabled:
+        type: boolean
+        description: Fail the job if the flag is disabled
+        default: true
+    steps:
+      - check-flag:
+          api-url: << parameters.api-url >>
+          api-key: << parameters.api-key >>
+          flag-key: << parameters.flag-key >>
+          fail-if-disabled: << parameters.fail-if-disabled >>

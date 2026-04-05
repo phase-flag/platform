@@ -6,6 +6,7 @@ export default function Footer() {
         { label: 'Features', href: '#features' },
         { label: 'Pricing', href: '#pricing' },
         { label: 'Compare', href: '#compare' },
+        { label: 'vs Competitors', href: '#compare-full' },
         { label: 'Live Demo', href: '#live-demo' },
         { label: 'Changelog', href: 'https://phaseflag.dev/changelog' },
       ],
@@ -38,12 +39,21 @@ export default function Footer() {
         { label: 'Contributing', href: 'https://github.com/phaseflag/phaseflag/blob/main/CONTRIBUTING.md' },
       ],
     },
+    {
+      title: 'Legal',
+      links: [
+        { label: 'Terms of Service', href: '#/terms' },
+        { label: 'Privacy Policy', href: '#/privacy' },
+        { label: 'Status', href: 'https://status.phaseflag.com' },
+        { label: 'Documentation', href: 'https://docs.phaseflag.com' },
+      ],
+    },
   ];
 
   return (
     <footer className="bg-[#0A1218] text-white/70">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
           {/* Logo and description */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
@@ -103,11 +113,12 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm">&copy; {new Date().getFullYear()} Phase Flag. Apache 2.0 License.</p>
+          <p className="text-sm">&copy; {new Date().getFullYear()} Hextrot, Inc. (dba Phase Flag). Apache 2.0 License.</p>
           <div className="flex items-center gap-6 text-sm">
-            <a href="https://phaseflag.dev/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Privacy Policy</a>
-            <a href="https://phaseflag.dev/terms" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Terms of Service</a>
-            <a href="https://status.phaseflag.dev" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Status</a>
+            <a href="#/terms" className="hover:text-pf-mint transition-colors">Terms of Service</a>
+            <a href="#/privacy" className="hover:text-pf-mint transition-colors">Privacy Policy</a>
+            <a href="https://status.phaseflag.com" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Status</a>
+            <a href="https://docs.phaseflag.com" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Documentation</a>
           </div>
         </div>
       </div>

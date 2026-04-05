@@ -19,6 +19,10 @@ export default class ErrorBoundary extends Component<Props, State> {
         return { hasError: true, error }
     }
 
+    componentDidCatch(error: Error, info: { componentStack: string }) {
+        console.error('[ErrorBoundary] Caught rendering error:', error, info.componentStack)
+    }
+
     handleReload = () => {
         this.setState({ hasError: false, error: null })
         window.location.reload()

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
 import { X, CheckCircle, XCircle, Info } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -8,6 +8,7 @@ interface Toast {
     id: number
     type: ToastType
     message: string
+    link?: string
 }
 
 interface ToastContextValue {
@@ -25,13 +26,23 @@ let nextId = 0
 export function ToastProvider({ children }: { children: ReactNode }) {
     const [toasts, setToasts] = useState<Toast[]>([])
 
-    const addToast = useCallback((type: ToastType, message: string) => {
+    const addToast = useCallback((type: ToastType, message: string, link?: string) => {
         const id = nextId++
-        setToasts(prev => [...prev, { id, type, message }])
+        setToasts(prev => [...prev, { id, type, message, link }])
         setTimeout(() => {
             setToasts(prev => prev.filter(t => t.id !== id))
         }, 5000)
     }, [])
+
+    // Listen for toasts dispatched by the Axios interceptor (outside React tree)
+    useEffect(() => {
+        function handleApiToast(e: Event) {
+            const { type, message, link } = (e as CustomEvent).detail as { type: ToastType; message: string; link?: string }
+            addToast(type, message, link)
+        }
+        window.addEventListener('phaseflag:toast', handleApiToast)
+        return () => window.removeEventListener('phaseflag:toast', handleApiToast)
+    }, [addToast])
 
     const removeToast = useCallback((id: number) => {
         setToasts(prev => prev.filter(t => t.id !== id))
@@ -60,7 +71,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                             )}
                         >
                             <Icon className="w-5 h-5 flex-shrink-0" />
-                            <p className="flex-1 text-sm">{t.message}</p>
+                            <p className="flex-1 text-sm">
+                                {t.message}
+                                {t.link && (
+                                    <a href={t.link} className="ml-1 underline font-medium">View billing</a>
+                                )}
+                            </p>
                             <button onClick={() => removeToast(t.id)} className="flex-shrink-0 p-0.5 hover:opacity-70">
                                 <X className="w-4 h-4" />
                             </button>

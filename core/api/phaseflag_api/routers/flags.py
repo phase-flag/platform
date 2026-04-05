@@ -11,6 +11,7 @@ from phaseflag_api.database import get_session
 from phaseflag_api.middleware.auth import require_api_key, require_role
 from phaseflag_api.repositories import flag_repository
 from phaseflag_api.services import flag_service
+from phaseflag_api.services.billing_service import check_flag_limit
 
 router = APIRouter(dependencies=[Depends(require_api_key)])
 
@@ -364,7 +365,14 @@ async def get_flag(key: str, session: AsyncSession = Depends(get_session)):
     status_code=status.HTTP_201_CREATED,
     dependencies=[require_role("editor")],
 )
-async def create_flag(body: FlagCreate, session: AsyncSession = Depends(get_session)):
+async def create_flag(
+    body: FlagCreate,
+    session: AsyncSession = Depends(get_session),
+    org_id: str | None = None,
+):
+    # Enforce tier-based flag limit (org_id is optional; skipped in OSS mode)
+    await check_flag_limit(session, org_id)
+
     existing = await flag_repository.get_flag_by_key(session, body.key)
     if existing is not None:
         raise HTTPException(

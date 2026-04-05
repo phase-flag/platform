@@ -1,0 +1,7 @@
+src/
+tests/
+tsconfig.json
+tsup.config.ts
+*.map
+node_modules/
+.DS_Store

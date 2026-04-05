@@ -1,0 +1,91 @@
+/**
+ * Phase Flag — Shared Brand CSS Custom Properties
+ *
+ * This file can be imported by any of the three frontends to access the
+ * canonical design token set as CSS custom properties.
+ *
+ * Usage (Tailwind 3 — dashboard):
+ *   Add to core/dashboard/src/index.css:
+ *     @import "../../../../design/tokens/brand.css";
+ *
+ * Usage (Tailwind 4 — portal / marketing):
+ *   Already covered via @theme in each app's index.css, but this file
+ *   serves as the authoritative single-source-of-truth for tooling.
+ */
+
+:root {
+  /* ── Brand Palette ────────────────────────────────────────────────── */
+  --pf-primary:      #34D399;   /* Emerald green — canonical brand primary    */
+  --pf-mint:         #5BBAA7;   /* Teal mint — UI accent, borders, icons      */
+  --pf-mint-light:   #7ED4C1;   /* Mint hover state                           */
+  --pf-mint-pale:    #E8F7F3;   /* Mint tint — light-mode backgrounds         */
+  --pf-navy:         #2B4C5C;   /* Navy — favicon bg, dashboard primary shade */
+  --pf-dark:         #1E3A4A;   /* Darker navy — code backgrounds             */
+
+  /* ── Surface Palette (dark-mode default) ─────────────────────────── */
+  --pf-page:         #0F1A20;   /* Page background                            */
+  --pf-card:         #162029;   /* Card background (portal)                   */
+  --pf-surface:      #1C2D38;   /* Raised surface / panel                     */
+  --pf-surface-light:#1E3A4A;   /* Slightly lighter surface                   */
+  --pf-footer:       #0A1218;   /* Footer strip                               */
+
+  /* ── Typography ──────────────────────────────────────────────────── */
+  --pf-text:         #E8F0F2;   /* Primary body text                          */
+  --pf-text-muted:   #8FA3AD;   /* Secondary / muted text                     */
+
+  /* ── Border ──────────────────────────────────────────────────────── */
+  --pf-border:       rgba(91, 186, 167, 0.15);
+  --pf-border-dim:   rgba(91, 186, 167, 0.10);
+
+  /* ── Grays ───────────────────────────────────────────────────────── */
+  --pf-gray-50:  #F8FAFB;
+  --pf-gray-100: #EDF1F3;
+  --pf-gray-500: #6B7F8A;
+
+  /* ── Semantic ────────────────────────────────────────────────────── */
+  --pf-success:  #22C55E;
+  --pf-warning:  #F59E0B;
+  --pf-danger:   #EF4444;
+
+  /* ── Typography ──────────────────────────────────────────────────── */
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-heading: 'Josefin Sans', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  /* ── Google Fonts (reference — load via <link> in index.html) ────── */
+  /* https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700
+     &family=Josefin+Sans:wght@100;200;300;400;600
+     &family=JetBrains+Mono:wght@400;500&display=swap                  */
+}
+
+/* ── Utility classes (framework-agnostic) ──────────────────────────── */
+.pf-brand-text {
+  font-family: var(--font-heading);
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pf-code {
+  font-family: var(--font-mono);
+}
+
+.pf-btn-primary {
+  background-color: var(--pf-mint);
+  color: #ffffff;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+.pf-btn-primary:hover {
+  background-color: var(--pf-mint-light);
+}
+
+.pf-badge-mint {
+  background-color: rgba(91, 186, 167, 0.10);
+  color: var(--pf-mint);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+}

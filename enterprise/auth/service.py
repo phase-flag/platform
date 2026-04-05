@@ -2,8 +2,17 @@
 
 This is a self-contained implementation using Python stdlib:
 - SAML: XML parsing and signature verification (simplified, no lxml)
-- OIDC: Token exchange via urllib
+- OIDC: Token exchange via urllib, JWKS key caching for RS256 verification
 - SCIM: User provisioning with DB persistence
+
+Security controls:
+- SAML: XXE protection, Signature element presence check, NotOnOrAfter expiry,
+  Issuer validation against configured idp_entity_id, Audience restriction check.
+- OIDC: JWKS endpoint fetching with in-memory TTL cache, RS256 public-key
+  signature verification (stdlib-only via modular exponentiation), issuer/
+  audience/expiry claim validation.
+- All crypto uses Python stdlib (hashlib, hmac, base64, struct) — no third-party
+  crypto dependencies.
 """
 
 from __future__ import annotations
@@ -12,8 +21,11 @@ import base64
 import hashlib
 import hmac
 import json
+import logging
 import re
 import ssl
+import struct
+import time as _time
 import urllib.parse
 import urllib.request
 import uuid
@@ -25,6 +37,159 @@ from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import SCIMMapping, SSOConfiguration
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# JWKS cache (in-memory, TTL = 5 minutes)
+# ---------------------------------------------------------------------------
+
+_JWKS_CACHE: Dict[str, Tuple[float, List[Dict[str, Any]]]] = {}
+_JWKS_TTL = 300.0  # seconds
+
+
+def _b64url_decode(data: str) -> bytes:
+    """Decode a Base64URL string (no-padding variant) to bytes."""
+    padding = 4 - len(data) % 4
+    if padding != 4:
+        data += "=" * padding
+    return base64.urlsafe_b64decode(data)
+
+
+def _base64url_to_int(b64: str) -> int:
+    """Decode a Base64URL-encoded big-endian integer (used for RSA n/e)."""
+    raw = _b64url_decode(b64)
+    return int.from_bytes(raw, byteorder="big")
+
+
+def _rsa_verify_pkcs1_sha256(message: bytes, signature: bytes, n: int, e: int) -> bool:
+    """Verify an RSA-PKCS#1-v1.5 SHA-256 signature using stdlib (modular exponentiation).
+
+    This implements the RSA verification primitive using Python's built-in integer
+    pow() — no external crypto library required.  Only use for signature *verification*
+    (public-key operation).
+
+    PKCS#1 v1.5 DigestInfo prefix for SHA-256:
+        30 31 30 0d 06 09 60 86 48 01 65 03 04 02 01 05 00 04 20
+    """
+    # RSA public-key operation: m = sig^e mod n
+    sig_int = int.from_bytes(signature, byteorder="big")
+    key_len = (n.bit_length() + 7) // 8
+    if len(signature) != key_len:
+        return False
+    padded_int = pow(sig_int, e, n)
+    padded = padded_int.to_bytes(key_len, byteorder="big")
+
+    # PKCS#1 v1.5 format: 0x00 0x01 <0xff padding> 0x00 <DigestInfo>
+    # DigestInfo for SHA-256 (19 bytes) + SHA-256 digest (32 bytes) = 51 bytes
+    SHA256_DIGEST_INFO = bytes([
+        0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86,
+        0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05,
+        0x00, 0x04, 0x20,
+    ])
+    expected_suffix = SHA256_DIGEST_INFO + hashlib.sha256(message).digest()
+    expected_len = len(expected_suffix)
+
+    # Verify structure: 0x00, 0x01, PS (0xff bytes), 0x00, T
+    if len(padded) < 3 + expected_len:
+        return False
+    if padded[0] != 0x00 or padded[1] != 0x01:
+        return False
+    # Find the 0x00 separator after the padding string
+    sep_idx = padded.find(b"\x00", 2)
+    if sep_idx == -1:
+        return False
+    # The padding string must be all 0xff bytes
+    if padded[2:sep_idx] != b"\xff" * (sep_idx - 2):
+        return False
+    actual_suffix = padded[sep_idx + 1:]
+    return hmac.compare_digest(actual_suffix, expected_suffix)
+
+
+def _fetch_jwks(jwks_uri: str) -> List[Dict[str, Any]]:
+    """Fetch JWKS keys from the given URI (with in-memory TTL cache)."""
+    now = _time.monotonic()
+    cached = _JWKS_CACHE.get(jwks_uri)
+    if cached and (now - cached[0]) < _JWKS_TTL:
+        return cached[1]
+
+    ctx = ssl.create_default_context()
+    try:
+        with urllib.request.urlopen(jwks_uri, context=ctx, timeout=10) as resp:
+            jwks = json.loads(resp.read().decode())
+    except Exception as exc:
+        logger.warning("JWKS fetch failed for %s: %s", jwks_uri, exc)
+        # Return stale cache if available rather than failing entirely
+        if cached:
+            return cached[1]
+        raise ValueError(f"Failed to fetch JWKS from {jwks_uri}: {exc}")
+
+    keys = jwks.get("keys", [])
+    _JWKS_CACHE[jwks_uri] = (now, keys)
+    return keys
+
+
+def _verify_rs256_jwt(token: str, jwks_uri: str) -> Dict[str, Any]:
+    """Verify a JWT signed with RS256 using keys from a JWKS endpoint.
+
+    Returns the verified payload claims on success; raises ValueError on failure.
+    """
+    parts = token.strip().split(".")
+    if len(parts) != 3:
+        raise ValueError("Invalid JWT: expected 3 parts")
+
+    try:
+        header_bytes = _b64url_decode(parts[0])
+        header = json.loads(header_bytes)
+    except Exception as exc:
+        raise ValueError(f"Cannot decode JWT header: {exc}")
+
+    alg = header.get("alg", "")
+    if alg != "RS256":
+        raise ValueError(f"Unsupported JWT algorithm: {alg!r} (expected RS256)")
+
+    kid = header.get("kid")
+
+    # Fetch JWKS and find matching key
+    keys = _fetch_jwks(jwks_uri)
+    rsa_key = None
+    for key in keys:
+        if key.get("kty") != "RSA":
+            continue
+        if key.get("use") not in (None, "sig"):
+            continue
+        if kid and key.get("kid") != kid:
+            continue
+        rsa_key = key
+        break
+
+    if rsa_key is None:
+        raise ValueError(f"No matching RSA key found in JWKS (kid={kid!r})")
+
+    n_b64 = rsa_key.get("n")
+    e_b64 = rsa_key.get("e")
+    if not n_b64 or not e_b64:
+        raise ValueError("RSA key is missing 'n' or 'e' components")
+
+    n = _base64url_to_int(n_b64)
+    e = _base64url_to_int(e_b64)
+
+    signing_input = f"{parts[0]}.{parts[1]}".encode("ascii")
+    try:
+        signature = _b64url_decode(parts[2])
+    except Exception as exc:
+        raise ValueError(f"Cannot decode JWT signature: {exc}")
+
+    if not _rsa_verify_pkcs1_sha256(signing_input, signature, n, e):
+        raise ValueError("JWT signature verification failed")
+
+    try:
+        payload = json.loads(_b64url_decode(parts[1]))
+    except Exception as exc:
+        raise ValueError(f"Cannot decode JWT payload: {exc}")
+
+    return payload
 
 
 # ---------------------------------------------------------------------------
@@ -169,6 +334,19 @@ def validate_saml_assertion(
     if assertion is None:
         raise ValueError("No SAML assertion found in response")
 
+    # Validate Issuer matches the configured IdP entity ID
+    issuer_el = assertion.find("saml:Issuer", _SAML_NS)
+    if issuer_el is None:
+        # Also check root-level issuer (for Response-level issuer)
+        issuer_el = root.find("saml:Issuer", _SAML_NS)
+    if issuer_el is not None and config.idp_entity_id:
+        actual_issuer = issuer_el.text or ""
+        if actual_issuer != config.idp_entity_id:
+            raise ValueError(
+                f"SAML Issuer mismatch: expected '{config.idp_entity_id}', "
+                f"got '{actual_issuer}'"
+            )
+
     # Validate audience
     audience_el = assertion.find(".//saml:AudienceRestriction/saml:Audience", _SAML_NS)
     if audience_el is not None and config.sp_entity_id:
@@ -276,25 +454,35 @@ async def exchange_oidc_token(
     if not access_token:
         raise ValueError("No access_token in OIDC token response")
 
-    # Decode ID token claims.
-    # SECURITY: The ID token is received directly from the token endpoint over
-    # TLS, which provides transport-level trust. For full security, the token
-    # signature should be verified against the OIDC provider's JWKS keys.
-    # TODO: Implement proper ID token signature verification using the provider's
-    # JWKS endpoint (discovery["jwks_uri"]).
+    # Verify ID token signature using JWKS (RS256) and validate claims.
+    # JWKS keys are fetched from the discovery document's jwks_uri and cached
+    # in memory with a 5-minute TTL.  Signature is verified using stdlib RSA
+    # modular exponentiation (see _verify_rs256_jwt / _rsa_verify_pkcs1_sha256).
     user_info: Dict[str, Any] = {}
     jwks_uri = discovery.get("jwks_uri")
     if id_token:
-        parts = id_token.split(".")
-        if len(parts) != 3:
-            raise ValueError("Invalid ID token format: expected 3-part JWT")
-        payload = parts[1]
-        # Pad base64
-        payload += "=" * (4 - len(payload) % 4)
-        try:
-            claims = json.loads(base64.urlsafe_b64decode(payload))
-        except Exception as exc:
-            raise ValueError(f"Failed to decode ID token payload: {exc}")
+        if jwks_uri:
+            # Full RS256 signature verification via JWKS
+            try:
+                claims = _verify_rs256_jwt(id_token, jwks_uri)
+            except ValueError as exc:
+                raise ValueError(f"ID token signature verification failed: {exc}")
+        else:
+            # No JWKS URI in discovery — fall back to decode-only with a warning
+            logger.warning(
+                "OIDC provider at %s has no jwks_uri in discovery document; "
+                "ID token signature cannot be verified — trusting TLS transport only.",
+                config.oidc_issuer,
+            )
+            parts = id_token.split(".")
+            if len(parts) != 3:
+                raise ValueError("Invalid ID token format: expected 3-part JWT")
+            payload = parts[1]
+            payload += "=" * (4 - len(payload) % 4)
+            try:
+                claims = json.loads(base64.urlsafe_b64decode(payload))
+            except Exception as exc:
+                raise ValueError(f"Failed to decode ID token payload: {exc}")
 
         # Validate issuer matches discovery
         if claims.get("iss") != config.oidc_issuer:
@@ -304,13 +492,16 @@ async def exchange_oidc_token(
             )
         # Validate audience matches client_id
         aud = claims.get("aud")
-        valid_aud = (aud == config.oidc_client_id) if isinstance(aud, str) else (config.oidc_client_id in aud if isinstance(aud, list) else False)
+        valid_aud = (
+            aud == config.oidc_client_id
+            if isinstance(aud, str)
+            else (config.oidc_client_id in aud if isinstance(aud, list) else False)
+        )
         if not valid_aud:
             raise ValueError(
                 f"ID token audience mismatch: expected '{config.oidc_client_id}', got '{aud}'"
             )
         # Validate expiration
-        import time as _time
         if "exp" in claims and _time.time() >= claims["exp"]:
             raise ValueError("ID token has expired")
 

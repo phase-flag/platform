@@ -1,7 +1,9 @@
 ---
 title: "JavaScript / TypeScript SDK"
-description: "Integrate Phase Flag into your JavaScript or TypeScript application."
+description: "Integrate Phase Flag into your JavaScript or TypeScript application — local evaluation, polling, streaming, and flag mocking."
 ---
+
+# JavaScript / TypeScript SDK
 
 ## Installation
 
@@ -21,31 +23,42 @@ pnpm add @phaseflag/js-sdk
 import { PhaseFlagClient } from "@phaseflag/js-sdk";
 
 const client = new PhaseFlagClient({
-  apiKey: "sdk-dev-xxxxxxxxxxxx",   // SDK API key from your project settings
-  environment: "development",        // "development" | "staging" | "production"
-  baseUrl: "https://api.phaseflag.io", // optional — default shown
-  pollingInterval: 30_000,           // optional — ms between ruleset fetches (default: 30s)
-  streaming: false,                  // optional — use SSE instead of polling
+  apiUrl: "https://api.phaseflag.com/api/v1",  // your API URL (including /api/v1)
+  apiKey: "sdk-dev-xxxxxxxxxxxx",              // SDK API key from project settings
+  pollingInterval: 30_000,                     // ms between ruleset fetches (default: 30s)
+  context: {                                   // optional default evaluation context
+    userId: "user-123",
+    attributes: { plan: "pro" },
+  },
 });
 
-// Wait for the initial ruleset to load before evaluating flags
-await client.initialize();
+// Fetch the initial ruleset and start background polling
+await client.start();
 ```
 
-<Note>
-  Call `initialize()` once at application startup. The client fetches the full ruleset and caches it in memory. Subsequent `evaluateFlag` calls are synchronous and have no network overhead.
-</Note>
+> Call `start()` once at application startup. The client fetches the full ruleset and caches it in memory. All subsequent `getBooleanValue` / `getStringValue` calls are **synchronous** with no network overhead.
+
+### Convenience factory
+
+```typescript
+import { createClient } from "@phaseflag/js-sdk";
+
+// Creates and starts the client in one call
+const client = await createClient({
+  apiUrl: "https://api.phaseflag.com/api/v1",
+  apiKey: "sdk-dev-xxxxxxxxxxxx",
+});
+```
 
 ---
 
 ## Evaluating Flags
 
-### Boolean Flag
+### Boolean flag
 
 ```typescript
-const isEnabled = await client.evaluateFlag<boolean>("new-checkout-flow", {
-  userKey: "user-123",
-});
+// Returns the boolean value of the flag, or `false` if not found
+const isEnabled = client.getBooleanValue("new-checkout-flow", false);
 
 if (isEnabled) {
   renderNewCheckout();
@@ -54,26 +67,15 @@ if (isEnabled) {
 }
 ```
 
-### String Flag
+### String flag
 
 ```typescript
-const theme = await client.evaluateFlag<string>("ui-theme", {
-  userKey: "user-123",
-});
-// Returns "dark" | "light" | "system"
+const theme = client.getStringValue("ui-theme", "light");
+// Returns "dark" | "light" | "system", falling back to "light"
 applyTheme(theme);
 ```
 
-### Number Flag
-
-```typescript
-const rateLimit = await client.evaluateFlag<number>("api-rate-limit", {
-  userKey: "service-backend",
-});
-// Returns a number, e.g. 100, 500, 1000
-```
-
-### JSON Flag
+### JSON flag
 
 ```typescript
 interface CheckoutConfig {
@@ -82,24 +84,39 @@ interface CheckoutConfig {
   provider: "stripe" | "braintree";
 }
 
-const config = await client.evaluateFlag<CheckoutConfig>("checkout-config", {
-  userKey: "user-123",
+const config = client.getJsonValue<CheckoutConfig>("checkout-config", {
+  showPromoCode: false,
+  maxItems: 10,
+  provider: "stripe",
 });
 
 console.log(config.provider); // "stripe"
 ```
 
----
-
-## User Targeting
-
-Pass an `EvaluationContext` with attributes to match targeting rules:
+### Full evaluation result
 
 ```typescript
-import { EvaluationContext } from "@phaseflag/js-sdk";
+const result = client.getVariation("new-checkout-flow");
+
+if (result) {
+  console.log(result.value);        // true
+  console.log(result.reason);       // "targeting_match" | "percentage_rollout" | "default"
+  console.log(result.variationKey); // "enabled"
+}
+```
+
+---
+
+## Evaluation Context
+
+Pass a per-call context to override the default context:
+
+```typescript
+import type { EvaluationContext } from "@phaseflag/js-sdk";
 
 const context: EvaluationContext = {
-  userKey: "user-123",           // required — used for percentage rollout bucketing
+  userId: "user-123",           // used for percentage rollout bucketing
+  sessionId: "sess-abc",        // fallback when userId is unavailable
   attributes: {
     email: "alice@example.com",
     plan: "pro",
@@ -109,22 +126,34 @@ const context: EvaluationContext = {
   },
 };
 
-const enabled = await client.evaluateFlag<boolean>("beta-feature", context);
+const enabled = client.getBooleanValue("beta-feature", false, context);
 ```
 
-Attributes can be **strings**, **numbers**, or **booleans**. They are matched against the targeting rules configured in your dashboard.
+Attributes can be **strings**, **numbers**, or **booleans**. They are matched against targeting rules configured in the dashboard.
+
+### Update the default context
+
+When a user logs in or their attributes change, update the default context:
+
+```typescript
+client.setContext({
+  userId: loggedInUser.id,
+  attributes: {
+    plan: loggedInUser.plan,
+    email: loggedInUser.email,
+  },
+});
+```
 
 ---
 
 ## Percentage Rollouts
 
-Percentage rollouts are handled automatically by the evaluation engine using DJB2 hashing on `{flagKey}:{userKey}`. The same user always lands in the same bucket — no additional configuration required in your code.
+Percentage rollouts are handled automatically using DJB2 hashing on `{flagKey}:{userId}`. The same user always lands in the same bucket — no additional configuration in your code:
 
 ```typescript
 // User "user-123" will consistently get the same variation for "gradual-rollout"
-const variation = await client.evaluateFlag<string>("gradual-rollout", {
-  userKey: "user-123",
-});
+const theme = client.getStringValue("gradual-rollout", "control");
 // Returns "control" or "treatment" based on the configured percentages
 ```
 
@@ -132,48 +161,89 @@ const variation = await client.evaluateFlag<string>("gradual-rollout", {
 
 ## Background Polling
 
-By default the SDK polls the control plane every 30 seconds for ruleset updates. You can configure the interval:
+The SDK polls the control plane every 30 seconds for ruleset updates by default. Configure the interval in milliseconds:
 
 ```typescript
 const client = new PhaseFlagClient({
+  apiUrl: "https://api.phaseflag.com/api/v1",
   apiKey: "sdk-dev-xxxxxxxxxxxx",
-  environment: "production",
   pollingInterval: 60_000, // poll every 60 seconds
 });
 ```
 
-To disable polling entirely (useful for short-lived processes):
+To disable polling (useful for short-lived processes):
 
 ```typescript
 const client = new PhaseFlagClient({
+  apiUrl: "https://api.phaseflag.com/api/v1",
   apiKey: "sdk-dev-xxxxxxxxxxxx",
-  environment: "production",
-  pollingInterval: 0, // fetch once at initialize(), never again
+  pollingInterval: 0, // fetch once at start(), never poll again
 });
 ```
 
 ---
 
-## Streaming Updates (SSE)
+## Listen for Flag Changes
 
-For near-instant flag propagation, enable Server-Sent Events:
+Register a listener that fires whenever the ruleset is updated after a poll:
+
+```typescript
+const unsubscribe = client.onFlagsChanged((flags) => {
+  console.log(`Ruleset updated: ${flags.size} flags loaded`);
+  // Re-evaluate flags and update your UI here
+});
+
+// Remove the listener when no longer needed
+unsubscribe();
+```
+
+---
+
+## Wait Until Ready
+
+If you need to ensure the client has fetched the initial ruleset before evaluating:
+
+```typescript
+await client.start();
+await client.waitUntilReady();
+
+// Safe to evaluate — ruleset is loaded
+const enabled = client.getBooleanValue("my-flag", false);
+```
+
+---
+
+## Offline Mode and Bootstrap
+
+For resilience against API downtime, provide bootstrap data and enable offline mode:
 
 ```typescript
 const client = new PhaseFlagClient({
+  apiUrl: "https://api.phaseflag.com/api/v1",
   apiKey: "sdk-dev-xxxxxxxxxxxx",
-  environment: "production",
-  streaming: true,
+  offlineMode: true,
+  bootstrapUrl: "/api/v1/sdk/bootstrap", // fetch initial state from your own server
 });
-
-await client.initialize();
-
-// The client will receive push updates from the control plane
-// and update the in-memory ruleset within milliseconds of a flag change
 ```
 
-<Note>
-  SSE streaming requires a persistent HTTP connection. It is recommended for long-lived server processes. Browser clients should use polling or the React SDK's built-in hooks.
-</Note>
+---
+
+## Flag Mocking (Testing)
+
+Override flag values in tests without connecting to the API:
+
+```typescript
+// In your test setup
+const client = new PhaseFlagClient({ apiUrl: "", apiKey: "" });
+client.setOverride("new-checkout-flow", true);
+
+// client.getBooleanValue now returns true without any network calls
+expect(client.getBooleanValue("new-checkout-flow", false)).toBe(true);
+
+// Clear overrides when done
+client.clearOverride("new-checkout-flow");
+client.clearAllOverrides();
+```
 
 ---
 
@@ -181,49 +251,73 @@ await client.initialize();
 
 ```typescript
 import type {
-  PhaseFlagClientOptions,
+  PhaseFlagConfig,
   EvaluationContext,
-  FlagValue,
   EvaluationResult,
+  FlagDefinition,
+  Variation,
 } from "@phaseflag/js-sdk";
 
 // EvaluationContext
 interface EvaluationContext {
-  userKey: string;
-  attributes?: Record<string, string | number | boolean>;
+  userId?: string;
+  sessionId?: string;
+  attributes?: Record<string, unknown>;
 }
 
-// EvaluationResult — returned by evaluateFlagWithDetail()
-interface EvaluationResult<T extends FlagValue = FlagValue> {
-  value: T;
-  reason: "TARGETING_RULE" | "PERCENTAGE_ROLLOUT" | "DEFAULT" | "DISABLED";
-  ruleId?: string;
-  variationKey?: string;
+// EvaluationResult — returned by getVariation()
+interface EvaluationResult {
+  flagKey: string;
+  variationId: string | null;
+  variationKey: string | null;
+  value: unknown;
+  reason: string; // "targeting_match" | "percentage_rollout" | "default" | "override"
 }
 ```
 
-### Get evaluation detail
+---
+
+## Remote Evaluation
+
+For server-side evaluation where the SDK doesn't have context locally:
 
 ```typescript
-const result = await client.evaluateFlagWithDetail<boolean>(
-  "new-checkout-flow",
-  { userKey: "user-123" }
-);
+const result = await client.evaluateRemote("new-checkout-flow", {
+  userId: "user-123",
+  attributes: { plan: "enterprise" },
+});
 
-console.log(result.value);   // true
-console.log(result.reason);  // "TARGETING_RULE"
-console.log(result.ruleId);  // "rule_abc123"
+console.log(result.value);  // true
+console.log(result.reason); // "targeting_match"
+```
+
+---
+
+## Event Tracking
+
+The SDK automatically tracks evaluation events. For custom analytics events:
+
+```typescript
+client.trackEvent({
+  flagKey: "new-checkout-flow",
+  variationKey: "enabled",
+  userId: "user-123",
+  metadata: { page: "checkout", experiment: "v2" },
+});
+
+// Flush all queued events immediately
+await client.flushEvents();
 ```
 
 ---
 
 ## Cleanup
 
-For server-side applications, call `close()` on shutdown to flush pending events and stop background tasks:
+For server-side applications, stop polling and flush events on shutdown:
 
 ```typescript
-process.on("SIGTERM", async () => {
-  await client.close();
+process.on("SIGTERM", () => {
+  client.stop(); // stops polling, flushes remaining events
   process.exit(0);
 });
 ```

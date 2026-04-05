@@ -13,6 +13,7 @@ export default defineConfig({
 
     nav: [
       { text: 'Guide', link: '/introduction' },
+      { text: 'Quickstart', link: '/quickstart' },
       { text: 'API Reference', link: '/api-reference/overview' },
       { text: 'Dashboard', link: 'https://app.phaseflag.io' },
     ],
@@ -22,11 +23,11 @@ export default defineConfig({
         text: 'Getting Started',
         items: [
           { text: 'Introduction', link: '/introduction' },
-          { text: 'Quickstart', link: '/quickstart' },
+          { text: '5-Minute Quickstart', link: '/quickstart' },
         ],
       },
       {
-        text: 'SDKs',
+        text: 'SDK Guides',
         items: [
           { text: 'JavaScript / TypeScript', link: '/sdks/javascript' },
           { text: 'Python', link: '/sdks/python' },
@@ -47,24 +48,28 @@ export default defineConfig({
       {
         text: 'Deployment',
         items: [
-          { text: 'OSS Docker', link: '/deployment/oss-docker' },
-          { text: 'Self-Hosted', link: '/deployment/self-hosted' },
+          { text: 'Docker Compose', link: '/deployment/docker' },
+          { text: 'OSS Docker (Local Dev)', link: '/deployment/oss-docker' },
+          { text: 'Self-Hosted (Production)', link: '/deployment/self-hosted' },
           { text: 'Kubernetes / Helm', link: '/deployment/kubernetes' },
           { text: 'Terraform', link: '/deployment/terraform' },
         ],
       },
       {
         text: 'Architecture',
-        items: [{ text: 'Overview', link: '/architecture/overview' }],
+        items: [
+          { text: 'Architecture Overview', link: '/architecture' },
+          { text: 'Component Details', link: '/architecture/overview' },
+        ],
       },
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/phase-flag/phaseflag' },
+      { icon: 'github', link: 'https://github.com/phaseflag/phaseflag' },
     ],
 
     editLink: {
-      pattern: 'https://github.com/phase-flag/phaseflag/edit/main/docs/site/:path',
+      pattern: 'https://github.com/phaseflag/phaseflag/edit/main/docs/site/:path',
       text: 'Edit this page on GitHub',
     },
 

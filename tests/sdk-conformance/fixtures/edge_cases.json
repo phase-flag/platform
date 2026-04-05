@@ -1,0 +1,559 @@
+{
+  "suite": "edge_cases",
+  "description": "Edge cases: empty context, missing attributes, null values, malformed/extreme inputs",
+  "cases": [
+    {
+      "name": "empty context — no user_id, no attributes",
+      "description": "Evaluation with completely empty context — uses default variation",
+      "flags": {
+        "edge-empty-ctx": {
+          "id": "flag-edge-empty-ctx",
+          "key": "edge-empty-ctx",
+          "name": "Edge Empty Context",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "country", "operator": "is", "value": "US"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"attributes": {}},
+      "expected": {"flag_key": "edge-empty-ctx", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "missing required attribute — is operator",
+      "description": "is operator with missing attribute returns false (not a negation operator)",
+      "flags": {
+        "edge-missing-is": {
+          "id": "flag-edge-missing-is",
+          "key": "edge-missing-is",
+          "name": "Edge Missing Is",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "country", "operator": "is", "value": "US"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-1", "attributes": {}},
+      "expected": {"flag_key": "edge-missing-is", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "missing required attribute — gt operator",
+      "description": "gt operator with missing attribute returns false",
+      "flags": {
+        "edge-missing-gt": {
+          "id": "flag-edge-missing-gt",
+          "key": "edge-missing-gt",
+          "name": "Edge Missing GT",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "age", "operator": "gt", "value": 18}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-2", "attributes": {}},
+      "expected": {"flag_key": "edge-missing-gt", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "missing required attribute — contains operator",
+      "description": "contains operator with missing attribute returns false",
+      "flags": {
+        "edge-missing-contains": {
+          "id": "flag-edge-missing-contains",
+          "key": "edge-missing-contains",
+          "name": "Edge Missing Contains",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "email", "operator": "contains", "value": "@company.com"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-3", "attributes": {}},
+      "expected": {"flag_key": "edge-missing-contains", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "missing required attribute — one_of operator",
+      "description": "one_of operator with missing attribute returns false",
+      "flags": {
+        "edge-missing-one-of": {
+          "id": "flag-edge-missing-one-of",
+          "key": "edge-missing-one-of",
+          "name": "Edge Missing One Of",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "one_of", "value": ["admin", "owner"]}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-4", "attributes": {}},
+      "expected": {"flag_key": "edge-missing-one-of", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "missing attribute — is_not is true (negation with missing)",
+      "description": "is_not with missing attribute returns true — treated as 'attribute is not X'",
+      "flags": {
+        "edge-missing-is-not": {
+          "id": "flag-edge-missing-is-not",
+          "key": "edge-missing-is-not",
+          "name": "Edge Missing Is Not",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "blocked", "operator": "is_not", "value": "true"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-5", "attributes": {}},
+      "expected": {"flag_key": "edge-missing-is-not", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "missing attribute — not_one_of is true (negation with missing)",
+      "description": "not_one_of with missing attribute returns true — missing is not in the list",
+      "flags": {
+        "edge-missing-not-one-of": {
+          "id": "flag-edge-missing-not-one-of",
+          "key": "edge-missing-not-one-of",
+          "name": "Edge Missing Not One Of",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "country", "operator": "not_one_of", "value": ["BLOCKED"]}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-6", "attributes": {}},
+      "expected": {"flag_key": "edge-missing-not-one-of", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "missing attribute — not_contains is true (negation with missing)",
+      "description": "not_contains with missing attribute returns true — missing does not contain X",
+      "flags": {
+        "edge-missing-not-contains": {
+          "id": "flag-edge-missing-not-contains",
+          "key": "edge-missing-not-contains",
+          "name": "Edge Missing Not Contains",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "user_agent", "operator": "not_contains", "value": "bot"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-7", "attributes": {}},
+      "expected": {"flag_key": "edge-missing-not-contains", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "non-numeric value for gt operator — no match",
+      "description": "gt operator with non-numeric actual value fails coercion — condition returns false",
+      "flags": {
+        "edge-non-numeric-gt": {
+          "id": "flag-edge-non-numeric-gt",
+          "key": "edge-non-numeric-gt",
+          "name": "Edge Non Numeric GT",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "age", "operator": "gt", "value": 18}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-8", "attributes": {"age": "not-a-number"}},
+      "expected": {"flag_key": "edge-non-numeric-gt", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "invalid regex pattern — no match (graceful failure)",
+      "description": "Malformed regex pattern like '[invalid' should return false without throwing",
+      "flags": {
+        "edge-invalid-regex": {
+          "id": "flag-edge-invalid-regex",
+          "key": "edge-invalid-regex",
+          "name": "Edge Invalid Regex",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "email", "operator": "matches_regex", "value": "[invalid"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-9", "attributes": {"email": "test@example.com"}},
+      "expected": {"flag_key": "edge-invalid-regex", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "boolean attribute coerced to string for is operator",
+      "description": "Attribute value true (boolean) compared via is to string 'true' using string coercion",
+      "flags": {
+        "edge-bool-coerce": {
+          "id": "flag-edge-bool-coerce",
+          "key": "edge-bool-coerce",
+          "name": "Edge Bool Coerce",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "beta", "operator": "is", "value": "true"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-10", "attributes": {"beta": "true"}},
+      "expected": {"flag_key": "edge-bool-coerce", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "numeric attribute compared via is operator with string target",
+      "description": "Attribute value 42 (number) compared to '42' (string) using string coercion",
+      "flags": {
+        "edge-num-str-coerce": {
+          "id": "flag-edge-num-str-coerce",
+          "key": "edge-num-str-coerce",
+          "name": "Edge Num Str Coerce",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "score", "operator": "is", "value": "42"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-11", "attributes": {"score": 42}},
+      "expected": {"flag_key": "edge-num-str-coerce", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "empty string attribute — is operator with empty string target matches",
+      "description": "is operator: empty string attribute matches empty string target",
+      "flags": {
+        "edge-empty-string": {
+          "id": "flag-edge-empty-string",
+          "key": "edge-empty-string",
+          "name": "Edge Empty String",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "tag", "operator": "is", "value": ""}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-12", "attributes": {"tag": ""}},
+      "expected": {"flag_key": "edge-empty-string", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "version_gt with invalid version string — no match",
+      "description": "Invalid version string 'not-a-version' gracefully fails version comparison",
+      "flags": {
+        "edge-invalid-version": {
+          "id": "flag-edge-invalid-version",
+          "key": "edge-invalid-version",
+          "name": "Edge Invalid Version",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "app_version", "operator": "version_gt", "value": "1.0.0"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-13", "attributes": {"app_version": "not-a-version"}},
+      "expected": {"flag_key": "edge-invalid-version", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "unknown operator — no match, returns default",
+      "description": "Unknown operator 'unknown_op' gracefully returns false, falls back to default",
+      "flags": {
+        "edge-unknown-op": {
+          "id": "flag-edge-unknown-op",
+          "key": "edge-unknown-op",
+          "name": "Edge Unknown Op",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "country", "operator": "unknown_op", "value": "US"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-14", "attributes": {"country": "US"}},
+      "expected": {"flag_key": "edge-unknown-op", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "very large number comparison",
+      "description": "gt operator with very large numbers should work correctly",
+      "flags": {
+        "edge-large-number": {
+          "id": "flag-edge-large-number",
+          "key": "edge-large-number",
+          "name": "Edge Large Number",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "revenue", "operator": "gt", "value": 1000000}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-15", "attributes": {"revenue": 5000000}},
+      "expected": {"flag_key": "edge-large-number", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "float comparison — value is greater",
+      "description": "gt operator with floating point values",
+      "flags": {
+        "edge-float-gt": {
+          "id": "flag-edge-float-gt",
+          "key": "edge-float-gt",
+          "name": "Edge Float GT",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "score", "operator": "gt", "value": 0.5}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-16", "attributes": {"score": 0.75}},
+      "expected": {"flag_key": "edge-float-gt", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "unicode attribute value comparison",
+      "description": "is operator with unicode strings should work correctly",
+      "flags": {
+        "edge-unicode": {
+          "id": "flag-edge-unicode",
+          "key": "edge-unicode",
+          "name": "Edge Unicode",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "locale", "operator": "is", "value": "zh-Hans"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-17", "attributes": {"locale": "zh-Hans"}},
+      "expected": {"flag_key": "edge-unicode", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "single variation flag — always returns the only variation",
+      "description": "Flag with only one variation returns it regardless of targeting",
+      "flags": {
+        "edge-single-var": {
+          "id": "flag-edge-single-var",
+          "key": "edge-single-var",
+          "name": "Edge Single Var",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-only",
+          "variations": [
+            {"id": "var-only", "key": "only", "name": "Only", "value": true}
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {"user_id": "user-18", "attributes": {}},
+      "expected": {"flag_key": "edge-single-var", "value": true, "variation_key": "only", "reason": "default"}
+    },
+    {
+      "name": "zero value attribute — 0 is not missing",
+      "description": "Attribute value 0 (integer) is present, is operator should compare as '0'",
+      "flags": {
+        "edge-zero-value": {
+          "id": "flag-edge-zero-value",
+          "key": "edge-zero-value",
+          "name": "Edge Zero Value",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "score", "operator": "is", "value": "0"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-19", "attributes": {"score": 0}},
+      "expected": {"flag_key": "edge-zero-value", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    }
+  ]
+}

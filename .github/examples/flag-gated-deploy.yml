@@ -1,0 +1,104 @@
+name: Flag-Gated Deployment
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "production"
+        type: choice
+        options: [staging, production]
+
+env:
+  ENVIRONMENT: ${{ github.event.inputs.environment || 'production' }}
+
+jobs:
+  # -------------------------------------------------------------------------
+  # Step 1: Check kill-switch flag before doing anything
+  # -------------------------------------------------------------------------
+  check-kill-switch:
+    name: Check kill-switch flag
+    runs-on: ubuntu-latest
+    outputs:
+      kill_switch_enabled: ${{ steps.flag.outputs.enabled }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check kill-switch flag
+        id: flag
+        uses: ./.github/actions/flag-check
+        with:
+          api-url: ${{ secrets.PHASEFLAG_API_URL }}
+          api-key: ${{ secrets.PHASEFLAG_API_KEY }}
+          flag-key: deployment-kill-switch
+          action: check
+          context: '{"environment":"${{ env.ENVIRONMENT }}"}'
+
+      - name: Log flag status
+        run: |
+          echo "Kill switch enabled: ${{ steps.flag.outputs.enabled }}"
+          echo "Flag value: ${{ steps.flag.outputs.value }}"
+
+  # -------------------------------------------------------------------------
+  # Step 2: Deploy only if kill switch is NOT active
+  # -------------------------------------------------------------------------
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment || 'production' }}
+    runs-on: ubuntu-latest
+    needs: check-kill-switch
+    # Only run when the kill switch is NOT enabled (i.e. enabled == 'false')
+    if: needs.check-kill-switch.outputs.kill_switch_enabled != 'true'
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: https://app.phaseflag.com
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Deploy application
+        run: |
+          echo "Deploying to ${{ env.ENVIRONMENT }}..."
+          # Replace with your actual deployment command:
+          # ./scripts/deploy.sh ${{ env.ENVIRONMENT }}
+
+      - name: Notify deployment success
+        run: echo "Deployment to ${{ env.ENVIRONMENT }} completed successfully."
+
+  # -------------------------------------------------------------------------
+  # Step 3: After successful deploy, toggle the "release" flag on
+  # -------------------------------------------------------------------------
+  enable-release-flag:
+    name: Enable release flag post-deploy
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: success()
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Toggle release flag on
+        uses: ./.github/actions/flag-check
+        with:
+          api-url: ${{ secrets.PHASEFLAG_API_URL }}
+          api-key: ${{ secrets.PHASEFLAG_API_KEY }}
+          flag-key: new-feature-release
+          action: toggle
+
+  # -------------------------------------------------------------------------
+  # Step 4: If kill switch was active, abort and notify
+  # -------------------------------------------------------------------------
+  abort-deployment:
+    name: Abort — kill switch active
+    runs-on: ubuntu-latest
+    needs: check-kill-switch
+    if: needs.check-kill-switch.outputs.kill_switch_enabled == 'true'
+    steps:
+      - name: Abort deployment
+        run: |
+          echo "::error::Deployment aborted — kill switch 'deployment-kill-switch' is ENABLED."
+          echo "Disable the flag in the Phase Flag dashboard before re-running this workflow."
+          exit 1

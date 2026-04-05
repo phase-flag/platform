@@ -6,7 +6,7 @@ description: "The Phase Flag REST API — base URLs, authentication, rate limits
 ## Base URL
 
 ```
-https://api.phaseflag.io/api/v1
+https://api.phaseflag.com/api/v1
 ```
 
 For local development (OSS Docker):
@@ -160,13 +160,13 @@ GET /api/v1/flags?environment_id=env_abc&status=active&sort=name&order=asc
 The interactive API documentation (Swagger UI) is available at:
 
 ```
-https://api.phaseflag.io/docs
+https://api.phaseflag.com/docs
 ```
 
 The raw OpenAPI 3.1 schema:
 
 ```
-https://api.phaseflag.io/openapi.json
+https://api.phaseflag.com/openapi.json
 ```
 
 For local development:

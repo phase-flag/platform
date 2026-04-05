@@ -28,6 +28,8 @@ func main() {
 		cmd.ExportCommand(os.Args[2:])
 	case "import":
 		cmd.ImportCommand(os.Args[2:])
+	case "cleanup":
+		cmd.CleanupCommand(os.Args[2:])
 	case "version":
 		cmd.VersionCommand(version)
 	case "help", "--help", "-h":
@@ -51,6 +53,7 @@ Commands:
   config      Manage CLI configuration (API URL, API key)
   export      Export flags to a JSON file
   import      Import flags from a JSON file
+  cleanup     Flag lifecycle cleanup (list stale, archive expired, report)
   version     Print version information
   help        Show this help message
 
@@ -66,6 +69,10 @@ Examples:
   pfctl evaluate my-flag --user-id user123 --attr plan=pro
   pfctl export --output flags.json
   pfctl import --input flags.json
+  pfctl cleanup list
+  pfctl cleanup list --threshold-days 60
+  pfctl cleanup archive
+  pfctl cleanup report --team platform
   pfctl config set api-url http://localhost:8000
   pfctl config set api-key pf_xxx`)
 }

@@ -1,0 +1,137 @@
+name: "Phase Flag: Check"
+description: "Check, toggle, or archive a Phase Flag feature flag from within a GitHub Actions workflow."
+author: "Phase Flag <support@phaseflag.com>"
+
+branding:
+  icon: "flag"
+  color: "blue"
+
+inputs:
+  api-url:
+    description: "Base URL of the Phase Flag API (e.g. https://api.phaseflag.com)"
+    required: true
+  api-key:
+    description: "Phase Flag API key. Store as a repository or organization secret."
+    required: true
+  flag-key:
+    description: "The slug/key of the feature flag to operate on (e.g. my-feature)."
+    required: true
+  context:
+    description: >
+      JSON object containing evaluation context attributes (user ID, plan, region, etc.).
+      Used only for the 'check' action when server-side evaluation context is needed.
+      Example: '{"userId":"abc","plan":"pro","region":"us-east-1"}'
+    required: false
+    default: "{}"
+  action:
+    description: "Action to perform: 'check' (default), 'toggle', or 'archive'."
+    required: false
+    default: "check"
+
+outputs:
+  enabled:
+    description: "Whether the flag is currently enabled (true/false). Only populated for 'check' action."
+    value: ${{ steps.run.outputs.enabled }}
+  value:
+    description: "The raw flag value returned by the API. Only populated for 'check' action."
+    value: ${{ steps.run.outputs.value }}
+  variation:
+    description: "The variation key the flag resolved to. Only populated for 'check' action."
+    value: ${{ steps.run.outputs.variation }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Phase Flag action
+      id: run
+      shell: bash
+      env:
+        PHASEFLAG_API_URL: ${{ inputs.api-url }}
+        PHASEFLAG_API_KEY: ${{ inputs.api-key }}
+        PHASEFLAG_FLAG_KEY: ${{ inputs.flag-key }}
+        PHASEFLAG_CONTEXT: ${{ inputs.context }}
+        PHASEFLAG_ACTION: ${{ inputs.action }}
+      run: |
+        set -euo pipefail
+
+        ACTION="${PHASEFLAG_ACTION:-check}"
+        FLAG_KEY="${PHASEFLAG_FLAG_KEY}"
+        API_URL="${PHASEFLAG_API_URL%/}"          # strip trailing slash
+        API_KEY="${PHASEFLAG_API_KEY}"
+
+        # ---- Shared auth header ----
+        AUTH_HEADER="X-API-Key: ${API_KEY}"
+
+        case "${ACTION}" in
+
+          check)
+            echo "::group::Phase Flag — checking flag '${FLAG_KEY}'"
+            RESPONSE=$(curl \
+              --silent \
+              --fail-with-body \
+              --max-time 15 \
+              -H "${AUTH_HEADER}" \
+              -H "Content-Type: application/json" \
+              "${API_URL}/api/v1/flags/${FLAG_KEY}" \
+            )
+            echo "Response: ${RESPONSE}"
+
+            # Parse fields from the response JSON
+            ENABLED=$(echo "${RESPONSE}" | python3 -c "import sys,json; d=json.load(sys.stdin); print(str(d.get('enabled', d.get('status','') == 'active')).lower())" 2>/dev/null || echo "false")
+            VALUE=$(echo "${RESPONSE}"   | python3 -c "import sys,json; d=json.load(sys.stdin); print(json.dumps(d.get('value', d.get('status',''))))" 2>/dev/null || echo '""')
+            VARIATION=$(echo "${RESPONSE}" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('default_variation_id',''))" 2>/dev/null || echo "")
+
+            echo "enabled=${ENABLED}"   >> "$GITHUB_OUTPUT"
+            echo "value=${VALUE}"       >> "$GITHUB_OUTPUT"
+            echo "variation=${VARIATION}" >> "$GITHUB_OUTPUT"
+
+            echo "Flag '${FLAG_KEY}' enabled=${ENABLED}"
+            echo "::endgroup::"
+            ;;
+
+          toggle)
+            echo "::group::Phase Flag — toggling flag '${FLAG_KEY}'"
+            RESPONSE=$(curl \
+              --silent \
+              --fail-with-body \
+              --max-time 15 \
+              -X POST \
+              -H "${AUTH_HEADER}" \
+              -H "Content-Type: application/json" \
+              "${API_URL}/api/v1/flags/${FLAG_KEY}/toggle" \
+            )
+            echo "Response: ${RESPONSE}"
+
+            NEW_STATUS=$(echo "${RESPONSE}" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('status',''))" 2>/dev/null || echo "unknown")
+            echo "Flag '${FLAG_KEY}' new status: ${NEW_STATUS}"
+            echo "enabled=$( [ "${NEW_STATUS}" = "active" ] && echo true || echo false )" >> "$GITHUB_OUTPUT"
+            echo "value=${NEW_STATUS}"  >> "$GITHUB_OUTPUT"
+            echo "variation="           >> "$GITHUB_OUTPUT"
+            echo "::endgroup::"
+            ;;
+
+          archive)
+            echo "::group::Phase Flag — archiving flag '${FLAG_KEY}'"
+            RESPONSE=$(curl \
+              --silent \
+              --fail-with-body \
+              --max-time 15 \
+              -X POST \
+              -H "${AUTH_HEADER}" \
+              -H "Content-Type: application/json" \
+              "${API_URL}/api/v1/flags/${FLAG_KEY}/archive" \
+            )
+            echo "Response: ${RESPONSE}"
+
+            echo "Flag '${FLAG_KEY}' archived."
+            echo "enabled=false"  >> "$GITHUB_OUTPUT"
+            echo "value=archived" >> "$GITHUB_OUTPUT"
+            echo "variation="     >> "$GITHUB_OUTPUT"
+            echo "::endgroup::"
+            ;;
+
+          *)
+            echo "::error::Unknown action '${ACTION}'. Valid values: check, toggle, archive."
+            exit 1
+            ;;
+        esac

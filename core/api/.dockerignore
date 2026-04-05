@@ -1,6 +1,7 @@
-__pycache__
-*.pyc
-*.pyo
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
 .pytest_cache
 .mypy_cache
 .ruff_cache
@@ -9,9 +10,16 @@ tests/
 *.db-shm
 *.db-wal
 .env
+.env.*
 .git
 .gitignore
+.dockerignore
+Dockerfile
 *.md
 dist/
 htmlcov/
 .coverage
+.coverage.*
+coverage.xml
+.venv
+venv/

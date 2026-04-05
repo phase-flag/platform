@@ -10,6 +10,7 @@ from phaseflag_api.middleware.auth import get_current_user, require_api_key, req
 from phaseflag_api.models.projects import OrgMemberDB, OrganizationDB, ProjectDB
 from phaseflag_api.models.users import UserDB
 from phaseflag_api.repositories import project_repository
+from phaseflag_api.services.billing_service import check_project_limit
 
 router = APIRouter(dependencies=[Depends(require_api_key)])
 
@@ -246,6 +247,10 @@ async def create_project(org_slug: str, body: ProjectCreate, session: AsyncSessi
     org = await project_repository.get_org_by_slug(session, org_slug)
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
+
+    # Enforce tier-based project limit before creating
+    await check_project_limit(session, org.id)
+
     existing = await project_repository.get_project_by_slug(session, org.id, body.slug)
     if existing:
         raise HTTPException(status_code=409, detail=f"Project '{body.slug}' already exists in this org")

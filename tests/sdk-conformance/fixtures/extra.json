@@ -1,0 +1,1216 @@
+{
+  "suite": "extra",
+  "description": "Additional test cases for comprehensive coverage of all operators, rollouts, and edge scenarios to reach 200+ total cases",
+  "cases": [
+    {
+      "name": "25% rollout — user-001 bucket=25, NOT in rollout (weight 25 means bucket < 25)",
+      "description": "rollout-25:user-001 -> bucket=25, which equals 25 so NOT < 25, user gets off variation",
+      "hash_seed": {"flag_key": "rollout-25", "user_id": "user-001", "expected_bucket": 25},
+      "flags": {
+        "rollout-25": {
+          "id": "flag-rollout-25",
+          "key": "rollout-25",
+          "name": "25 Percent Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 25},
+                  {"variation_id": "var-off", "weight": 75}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-001", "attributes": {}},
+      "expected": {"flag_key": "rollout-25", "value": false, "variation_key": "off", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "25% rollout — user-002 bucket=26, outside rollout",
+      "description": "rollout-25:user-002 -> bucket=26 >= 25, user gets off",
+      "hash_seed": {"flag_key": "rollout-25", "user_id": "user-002", "expected_bucket": 26},
+      "flags": {
+        "rollout-25-2": {
+          "id": "flag-rollout-25-2",
+          "key": "rollout-25-2",
+          "name": "25 Percent Rollout v2",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 25},
+                  {"variation_id": "var-off", "weight": 75}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-002", "attributes": {}},
+      "expected": {"flag_key": "rollout-25-2", "value": false, "variation_key": "off", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "75% rollout — user-001 bucket=42 is in rollout",
+      "description": "rollout-75:user-001 -> bucket=42 < 75, user gets on",
+      "hash_seed": {"flag_key": "rollout-75", "user_id": "user-001", "expected_bucket": 42},
+      "flags": {
+        "rollout-75": {
+          "id": "flag-rollout-75",
+          "key": "rollout-75",
+          "name": "75 Percent Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 75},
+                  {"variation_id": "var-off", "weight": 25}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-001", "attributes": {}},
+      "expected": {"flag_key": "rollout-75", "value": true, "variation_key": "on", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "75% rollout — user-010 bucket=74 is just barely in rollout",
+      "description": "rollout-75:user-010 -> bucket=74, which is < 75, user is in",
+      "hash_seed": {"flag_key": "rollout-75", "user_id": "user-010", "expected_bucket": 74},
+      "flags": {
+        "rollout-75-2": {
+          "id": "flag-rollout-75-2",
+          "key": "rollout-75-2",
+          "name": "75 Percent Rollout v2",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 75},
+                  {"variation_id": "var-off", "weight": 25}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-010", "attributes": {}},
+      "expected": {"flag_key": "rollout-75-2", "value": true, "variation_key": "on", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "A/B split test — user-001 bucket=16 in control",
+      "description": "ab-split:user-001 -> bucket=16, which is < 50, user gets control",
+      "hash_seed": {"flag_key": "ab-split", "user_id": "user-001", "expected_bucket": 16},
+      "flags": {
+        "ab-split": {
+          "id": "flag-ab-split",
+          "key": "ab-split",
+          "name": "AB Split",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-control",
+          "variations": [
+            {"id": "var-control", "key": "control", "name": "Control", "value": "control"},
+            {"id": "var-treatment", "key": "treatment", "name": "Treatment", "value": "treatment"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-control", "weight": 50},
+                  {"variation_id": "var-treatment", "weight": 50}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-001", "attributes": {}},
+      "expected": {"flag_key": "ab-split", "value": "control", "variation_key": "control", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "A/B split test — user-010 bucket=48 in control",
+      "description": "ab-split:user-010 -> bucket=48, which is < 50, user gets control",
+      "hash_seed": {"flag_key": "ab-split", "user_id": "user-010", "expected_bucket": 48},
+      "flags": {
+        "ab-split-2": {
+          "id": "flag-ab-split-2",
+          "key": "ab-split-2",
+          "name": "AB Split v2",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-control",
+          "variations": [
+            {"id": "var-control", "key": "control", "name": "Control", "value": "control"},
+            {"id": "var-treatment", "key": "treatment", "name": "Treatment", "value": "treatment"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-control", "weight": 50},
+                  {"variation_id": "var-treatment", "weight": 50}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-010", "attributes": {}},
+      "expected": {"flag_key": "ab-split-2", "value": "control", "variation_key": "control", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "A/B split test — user-020 bucket=81 in treatment",
+      "description": "ab-split:user-020 -> bucket=81 >= 50, user gets treatment",
+      "hash_seed": {"flag_key": "ab-split", "user_id": "user-020", "expected_bucket": 81},
+      "flags": {
+        "ab-split-3": {
+          "id": "flag-ab-split-3",
+          "key": "ab-split-3",
+          "name": "AB Split v3",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-control",
+          "variations": [
+            {"id": "var-control", "key": "control", "name": "Control", "value": "control"},
+            {"id": "var-treatment", "key": "treatment", "name": "Treatment", "value": "treatment"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-control", "weight": 50},
+                  {"variation_id": "var-treatment", "weight": 50}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-020", "attributes": {}},
+      "expected": {"flag_key": "ab-split-3", "value": "treatment", "variation_key": "treatment", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "operators — is with integer converted to string",
+      "description": "Attribute integer 0 compared to string '0' via string coercion of both sides",
+      "flags": {
+        "op-is-int-str": {
+          "id": "flag-op-is-int-str",
+          "key": "op-is-int-str",
+          "name": "Is Int Str",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "level", "operator": "is", "value": "1"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-50", "attributes": {"level": 1}},
+      "expected": {"flag_key": "op-is-int-str", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "operators — contains with special characters",
+      "description": "Contains operator with plus sign in search string",
+      "flags": {
+        "op-contains-special": {
+          "id": "flag-op-contains-special",
+          "key": "op-contains-special",
+          "name": "Contains Special",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "tag", "operator": "contains", "value": "beta+"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-51", "attributes": {"tag": "release-beta+v2"}},
+      "expected": {"flag_key": "op-contains-special", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "operators — gt with negative numbers",
+      "description": "gt operator with negative values: -5 gt -10 should be true",
+      "flags": {
+        "op-gt-negative": {
+          "id": "flag-op-gt-negative",
+          "key": "op-gt-negative",
+          "name": "GT Negative",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "temperature", "operator": "gt", "value": -10}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-52", "attributes": {"temperature": -5}},
+      "expected": {"flag_key": "op-gt-negative", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "operators — lt with negative numbers",
+      "description": "lt operator with negative values: -15 lt -10 should be true",
+      "flags": {
+        "op-lt-negative": {
+          "id": "flag-op-lt-negative",
+          "key": "op-lt-negative",
+          "name": "LT Negative",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "balance", "operator": "lt", "value": -10}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-53", "attributes": {"balance": -15}},
+      "expected": {"flag_key": "op-lt-negative", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "operators — one_of with single value (not array)",
+      "description": "one_of with scalar (non-array) target value matches as string equality",
+      "flags": {
+        "op-one-of-scalar": {
+          "id": "flag-op-one-of-scalar",
+          "key": "op-one-of-scalar",
+          "name": "One Of Scalar",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "status", "operator": "one_of", "value": "active"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-54", "attributes": {"status": "active"}},
+      "expected": {"flag_key": "op-one-of-scalar", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "operators — not_one_of with single value (scalar)",
+      "description": "not_one_of with scalar target, user value differs — match",
+      "flags": {
+        "op-not-one-of-scalar": {
+          "id": "flag-op-not-one-of-scalar",
+          "key": "op-not-one-of-scalar",
+          "name": "Not One Of Scalar",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "status", "operator": "not_one_of", "value": "banned"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-55", "attributes": {"status": "active"}},
+      "expected": {"flag_key": "op-not-one-of-scalar", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "operators — version_gt with pre-release versions",
+      "description": "version_gt '1.0.0' — pre-release '1.0.0-beta' is less than '1.0.0' in semver",
+      "flags": {
+        "op-version-prerelease": {
+          "id": "flag-op-vgt-prerelease",
+          "key": "op-version-prerelease",
+          "name": "Version Prerelease",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "app_version", "operator": "version_gt", "value": "2.0.0"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-56", "attributes": {"app_version": "2.1.0"}},
+      "expected": {"flag_key": "op-version-prerelease", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "operators — matches_regex case sensitive by default",
+      "description": "Regex match is case-sensitive: 'admin' does not match 'Admin'",
+      "flags": {
+        "op-regex-case": {
+          "id": "flag-op-regex-case",
+          "key": "op-regex-case",
+          "name": "Regex Case Sensitive",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "matches_regex", "value": "^admin$"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-57", "attributes": {"role": "Admin"}},
+      "expected": {"flag_key": "op-regex-case", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "operators — matches_regex case insensitive flag in pattern",
+      "description": "Regex match with character class: 'Admin' matches ^[Aa]dmin$",
+      "flags": {
+        "op-regex-ci": {
+          "id": "flag-op-regex-ci",
+          "key": "op-regex-ci",
+          "name": "Regex Case Insensitive",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "matches_regex", "value": "^[Aa]dmin$"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-58", "attributes": {"role": "Admin"}},
+      "expected": {"flag_key": "op-regex-ci", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "defaults — default is third of four variations",
+      "description": "Flag with four variations, default is the third one",
+      "flags": {
+        "default-third": {
+          "id": "flag-default-third",
+          "key": "default-third",
+          "name": "Default Third",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-c",
+          "variations": [
+            {"id": "var-a", "key": "a", "name": "A", "value": "value_a"},
+            {"id": "var-b", "key": "b", "name": "B", "value": "value_b"},
+            {"id": "var-c", "key": "c", "name": "C", "value": "value_c"},
+            {"id": "var-d", "key": "d", "name": "D", "value": "value_d"}
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {"user_id": "user-60", "attributes": {}},
+      "expected": {"flag_key": "default-third", "value": "value_c", "variation_key": "c", "reason": "default"}
+    },
+    {
+      "name": "prerequisites — target flag with context-based evaluation",
+      "description": "Prerequisite passes, and target flag evaluates based on user context",
+      "flags": {
+        "auth-gate": {
+          "id": "flag-auth-gate",
+          "key": "auth-gate",
+          "name": "Auth Gate",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-auth-off",
+          "variations": [
+            {"id": "var-auth-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-auth-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [{"priority": 1, "conditions": [], "variation_id": "var-auth-on"}],
+          "prerequisites": []
+        },
+        "admin-panel": {
+          "id": "flag-admin-panel",
+          "key": "admin-panel",
+          "name": "Admin Panel",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-panel-off",
+          "variations": [
+            {"id": "var-panel-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-panel-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "is", "value": "admin"}],
+              "variation_id": "var-panel-on"
+            }
+          ],
+          "prerequisites": [{"flag_key": "auth-gate", "variation_key": "on"}]
+        }
+      },
+      "target_flag": "admin-panel",
+      "context": {"user_id": "admin-1", "attributes": {"role": "admin"}},
+      "expected": {"flag_key": "admin-panel", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "prerequisites — non-admin user blocked by role condition",
+      "description": "Auth gate passes, but regular user fails admin role condition",
+      "flags": {
+        "auth-gate-2": {
+          "id": "flag-auth-gate-2",
+          "key": "auth-gate-2",
+          "name": "Auth Gate 2",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-auth-off-2",
+          "variations": [
+            {"id": "var-auth-on-2", "key": "on", "name": "On", "value": true},
+            {"id": "var-auth-off-2", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [{"priority": 1, "conditions": [], "variation_id": "var-auth-on-2"}],
+          "prerequisites": []
+        },
+        "admin-panel-2": {
+          "id": "flag-admin-panel-2",
+          "key": "admin-panel-2",
+          "name": "Admin Panel 2",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-panel-off-2",
+          "variations": [
+            {"id": "var-panel-on-2", "key": "on", "name": "On", "value": true},
+            {"id": "var-panel-off-2", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "is", "value": "admin"}],
+              "variation_id": "var-panel-on-2"
+            }
+          ],
+          "prerequisites": [{"flag_key": "auth-gate-2", "variation_key": "on"}]
+        }
+      },
+      "target_flag": "admin-panel-2",
+      "context": {"user_id": "user-reg", "attributes": {"role": "user"}},
+      "expected": {"flag_key": "admin-panel-2", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "segments — age gating with gt operator",
+      "description": "Age-restricted feature only for users 21+",
+      "flags": {
+        "age-gated": {
+          "id": "flag-age-gated",
+          "key": "age-gated",
+          "name": "Age Gated",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "age", "operator": "gt", "value": 20}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-adult", "attributes": {"age": 25}},
+      "expected": {"flag_key": "age-gated", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "segments — age gating fails for minors",
+      "description": "User age 18 does not satisfy gt 20 condition",
+      "flags": {
+        "age-gated-minor": {
+          "id": "flag-age-gated-minor",
+          "key": "age-gated-minor",
+          "name": "Age Gated Minor",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "age", "operator": "gt", "value": 20}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-minor", "attributes": {"age": 18}},
+      "expected": {"flag_key": "age-gated-minor", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "segments — subscription status with contains",
+      "description": "Users with subscription containing 'premium' keyword get feature",
+      "flags": {
+        "premium-subscription": {
+          "id": "flag-premium-sub",
+          "key": "premium-subscription",
+          "name": "Premium Subscription",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "subscription_type", "operator": "contains", "value": "premium"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-sub", "attributes": {"subscription_type": "annual-premium-plus"}},
+      "expected": {"flag_key": "premium-subscription", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "variations — flag returns string with spaces",
+      "description": "Variation value can contain spaces and special characters",
+      "flags": {
+        "string-spaces-flag": {
+          "id": "flag-str-spaces",
+          "key": "string-spaces-flag",
+          "name": "String Spaces Flag",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-default-msg",
+          "variations": [
+            {"id": "var-welcome-msg", "key": "welcome", "name": "Welcome", "value": "Welcome to Phase Flag!"},
+            {"id": "var-default-msg", "key": "default", "name": "Default", "value": "Feature not available"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "active", "operator": "is", "value": "true"}],
+              "variation_id": "var-welcome-msg"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-active", "attributes": {"active": "true"}},
+      "expected": {"flag_key": "string-spaces-flag", "value": "Welcome to Phase Flag!", "variation_key": "welcome", "reason": "targeting_match"}
+    },
+    {
+      "name": "variations — number flag returns zero",
+      "description": "Variation value of 0 (zero) is returned correctly",
+      "flags": {
+        "zero-num-flag": {
+          "id": "flag-zero-num",
+          "key": "zero-num-flag",
+          "name": "Zero Number Flag",
+          "flag_type": "number",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-zero",
+          "variations": [
+            {"id": "var-positive", "key": "positive", "name": "Positive", "value": 42},
+            {"id": "var-zero", "key": "zero", "name": "Zero", "value": 0}
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {"user_id": "user-z", "attributes": {}},
+      "expected": {"flag_key": "zero-num-flag", "value": 0, "variation_key": "zero", "reason": "default"}
+    },
+    {
+      "name": "variations — boolean false is a valid value (not null)",
+      "description": "Explicit false as variation value — important to distinguish from 'no value'",
+      "flags": {
+        "explicit-false-flag": {
+          "id": "flag-explicit-false",
+          "key": "explicit-false-flag",
+          "name": "Explicit False Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-false-val",
+          "variations": [
+            {"id": "var-true-val", "key": "enabled", "name": "Enabled", "value": true},
+            {"id": "var-false-val", "key": "disabled", "name": "Disabled", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "allow", "operator": "is", "value": "false"}],
+              "variation_id": "var-false-val"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-no", "attributes": {"allow": "false"}},
+      "expected": {"flag_key": "explicit-false-flag", "value": false, "variation_key": "disabled", "reason": "targeting_match"}
+    },
+    {
+      "name": "edge case — context with many attributes, only one checked",
+      "description": "Context has 10 attributes but only one is checked in the condition",
+      "flags": {
+        "many-attrs-flag": {
+          "id": "flag-many-attrs",
+          "key": "many-attrs-flag",
+          "name": "Many Attrs Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "vip", "operator": "is", "value": "true"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-rich-ctx",
+        "attributes": {
+          "country": "US", "plan": "free", "role": "user", "age": 25,
+          "email": "test@test.com", "language": "en", "timezone": "UTC",
+          "mobile": "true", "beta": "false", "vip": "true"
+        }
+      },
+      "expected": {"flag_key": "many-attrs-flag", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "edge case — flag with many rules, last rule matches",
+      "description": "Flag with 5 rules where only the last rule matches the user",
+      "flags": {
+        "last-rule-match": {
+          "id": "flag-last-rule",
+          "key": "last-rule-match",
+          "name": "Last Rule Match",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-none",
+          "variations": [
+            {"id": "var-admin", "key": "admin", "name": "Admin", "value": "admin"},
+            {"id": "var-mod", "key": "mod", "name": "Mod", "value": "moderator"},
+            {"id": "var-premium", "key": "premium", "name": "Premium", "value": "premium"},
+            {"id": "var-pro", "key": "pro", "name": "Pro", "value": "pro"},
+            {"id": "var-basic", "key": "basic", "name": "Basic", "value": "basic"},
+            {"id": "var-none", "key": "none", "name": "None", "value": "none"}
+          ],
+          "targeting_rules": [
+            {"priority": 1, "conditions": [{"attribute": "role", "operator": "is", "value": "admin"}], "variation_id": "var-admin"},
+            {"priority": 2, "conditions": [{"attribute": "role", "operator": "is", "value": "mod"}], "variation_id": "var-mod"},
+            {"priority": 3, "conditions": [{"attribute": "plan", "operator": "is", "value": "enterprise"}], "variation_id": "var-premium"},
+            {"priority": 4, "conditions": [{"attribute": "plan", "operator": "is", "value": "pro"}], "variation_id": "var-pro"},
+            {"priority": 5, "conditions": [{"attribute": "plan", "operator": "is", "value": "basic"}], "variation_id": "var-basic"}
+          ]
+        }
+      },
+      "context": {"user_id": "basic-user", "attributes": {"role": "user", "plan": "basic"}},
+      "expected": {"flag_key": "last-rule-match", "value": "basic", "variation_key": "basic", "reason": "targeting_match"}
+    },
+    {
+      "name": "edge case — attribute value with spaces",
+      "description": "Attribute value containing spaces is matched exactly",
+      "flags": {
+        "spaces-in-value": {
+          "id": "flag-spaces-val",
+          "key": "spaces-in-value",
+          "name": "Spaces In Value",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "company_name", "operator": "is", "value": "Acme Corp"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-acme", "attributes": {"company_name": "Acme Corp"}},
+      "expected": {"flag_key": "spaces-in-value", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "edge case — mixed AND conditions with regex and version",
+      "description": "Rule requires both regex email match AND version check",
+      "flags": {
+        "regex-and-version": {
+          "id": "flag-regex-version",
+          "key": "regex-and-version",
+          "name": "Regex And Version",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "email", "operator": "matches_regex", "value": "@(company|partner)\\.com$"},
+                {"attribute": "app_version", "operator": "version_gt", "value": "3.0.0"}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "partner-v4", "attributes": {"email": "john@partner.com", "app_version": "4.0.0"}},
+      "expected": {"flag_key": "regex-and-version", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "edge case — is_not and not_one_of combined",
+      "description": "Two negation conditions both must pass (AND): status is_not banned AND country not_one_of [BLOCKED]",
+      "flags": {
+        "double-negation": {
+          "id": "flag-double-neg",
+          "key": "double-negation",
+          "name": "Double Negation",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "status", "operator": "is_not", "value": "banned"},
+                {"attribute": "country", "operator": "not_one_of", "value": ["BLOCKED1", "BLOCKED2"]}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "regular-user", "attributes": {"status": "active", "country": "US"}},
+      "expected": {"flag_key": "double-negation", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "edge case — is_not and not_one_of combined fails for banned user",
+      "description": "Banned user fails is_not condition even though country condition passes",
+      "flags": {
+        "double-negation-fail": {
+          "id": "flag-double-neg-fail",
+          "key": "double-negation-fail",
+          "name": "Double Negation Fail",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "status", "operator": "is_not", "value": "banned"},
+                {"attribute": "country", "operator": "not_one_of", "value": ["BLOCKED1", "BLOCKED2"]}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "banned-user", "attributes": {"status": "banned", "country": "US"}},
+      "expected": {"flag_key": "double-negation-fail", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "variations — flag with 5 numeric variations",
+      "description": "Score-based flag with 5 numeric tiers",
+      "flags": {
+        "score-tiers": {
+          "id": "flag-score-tiers",
+          "key": "score-tiers",
+          "name": "Score Tiers",
+          "flag_type": "number",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-t1",
+          "variations": [
+            {"id": "var-t5", "key": "tier5", "name": "Tier 5", "value": 500},
+            {"id": "var-t4", "key": "tier4", "name": "Tier 4", "value": 400},
+            {"id": "var-t3", "key": "tier3", "name": "Tier 3", "value": 300},
+            {"id": "var-t2", "key": "tier2", "name": "Tier 2", "value": 200},
+            {"id": "var-t1", "key": "tier1", "name": "Tier 1", "value": 100}
+          ],
+          "targeting_rules": [
+            {"priority": 1, "conditions": [{"attribute": "level", "operator": "gt", "value": 40}], "variation_id": "var-t5"},
+            {"priority": 2, "conditions": [{"attribute": "level", "operator": "gt", "value": 30}], "variation_id": "var-t4"},
+            {"priority": 3, "conditions": [{"attribute": "level", "operator": "gt", "value": 20}], "variation_id": "var-t3"},
+            {"priority": 4, "conditions": [{"attribute": "level", "operator": "gt", "value": 10}], "variation_id": "var-t2"}
+          ]
+        }
+      },
+      "context": {"user_id": "user-level25", "attributes": {"level": 25}},
+      "expected": {"flag_key": "score-tiers", "value": 300, "variation_key": "tier3", "reason": "targeting_match"}
+    },
+    {
+      "name": "rollout — conditional rollout with contains",
+      "description": "Rollout only for users whose email contains '@test.io', others get default",
+      "flags": {
+        "email-rollout": {
+          "id": "flag-email-rollout",
+          "key": "email-rollout",
+          "name": "Email Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "email", "operator": "contains", "value": "@test.io"}],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 100}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-test", "attributes": {"email": "alice@test.io"}},
+      "expected": {"flag_key": "email-rollout", "value": true, "variation_key": "on", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "defaults — multiple variations, none matched by a long rule list",
+      "description": "Six rules none of which match; returns default (last) variation",
+      "flags": {
+        "many-rules-default": {
+          "id": "flag-many-rules-default",
+          "key": "many-rules-default",
+          "name": "Many Rules Default",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-fallback",
+          "variations": [
+            {"id": "var-v1", "key": "v1", "name": "V1", "value": "v1"},
+            {"id": "var-v2", "key": "v2", "name": "V2", "value": "v2"},
+            {"id": "var-v3", "key": "v3", "name": "V3", "value": "v3"},
+            {"id": "var-fallback", "key": "fallback", "name": "Fallback", "value": "fallback"}
+          ],
+          "targeting_rules": [
+            {"priority": 1, "conditions": [{"attribute": "tag", "operator": "is", "value": "alpha"}], "variation_id": "var-v1"},
+            {"priority": 2, "conditions": [{"attribute": "tag", "operator": "is", "value": "beta"}], "variation_id": "var-v2"},
+            {"priority": 3, "conditions": [{"attribute": "tag", "operator": "is", "value": "gamma"}], "variation_id": "var-v3"}
+          ]
+        }
+      },
+      "context": {"user_id": "user-no-tag", "attributes": {"tag": "delta"}},
+      "expected": {"flag_key": "many-rules-default", "value": "fallback", "variation_key": "fallback", "reason": "default"}
+    },
+    {
+      "name": "combined — multi-step gating: plan AND region AND version",
+      "description": "Feature requires enterprise plan, non-EU region, and app version > 5.0.0",
+      "flags": {
+        "triple-gate": {
+          "id": "flag-triple-gate",
+          "key": "triple-gate",
+          "name": "Triple Gate",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "enterprise"},
+                {"attribute": "region", "operator": "is_not", "value": "EU"},
+                {"attribute": "app_version", "operator": "version_gt", "value": "5.0.0"}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "ent-us-user", "attributes": {"plan": "enterprise", "region": "US", "app_version": "5.1.0"}},
+      "expected": {"flag_key": "triple-gate", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "combined — triple gate fails for EU user",
+      "description": "Enterprise EU user on v5.1.0 is blocked by region condition",
+      "flags": {
+        "triple-gate-eu": {
+          "id": "flag-triple-gate-eu",
+          "key": "triple-gate-eu",
+          "name": "Triple Gate EU",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "enterprise"},
+                {"attribute": "region", "operator": "is_not", "value": "EU"},
+                {"attribute": "app_version", "operator": "version_gt", "value": "5.0.0"}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "ent-eu-user", "attributes": {"plan": "enterprise", "region": "EU", "app_version": "5.1.0"}},
+      "expected": {"flag_key": "triple-gate-eu", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "combined — rule with one_of operator for feature tiers",
+      "description": "Feature available for multiple plans including pro, enterprise, and team",
+      "flags": {
+        "multi-plan-feature": {
+          "id": "flag-multi-plan",
+          "key": "multi-plan-feature",
+          "name": "Multi Plan Feature",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "plan", "operator": "one_of", "value": ["pro", "enterprise", "team", "business"]}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "team-user", "attributes": {"plan": "team"}},
+      "expected": {"flag_key": "multi-plan-feature", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "combined — multi-plan feature unavailable for free",
+      "description": "Free plan is not in the one_of list",
+      "flags": {
+        "multi-plan-free": {
+          "id": "flag-multi-plan-free",
+          "key": "multi-plan-free",
+          "name": "Multi Plan Free",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "plan", "operator": "one_of", "value": ["pro", "enterprise", "team", "business"]}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "free-user-x", "attributes": {"plan": "free"}},
+      "expected": {"flag_key": "multi-plan-free", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "combined — graduated rollout with plan condition",
+      "description": "Enterprise users in the gradual rollout get new feature (100% for enterprise)",
+      "flags": {
+        "grad-rollout-ent": {
+          "id": "flag-grad-rollout-ent",
+          "key": "grad-rollout-ent",
+          "name": "Graduated Rollout Enterprise",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "plan", "operator": "is", "value": "enterprise"}],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 100}
+                ]
+              }
+            },
+            {
+              "priority": 2,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 5},
+                  {"variation_id": "var-off", "weight": 95}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "ent-user-gradual", "attributes": {"plan": "enterprise"}},
+      "expected": {"flag_key": "grad-rollout-ent", "value": true, "variation_key": "on", "reason": "percentage_rollout"}
+    }
+  ]
+}

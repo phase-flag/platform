@@ -272,6 +272,27 @@ async def evaluate_flag(body: EvaluateRequest, session: AsyncSession = Depends(g
     flag_db.last_evaluated_at = datetime.now(UTC)
     await flag_repository.update_flag(session, flag_db)
 
+    # Track usage: record unique user for MTU metering.
+    # We do this best-effort — errors must not block evaluations.
+    user_key = body.context.user_id or body.context.session_id
+    if user_key:
+        try:
+            from phaseflag_api.services.usage_service import track_user as _track_user
+            from phaseflag_api.repositories import project_repository  # noqa: F401
+
+            # Attempt to resolve org_id from the API key context.
+            # For simplicity, we look up all orgs and use the first (single-org mode).
+            # In multi-tenant mode with JWT, org_id would come from the token claims.
+            from phaseflag_api.models.projects import OrganizationDB
+            from sqlalchemy import select as _select
+
+            org_result = await session.execute(_select(OrganizationDB).limit(1))
+            org = org_result.scalar_one_or_none()
+            if org:
+                await _track_user(session, org.id, user_key)
+        except Exception as _exc:  # pragma: no cover
+            logger.debug("Usage tracking error (non-fatal): %s", _exc)
+
     return EvaluateResponse(
         flag_key=body.flag_key,
         variation_id=result.get("variation_id"),

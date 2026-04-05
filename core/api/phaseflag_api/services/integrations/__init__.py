@@ -1,0 +1,1 @@
+"""Webhook marketplace integration templates."""

@@ -64,4 +64,4 @@ docker compose pull && docker compose up -d
 
 ## Full Documentation
 
-See [docs.phaseflag.io/deployment/oss-docker](https://docs.phaseflag.io/deployment/oss-docker) for troubleshooting, relay proxy setup, and production hardening.
+See [docs.phaseflag.com/deployment/oss-docker](https://docs.phaseflag.com/deployment/oss-docker) for troubleshooting, relay proxy setup, and production hardening.

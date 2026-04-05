@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from phaseflag_api.models.flags import FeatureFlagDB, VariationDB
 from phaseflag_api.repositories import audit_repository, flag_repository
-from phaseflag_api.services import webhook_service
+from phaseflag_api.services import notification_service, webhook_service
 from phaseflag_api.services.sse_manager import sse_manager
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,13 @@ async def _check_circular_prerequisites(session: AsyncSession, flag_key: str, pr
                 to_check.append(dp["flag_key"])
 
 
-async def _notify_flag_change(event_type: str, flag: FeatureFlagDB, session: AsyncSession) -> None:
+async def _notify_flag_change(
+    event_type: str,
+    flag: FeatureFlagDB,
+    session: AsyncSession,
+    actor: str = "system",
+    project_id: str = "default",
+) -> None:
     summary = _flag_summary(flag)
     await webhook_service.fire_webhooks(session, event_type, flag.key, summary)
     await sse_manager.broadcast(
@@ -59,6 +65,14 @@ async def _notify_flag_change(event_type: str, flag: FeatureFlagDB, session: Asy
             "timestamp": datetime.now(UTC).isoformat(),
             **summary,
         },
+    )
+    # Fire Slack / Teams notifications (non-blocking — errors are logged, not raised)
+    await notification_service.dispatch_notifications(
+        session,
+        event_type=event_type,
+        flag_data=summary,
+        actor=actor,
+        project_id=project_id,
     )
 
 
@@ -123,7 +137,7 @@ async def create_flag(session: AsyncSession, data: dict[str, Any]) -> FeatureFla
         },
     )
 
-    await _notify_flag_change("flag.created", flag, session)
+    await _notify_flag_change("flag.created", flag, session, actor=data.get("created_by", "system"))
     return result
 
 

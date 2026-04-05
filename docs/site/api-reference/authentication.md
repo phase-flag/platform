@@ -22,7 +22,7 @@ Create a new user account. On a fresh OSS installation, the first user to regist
 ### Request
 
 ```bash
-curl -X POST https://api.phaseflag.io/api/v1/auth/register \
+curl -X POST https://api.phaseflag.com/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "alice@example.com",
@@ -74,7 +74,7 @@ Exchange credentials for a JWT access token.
 ### Request
 
 ```bash
-curl -X POST https://api.phaseflag.io/api/v1/auth/login \
+curl -X POST https://api.phaseflag.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "alice@example.com",
@@ -122,7 +122,7 @@ Return the profile of the currently authenticated user.
 ### Request
 
 ```bash
-curl https://api.phaseflag.io/api/v1/auth/me \
+curl https://api.phaseflag.com/api/v1/auth/me \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -157,7 +157,7 @@ Obtain a new access token using a refresh token.
 ### Request
 
 ```bash
-curl -X POST https://api.phaseflag.io/api/v1/auth/refresh \
+curl -X POST https://api.phaseflag.com/api/v1/auth/refresh \
   -H "Content-Type: application/json" \
   -d '{"refresh_token": "rt_01HXKR7M2P3QNZFVM6T8WE9J0E"}'
 ```
@@ -183,7 +183,7 @@ Invalidate the current access token and refresh token.
 ### Request
 
 ```bash
-curl -X POST https://api.phaseflag.io/api/v1/auth/logout \
+curl -X POST https://api.phaseflag.com/api/v1/auth/logout \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -196,7 +196,7 @@ curl -X POST https://api.phaseflag.io/api/v1/auth/logout \
 For machine-to-machine authentication (SDKs, CI/CD, server code), use an SDK API Key instead of JWT tokens. Generate one in the dashboard under **Settings → API Keys**.
 
 ```bash
-curl https://api.phaseflag.io/api/v1/sdk/ruleset \
+curl https://api.phaseflag.com/api/v1/sdk/ruleset \
   -H "X-API-Key: sdk-prod-xxxxxxxxxxxx"
 ```
 

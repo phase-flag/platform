@@ -12,12 +12,20 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold text-white">Dashboard</h1>
             <p className="text-white/50 text-sm mt-1">Welcome back, {user?.name}</p>
           </div>
-          <button
-            onClick={logout}
-            className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 border border-white/10 rounded-lg"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/settings"
+              className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 border border-white/10 rounded-lg"
+            >
+              Settings
+            </Link>
+            <button
+              onClick={logout}
+              className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 border border-white/10 rounded-lg"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">

@@ -84,4 +84,4 @@ terraform destroy
 
 ## Full Documentation
 
-See [docs.phaseflag.io/deployment/terraform](https://docs.phaseflag.io/deployment/terraform) for remote state configuration, enterprise variables, and multi-region setup.
+See [docs.phaseflag.com/deployment/terraform](https://docs.phaseflag.com/deployment/terraform) for remote state configuration, enterprise variables, and multi-region setup.

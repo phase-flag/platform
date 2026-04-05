@@ -1,0 +1,163 @@
+{
+  "_comment": "Phase Flag — Stripe product and price definitions. Use this as a reference when creating products in the Stripe Dashboard, or pass it to the Stripe CLI: stripe fixtures infra/stripe/setup.json",
+  "fixtures": [
+    {
+      "_comment": "--- PRO PRODUCT ---",
+      "name": "Create Pro product",
+      "path": "/v1/products",
+      "method": "post",
+      "params": {
+        "name": "Phase Flag Pro",
+        "description": "Unlimited feature flags, 10 projects, 50,000 monthly tracked users, segments & targeting, audit log, email support.",
+        "metadata": {
+          "plan_id": "pro",
+          "tier": "pro"
+        }
+      }
+    },
+    {
+      "name": "Create Pro monthly price",
+      "path": "/v1/prices",
+      "method": "post",
+      "params": {
+        "product": "${Create Pro product:id}",
+        "currency": "usd",
+        "unit_amount": 2900,
+        "recurring": {
+          "interval": "month",
+          "interval_count": 1
+        },
+        "nickname": "Pro Monthly",
+        "metadata": {
+          "plan_id": "pro",
+          "billing_cycle": "monthly"
+        }
+      }
+    },
+    {
+      "name": "Create Pro annual price",
+      "path": "/v1/prices",
+      "method": "post",
+      "params": {
+        "product": "${Create Pro product:id}",
+        "currency": "usd",
+        "unit_amount": 27840,
+        "recurring": {
+          "interval": "year",
+          "interval_count": 1
+        },
+        "nickname": "Pro Annual (20% off)",
+        "metadata": {
+          "plan_id": "pro",
+          "billing_cycle": "annual"
+        }
+      }
+    },
+    {
+      "_comment": "--- ENTERPRISE PRODUCT ---",
+      "name": "Create Enterprise product",
+      "path": "/v1/products",
+      "method": "post",
+      "params": {
+        "name": "Phase Flag Enterprise",
+        "description": "Everything in Pro plus unlimited projects & environments, SSO/SAML, SCIM provisioning, compliance tools, SLA, dedicated support.",
+        "metadata": {
+          "plan_id": "enterprise",
+          "tier": "enterprise"
+        }
+      }
+    },
+    {
+      "name": "Create Enterprise monthly price",
+      "path": "/v1/prices",
+      "method": "post",
+      "params": {
+        "product": "${Create Enterprise product:id}",
+        "currency": "usd",
+        "unit_amount": 29900,
+        "recurring": {
+          "interval": "month",
+          "interval_count": 1
+        },
+        "nickname": "Enterprise Monthly",
+        "metadata": {
+          "plan_id": "enterprise",
+          "billing_cycle": "monthly"
+        }
+      }
+    },
+    {
+      "name": "Create Enterprise annual price",
+      "path": "/v1/prices",
+      "method": "post",
+      "params": {
+        "product": "${Create Enterprise product:id}",
+        "currency": "usd",
+        "unit_amount": 287040,
+        "recurring": {
+          "interval": "year",
+          "interval_count": 1
+        },
+        "nickname": "Enterprise Annual (20% off)",
+        "metadata": {
+          "plan_id": "enterprise",
+          "billing_cycle": "annual"
+        }
+      }
+    },
+    {
+      "_comment": "--- WEBHOOK ENDPOINT ---",
+      "name": "Create webhook endpoint",
+      "path": "/v1/webhook_endpoints",
+      "method": "post",
+      "params": {
+        "url": "https://api.phaseflag.com/billing/webhook",
+        "enabled_events": [
+          "checkout.session.completed",
+          "customer.subscription.created",
+          "customer.subscription.updated",
+          "customer.subscription.deleted",
+          "invoice.payment_failed",
+          "invoice.payment_succeeded"
+        ],
+        "description": "Phase Flag billing webhook — updates org subscription tier"
+      }
+    }
+  ],
+  "tier_summary": {
+    "free": {
+      "price_usd_monthly": 0,
+      "max_flags": 10,
+      "max_projects": 1,
+      "max_mtu": 1000,
+      "stripe_price_id": null
+    },
+    "pro": {
+      "price_usd_monthly": 29,
+      "price_usd_annual": 278.40,
+      "max_flags": -1,
+      "max_projects": 10,
+      "max_mtu": 50000,
+      "stripe_price_id_monthly": "${Create Pro monthly price:id}",
+      "stripe_price_id_annual": "${Create Pro annual price:id}"
+    },
+    "enterprise": {
+      "price_usd_monthly": 299,
+      "price_usd_annual": 2870.40,
+      "max_flags": -1,
+      "max_projects": -1,
+      "max_mtu": -1,
+      "stripe_price_id_monthly": "${Create Enterprise monthly price:id}",
+      "stripe_price_id_annual": "${Create Enterprise annual price:id}"
+    }
+  },
+  "post_setup_instructions": [
+    "1. Run: stripe fixtures infra/stripe/setup.json",
+    "2. Copy the generated price IDs into your .env.production:",
+    "     PHASEFLAG_STRIPE_PRO_PRICE_ID=price_...",
+    "     PHASEFLAG_STRIPE_ENTERPRISE_PRICE_ID=price_...",
+    "3. Copy the webhook signing secret into:",
+    "     PHASEFLAG_STRIPE_WEBHOOK_SECRET=whsec_...",
+    "4. For testing: stripe listen --forward-to localhost:8000/billing/webhook"
+  ]
+}

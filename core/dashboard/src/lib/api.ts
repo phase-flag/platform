@@ -21,19 +21,49 @@ api.interceptors.request.use((config) => {
     return config
 })
 
-// Response interceptor: handle auth failures and sanitize errors
+// Response interceptor: handle auth failures, rate limits, payment errors, and sanitize errors
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        const status = error.response?.status
+
+        if (status === 401) {
             localStorage.removeItem('auth_token')
             localStorage.removeItem('auth_user')
             window.location.href = '/login'
         }
+
+        if (status === 429) {
+            const retryAfter = error.response?.headers?.['retry-after']
+            const detail = retryAfter
+                ? `Rate limit exceeded. Please wait ${retryAfter} second(s) before trying again.`
+                : 'Rate limit exceeded. Please wait a moment before trying again.'
+            // Emit a custom DOM event so ToastContext can display the message
+            // without requiring a React context reference here.
+            window.dispatchEvent(new CustomEvent('phaseflag:toast', { detail: { type: 'error', message: detail } }))
+        }
+
+        if (status === 402) {
+            window.dispatchEvent(new CustomEvent('phaseflag:toast', {
+                detail: { type: 'error', message: 'This action requires a plan upgrade.', link: '/billing' },
+            }))
+        }
+
+        if (status === 403) {
+            const serverMessage: string = error.response?.data?.detail || ''
+            const tierKeywords = ['plan', 'tier', 'upgrade', 'pro', 'enterprise', 'feature']
+            const isTierGated = tierKeywords.some((kw) => serverMessage.toLowerCase().includes(kw))
+            if (isTierGated) {
+                window.dispatchEvent(new CustomEvent('phaseflag:toast', {
+                    detail: { type: 'error', message: 'This feature is available on the Pro plan.' },
+                }))
+            }
+        }
+
         // Sanitize error messages — never expose raw server errors
         if (error.response?.data?.error?.message) {
             error.message = error.response.data.error.message
-        } else if (error.response?.status === 500) {
+        } else if (status === 500) {
             error.message = 'An unexpected error occurred. Please try again.'
         }
         return Promise.reject(error)
@@ -413,6 +443,99 @@ export interface RemoteConfigEntry {
     updated_at: string
 }
 
+/** Matches the actual RemoteConfigDB model returned by /configs endpoints */
+export interface RemoteConfigV2 {
+    id: string
+    key: string
+    name: string
+    description: string | null
+    config_type: string
+    value: unknown
+    default_value: unknown
+    environment: string
+    is_server_only: boolean
+    version: number
+    owner: string
+    created_at: string
+    updated_at: string
+}
+
+export interface RemoteConfigHistoryEntry {
+    version: number
+    value: unknown
+    updated_at: string
+    is_current: boolean
+}
+
+export interface RemoteConfigCreateInput {
+    key: string
+    name: string
+    description?: string
+    config_type: string
+    value: unknown
+    default_value: unknown
+    environment: string
+    schema_definition?: Record<string, unknown>
+    is_server_only?: boolean
+}
+
+/** Matches the actual ExperimentDB/ExperimentOut model from /enterprise/experiments */
+export interface ExperimentGoalV2 {
+    id: string
+    name: string
+    metric_key: string
+    goal_type: string
+    is_primary: boolean
+}
+
+export interface ExperimentResultV2 {
+    id: string
+    variation_key: string
+    sample_size: number
+    conversions: number
+    conversion_rate: number | null
+    confidence_level: number | null
+    is_significant: boolean
+    is_winner: boolean
+    lift: number | null
+}
+
+export interface ExperimentV2 {
+    id: string
+    key: string
+    name: string
+    description: string | null
+    flag_key: string
+    hypothesis: string | null
+    status: 'draft' | 'running' | 'paused' | 'completed' | 'cancelled'
+    experiment_type: string
+    traffic_percentage: number
+    start_date: string | null
+    end_date: string | null
+    goals: ExperimentGoalV2[]
+    results: ExperimentResultV2[]
+    created_by: string
+    created_at: string
+}
+
+export interface ExperimentCreateV2Input {
+    key: string
+    name: string
+    flag_key: string
+    description?: string
+    hypothesis?: string
+    experiment_type?: string
+    traffic_percentage?: number
+    goals?: Array<{
+        name: string
+        metric_key: string
+        description?: string
+        goal_type?: string
+        is_primary?: boolean
+        min_sample_size?: number
+    }>
+}
+
 export interface CodeReference {
     id: string
     flag_key: string
@@ -615,6 +738,30 @@ export const experimentsApi = {
         api.post<Experiment>(`/enterprise/experiments/${id}/conclude`, { winning_variation }),
 }
 
+/** Full experiment API using the /enterprise/experiments backend with ExperimentV2 types */
+export const experimentsApi2 = {
+    list: (params?: { flag_key?: string; status?: string; limit?: number; offset?: number }) =>
+        api.get<{ items: ExperimentV2[]; total: number }>('/enterprise/experiments', { params }),
+    get: (key: string) =>
+        api.get<ExperimentV2>(`/enterprise/experiments/${key}`),
+    create: (data: ExperimentCreateV2Input) =>
+        api.post<ExperimentV2>('/enterprise/experiments', data),
+    start: (key: string) =>
+        api.post<ExperimentV2>(`/enterprise/experiments/${key}/start`),
+    stop: (key: string) =>
+        api.post<ExperimentV2>(`/enterprise/experiments/${key}/stop`),
+    pause: (key: string) =>
+        api.post<ExperimentV2>(`/enterprise/experiments/${key}/pause`),
+    conclude: (key: string, winning_variation?: string) =>
+        api.post<ExperimentV2>(`/enterprise/experiments/${key}/stop`, { winning_variation }),
+    recordResult: (key: string, data: { variation_key: string; sample_size: number; conversions: number; goal_id?: string }) =>
+        api.post<ExperimentResultV2>(`/enterprise/experiments/${key}/results`, data),
+    calculateSignificance: (data: { control_conversions: number; control_size: number; treatment_conversions: number; treatment_size: number; confidence_threshold?: number }) =>
+        api.post('/enterprise/experiments/calculate/significance', data),
+    calculateSampleSize: (data: { baseline_rate: number; min_detectable_effect: number; confidence?: number; power?: number }) =>
+        api.post<{ sample_size_per_variation: number; total_sample_size: number }>('/enterprise/experiments/calculate/sample-size', data),
+}
+
 export const approvalsApi = {
     list: (params?: { flag_key?: string; status?: string }) =>
         api.get<ApprovalRequest[]>('/enterprise/approvals', { params }),
@@ -765,14 +912,27 @@ export const remoteConfigApi = {
         api.get<PaginatedResponse<RemoteConfigEntry>>('/remote-config', { params }),
     get: (key: string, environment?: string) =>
         api.get<RemoteConfigEntry>(`/remote-config/${key}`, { params: environment ? { environment } : {} }),
-    create: (data: { key: string; name: string; value_type: string; value: unknown; schema?: Record<string, unknown>; environment?: string }) =>
-        api.post<RemoteConfigEntry>('/remote-config', data),
+    create: (data: RemoteConfigCreateInput) =>
+        api.post<RemoteConfigV2>('/configs', data),
     update: (key: string, data: { value?: unknown; schema?: Record<string, unknown> }) =>
         api.put<RemoteConfigEntry>(`/remote-config/${key}`, data),
     delete: (key: string) =>
         api.delete(`/remote-config/${key}`),
     history: (key: string) =>
         api.get<Array<{ version: number; value: unknown; updated_at: string; updated_by: string }>>(`/remote-config/${key}/history`),
+    // Methods targeting the /configs backend routes (ID-based)
+    listV2: (params?: { environment?: string; limit?: number; offset?: number }) =>
+        api.get<{ items: RemoteConfigV2[]; total: number }>('/configs', { params }),
+    getById: (id: string) =>
+        api.get<RemoteConfigV2>(`/configs/${id}`),
+    updateById: (id: string, data: { value?: unknown; name?: string; description?: string; is_server_only?: boolean; schema_definition?: Record<string, unknown> | null }) =>
+        api.put<RemoteConfigV2>(`/configs/${id}`, data),
+    deleteById: (id: string) =>
+        api.delete(`/configs/${id}`),
+    historyById: (id: string, limit?: number) =>
+        api.get<RemoteConfigHistoryEntry[]>(`/configs/${id}/history`, { params: limit ? { limit } : {} }),
+    validateById: (id: string, value: unknown) =>
+        api.post<{ valid: boolean; message: string }>(`/configs/${id}/validate`, { value }),
 }
 
 export const codeRefsApi = {

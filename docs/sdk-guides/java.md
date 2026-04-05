@@ -93,4 +93,4 @@ Runtime.getRuntime().addShutdownHook(new Thread(client::close));
 
 ## Further Reading
 
-See the [full Java SDK guide](https://docs.phaseflag.io/sdks/java) for Spring Boot integration, Kotlin usage, and evaluation detail.
+See the [full Java SDK guide](https://docs.phaseflag.com/sdks/java) for Spring Boot integration, Kotlin usage, and evaluation detail.

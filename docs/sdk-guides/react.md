@@ -73,4 +73,4 @@ function LoginButton() {
 
 ## Further Reading
 
-See the [full React SDK guide](https://docs.phaseflag.io/sdks/react) for SSR, Next.js integration, and loading states.
+See the [full React SDK guide](https://docs.phaseflag.com/sdks/react) for SSR, Next.js integration, and loading states.

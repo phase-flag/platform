@@ -1,10 +1,12 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const { login, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const resetSuccess = searchParams.get('reset') === '1';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -32,6 +34,12 @@ export default function Login() {
           onSubmit={handleSubmit}
           className="bg-white/5 border border-white/10 rounded-2xl p-8 space-y-5"
         >
+          {resetSuccess && (
+            <div className="bg-[#34D399]/10 border border-[#34D399]/30 text-[#34D399] rounded-lg px-4 py-3 text-sm">
+              Password reset successfully. You can now sign in.
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-3 text-sm">
               {error}
@@ -51,7 +59,12 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Password</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-sm font-medium text-white/70">Password</label>
+              <Link to="/forgot-password" className="text-xs text-[#34D399] hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <input
               type="password"
               required

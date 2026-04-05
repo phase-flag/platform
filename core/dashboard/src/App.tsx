@@ -22,6 +22,8 @@ import Pipelines from './pages/Pipelines'
 import Migrations from './pages/Migrations'
 import Observability from './pages/Observability'
 import RemoteConfig from './pages/RemoteConfig'
+import RemoteConfigDetail from './pages/RemoteConfigDetail'
+import ExperimentDetail from './pages/ExperimentDetail'
 import CodeRefs from './pages/CodeRefs'
 import AdminOverview from './pages/admin/Overview'
 import AdminTenants from './pages/admin/Tenants'
@@ -51,6 +53,7 @@ function ProtectedRoutes() {
                 <Route path="segments/:segmentKey" element={<SegmentDetail />} />
                 <Route path="webhooks" element={<Webhooks />} />
                 <Route path="experiments" element={<Experiments />} />
+                <Route path="experiments/:experimentKey" element={<ExperimentDetail />} />
                 <Route path="exclusion-groups" element={<ExclusionGroups />} />
                 <Route path="holdout-groups" element={<HoldoutGroups />} />
                 <Route path="integrations" element={<Integrations />} />
@@ -63,6 +66,7 @@ function ProtectedRoutes() {
                 <Route path="migrations" element={<Migrations />} />
                 <Route path="observability" element={<Observability />} />
                 <Route path="remote-config" element={<RemoteConfig />} />
+                <Route path="remote-config/:configId" element={<RemoteConfigDetail />} />
                 <Route path="code-refs" element={<CodeRefs />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="admin" element={<AdminOverview />} />

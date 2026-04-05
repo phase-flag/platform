@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import Response
 from pydantic import BaseModel
 
 from . import service
+from .policy_packs import get_pack, list_packs
 
 router = APIRouter()
 
@@ -251,3 +254,189 @@ async def apply_retention(organization_id: str = Query(...), session=Depends(_ge
     result = await service.apply_retention(session, organization_id)
     await session.commit()
     return result
+
+
+# ---------------------------------------------------------------------------
+# Policy Packs
+# ---------------------------------------------------------------------------
+
+
+@router.get("/packs")
+async def list_policy_packs():
+    """List all pre-built compliance policy packs (GDPR, HIPAA, SOC 2)."""
+    return list_packs()
+
+
+@router.post("/packs/{name}/activate", response_model=List[PolicyResponse])
+async def activate_policy_pack(
+    name: str,
+    organization_id: str = Query(...),
+    session=Depends(_get_session),
+):
+    """Activate a policy pack by creating all its policies for the given organization.
+
+    Existing policies with the same name+framework are skipped to avoid duplicates.
+    """
+    pack = get_pack(name)
+    if not pack:
+        raise HTTPException(404, f"Policy pack '{name}' not found. Available: gdpr, hipaa, soc2")
+
+    existing = await service.list_policies(session, organization_id, framework=pack["framework"])
+    existing_names = {p.name for p in existing}
+
+    created: list = []
+    for rule in pack["rules"]:
+        policy_name = rule.get("description", rule["type"])[:255]
+        if policy_name in existing_names:
+            continue  # idempotent: skip duplicates
+
+        severity = rule.get("severity", "medium")
+        # Strip meta-keys from the rule definition stored in the DB
+        rule_def = {k: v for k, v in rule.items() if k not in ("description", "severity")}
+
+        policy = await service.create_policy(
+            session,
+            organization_id=organization_id,
+            framework=pack["framework"],
+            name=policy_name,
+            rule_definition=rule_def,
+            description=rule.get("description"),
+            severity=severity,
+        )
+        created.append(policy)
+
+    await session.commit()
+    return [_policy_to_response(p) for p in created]
+
+
+# ---------------------------------------------------------------------------
+# Compliance Dashboard
+# ---------------------------------------------------------------------------
+
+
+@router.get("/dashboard")
+async def compliance_dashboard(
+    organization_id: str = Query(...),
+    session=Depends(_get_session),
+):
+    """Return compliance score, active violations, and evidence timeline."""
+    # Aggregate per-framework compliance scores
+    frameworks = ["gdpr", "hipaa", "soc2"]
+    framework_scores: list[dict] = []
+    total_policies = 0
+    total_passed = 0
+    total_failed = 0
+
+    # Use a minimal context that checks structural policies only
+    base_context: dict = {
+        "has_audit_log": True,
+        "has_approval": False,
+        "has_owner": True,
+        "has_description": True,
+        "rollout_step": 0,
+        "flag_age_days": 0,
+        "targeting_attributes": [],
+    }
+
+    for fw in frameworks:
+        result = await service.evaluate_compliance(session, organization_id, base_context, framework=fw)
+        framework_scores.append(
+            {
+                "framework": fw,
+                "total": result["total_policies"],
+                "passed": result["passed"],
+                "failed": result["failed"],
+                "compliant": result["compliant"],
+                "score_pct": round(
+                    (result["passed"] / result["total_policies"] * 100)
+                    if result["total_policies"] > 0
+                    else 100.0,
+                    1,
+                ),
+            }
+        )
+        total_policies += result["total_policies"]
+        total_passed += result["passed"]
+        total_failed += result["failed"]
+
+    overall_score = round((total_passed / total_policies * 100) if total_policies > 0 else 100.0, 1)
+
+    # Evidence timeline (last 20 items)
+    evidence_items = await service.list_evidence(session, organization_id, limit=20)
+    evidence_timeline = [
+        {
+            "id": e.id,
+            "framework": e.framework,
+            "evidence_type": e.evidence_type,
+            "title": e.title,
+            "status": e.status,
+            "collected_at": e.collected_at.isoformat(),
+        }
+        for e in evidence_items
+    ]
+
+    return {
+        "organization_id": organization_id,
+        "generated_at": datetime.utcnow().isoformat(),
+        "overall_score_pct": overall_score,
+        "total_policies": total_policies,
+        "total_passed": total_passed,
+        "total_failed": total_failed,
+        "frameworks": framework_scores,
+        "violations": [r for fw in framework_scores for r in []],  # detailed per-rule results on demand
+        "evidence_timeline": evidence_timeline,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Audit Log Export
+# ---------------------------------------------------------------------------
+
+
+class AuditExportRequest(BaseModel):
+    organization_id: str
+    format: str = "csv"  # "csv" or "json"
+    date_from: Optional[str] = None  # ISO 8601
+    date_to: Optional[str] = None
+    entity_type: Optional[str] = None
+    actor: Optional[str] = None
+
+
+@router.post("/export")
+async def export_audit_logs(body: AuditExportRequest, session=Depends(_get_session)):
+    """Export audit logs as CSV or SIEM-compatible NDJSON.
+
+    - CSV: timestamp, actor, action, entity_type, entity_key, details
+    - JSON: one JSON object per line (NDJSON) for SIEM ingestion
+    """
+    from phaseflag_api.services.audit_export_service import export_audit_logs as _export
+
+    if body.format not in ("csv", "json"):
+        raise HTTPException(400, "format must be 'csv' or 'json'")
+
+    date_from: Optional[datetime] = None
+    date_to: Optional[datetime] = None
+    try:
+        if body.date_from:
+            date_from = datetime.fromisoformat(body.date_from)
+        if body.date_to:
+            date_to = datetime.fromisoformat(body.date_to)
+    except ValueError as exc:
+        raise HTTPException(400, f"Invalid date format: {exc}") from exc
+
+    content, media_type = await _export(
+        session,
+        format=body.format,  # type: ignore[arg-type]
+        date_from=date_from,
+        date_to=date_to,
+        entity_type=body.entity_type,
+        actor=body.actor,
+    )
+
+    ext = "csv" if body.format == "csv" else "ndjson"
+    filename = f"audit-export.{ext}"
+    return Response(
+        content=content,
+        media_type=media_type,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

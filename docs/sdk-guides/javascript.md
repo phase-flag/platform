@@ -85,4 +85,4 @@ process.on("SIGTERM", async () => {
 
 ## Further Reading
 
-See the [full JavaScript SDK guide](https://docs.phaseflag.io/sdks/javascript) for streaming updates, TypeScript types, and more.
+See the [full JavaScript SDK guide](https://docs.phaseflag.com/sdks/javascript) for streaming updates, TypeScript types, and more.

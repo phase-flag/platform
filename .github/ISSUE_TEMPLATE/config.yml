@@ -1,0 +1,25 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Ask a question (Q&A Discussions)
+    url: https://github.com/phase-flag/phaseflag/discussions/categories/q-a
+    about: >
+      Have a question about how to use Phase Flag? Start a discussion — the
+      community and maintainers monitor Q&A closely.
+
+  - name: Share what you built (Show and Tell)
+    url: https://github.com/phase-flag/phaseflag/discussions/categories/show-and-tell
+    about: >
+      Built something cool with Phase Flag? We'd love to see it!
+
+  - name: Propose an idea (Ideas Discussions)
+    url: https://github.com/phase-flag/phaseflag/discussions/categories/ideas
+    about: >
+      Have a broad idea or want community feedback before filing a feature
+      request? Start a discussion first.
+
+  - name: Documentation
+    url: https://docs.phaseflag.com
+    about: >
+      Check the official documentation for guides, API reference, and SDK
+      quickstarts.

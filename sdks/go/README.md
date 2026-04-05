@@ -5,7 +5,7 @@ Official Go SDK for the Phase Flag feature flagging platform. Provides feature f
 ## Installation
 
 ```bash
-go get github.com/phaseflag/sdk-go
+go get github.com/phaseflag/go-sdk
 ```
 
 Requires Go 1.21+.
@@ -19,7 +19,7 @@ import (
     "fmt"
     "time"
 
-    phaseflag "github.com/phaseflag/sdk-go"
+    phaseflag "github.com/phaseflag/go-sdk"
 )
 
 func main() {

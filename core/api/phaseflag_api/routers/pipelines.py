@@ -15,12 +15,25 @@ from phaseflag_api.services import rollout_service
 router = APIRouter(dependencies=[Depends(require_api_key)])
 
 
+class K8sDeploymentRef(BaseModel):
+    """Optional Kubernetes deployment reference attached to a pipeline stage."""
+
+    namespace: str = Field(..., examples=["production"])
+    name: str = Field(..., examples=["my-service"])
+    scale_to_replicas: int | None = Field(None, ge=0, description="Scale to this many replicas when stage activates")
+    rollback_on_failure: bool = False
+
+
 class StageIn(BaseModel):
     name: str
     rollout_percentage: int = Field(..., ge=0, le=100)
     duration_minutes: int | None = None
     health_check_url: str | None = None
     success_threshold: float | None = None
+    k8s_deployment: K8sDeploymentRef | None = Field(
+        None,
+        description="Optional Kubernetes deployment to scale/rollback at this stage",
+    )
 
 
 class PipelineCreate(BaseModel):

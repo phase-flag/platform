@@ -13,12 +13,12 @@
   "topbarLinks": [
     {
       "name": "Dashboard",
-      "url": "https://app.phaseflag.io"
+      "url": "https://app.phaseflag.com"
     }
   ],
   "topbarCtaButton": {
     "name": "Get Started",
-    "url": "https://app.phaseflag.io/signup"
+    "url": "https://app.phaseflag.com/signup"
   },
   "navigation": [
     {

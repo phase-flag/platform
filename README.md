@@ -107,12 +107,12 @@ open http://localhost:3000
 
 | Domain | Service |
 |--------|---------|
-| `api.phaseflag.io` | FastAPI backend |
-| `relay.phaseflag.io` | Go edge relay proxy |
-| `app.phaseflag.io` | Admin dashboard |
-| `portal.phaseflag.io` | SaaS customer portal |
-| `phaseflag.io` | Marketing site |
-| `docs.phaseflag.io` | Documentation |
+| `api.phaseflag.com` | FastAPI backend |
+| `relay.phaseflag.com` | Go edge relay proxy |
+| `app.phaseflag.com` | Admin dashboard |
+| `portal.phaseflag.com` | SaaS customer portal |
+| `phaseflag.com` | Marketing site |
+| `docs.phaseflag.com` | Documentation |
 
 ---
 

@@ -103,4 +103,4 @@ wg.Wait()
 
 ## Further Reading
 
-See the [full Go SDK guide](https://docs.phaseflag.io/sdks/go) for HTTP middleware integration, graceful shutdown, and more.
+See the [full Go SDK guide](https://docs.phaseflag.com/sdks/go) for HTTP middleware integration, graceful shutdown, and more.

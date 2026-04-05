@@ -1,0 +1,161 @@
+# Phase Flag — GitLab CI Reusable Template
+#
+# Usage:
+#   include:
+#     - project: 'phaseflag/integrations'
+#       file: '/gitlab/.gitlab-ci-template.yml'
+#
+# Required variables (set in GitLab CI/CD settings or .gitlab-ci.yml):
+#   PHASEFLAG_API_URL  — e.g. https://api.phaseflag.com
+#   PHASEFLAG_API_KEY  — API key with read/write access
+#   PHASEFLAG_FLAG_KEY — Feature flag key to operate on
+
+# ---------------------------------------------------------------------------
+# Reusable hidden job template
+# ---------------------------------------------------------------------------
+.phaseflag-base:
+  image: alpine:3.19
+  before_script:
+    - apk add --no-cache curl jq
+    - |
+      if [ -z "$PHASEFLAG_API_URL" ]; then
+        echo "ERROR: PHASEFLAG_API_URL is required" >&2
+        exit 1
+      fi
+      if [ -z "$PHASEFLAG_API_KEY" ]; then
+        echo "ERROR: PHASEFLAG_API_KEY is required" >&2
+        exit 1
+      fi
+
+# ---------------------------------------------------------------------------
+# Job template: .phaseflag-check
+# Checks the current state of a feature flag and fails if it is disabled.
+# Extend this template in your pipeline to gate deployments.
+#
+# Example:
+#   pre-deploy-gate:
+#     extends: .phaseflag-check
+#     variables:
+#       PHASEFLAG_FLAG_KEY: "enable-deploy-v2"
+# ---------------------------------------------------------------------------
+.phaseflag-check:
+  extends: .phaseflag-base
+  stage: .pre
+  script:
+    - |
+      if [ -z "$PHASEFLAG_FLAG_KEY" ]; then
+        echo "ERROR: PHASEFLAG_FLAG_KEY is required" >&2
+        exit 1
+      fi
+
+      echo "Checking flag: $PHASEFLAG_FLAG_KEY"
+
+      RESPONSE=$(curl --silent --fail \
+        --header "Authorization: Bearer $PHASEFLAG_API_KEY" \
+        --header "Content-Type: application/json" \
+        "$PHASEFLAG_API_URL/api/v1/flags/$PHASEFLAG_FLAG_KEY")
+
+      if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to reach Phase Flag API at $PHASEFLAG_API_URL" >&2
+        exit 1
+      fi
+
+      ENABLED=$(echo "$RESPONSE" | jq -r '.enabled // .default_value // false')
+      echo "Flag '$PHASEFLAG_FLAG_KEY' enabled=$ENABLED"
+
+      if [ "$ENABLED" != "true" ]; then
+        echo "GATE: Flag '$PHASEFLAG_FLAG_KEY' is disabled — aborting pipeline."
+        exit 1
+      fi
+
+      echo "GATE: Flag '$PHASEFLAG_FLAG_KEY' is enabled — proceeding."
+
+# ---------------------------------------------------------------------------
+# Concrete job: flag-check
+# Drop-in job that checks a flag before proceeding. Override stage as needed.
+#
+# Example:
+#   include:
+#     - file: '/gitlab/.gitlab-ci-template.yml'
+#   flag-check:
+#     extends: .phaseflag-check
+#     stage: test
+#     variables:
+#       PHASEFLAG_FLAG_KEY: "my-feature"
+# ---------------------------------------------------------------------------
+flag-check:
+  extends: .phaseflag-check
+  stage: test
+  rules:
+    - when: manual
+      allow_failure: false
+
+# ---------------------------------------------------------------------------
+# Concrete job: flag-toggle
+# Toggles a flag on/off after a successful deploy.
+# Set PHASEFLAG_FLAG_ENABLED to "true" or "false".
+# ---------------------------------------------------------------------------
+flag-toggle:
+  extends: .phaseflag-base
+  stage: deploy
+  variables:
+    PHASEFLAG_FLAG_ENABLED: "true"
+  script:
+    - |
+      if [ -z "$PHASEFLAG_FLAG_KEY" ]; then
+        echo "ERROR: PHASEFLAG_FLAG_KEY is required" >&2
+        exit 1
+      fi
+
+      echo "Toggling flag '$PHASEFLAG_FLAG_KEY' to enabled=$PHASEFLAG_FLAG_ENABLED"
+
+      RESPONSE=$(curl --silent --fail \
+        --request PATCH \
+        --header "Authorization: Bearer $PHASEFLAG_API_KEY" \
+        --header "Content-Type: application/json" \
+        --data "{\"enabled\": $PHASEFLAG_FLAG_ENABLED}" \
+        "$PHASEFLAG_API_URL/api/v1/flags/$PHASEFLAG_FLAG_KEY")
+
+      if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to toggle flag '$PHASEFLAG_FLAG_KEY'" >&2
+        exit 1
+      fi
+
+      echo "Flag toggled successfully:"
+      echo "$RESPONSE" | jq .
+  rules:
+    - when: manual
+      allow_failure: false
+
+# ---------------------------------------------------------------------------
+# Concrete job: flag-archive
+# Archives (soft-deletes) a flag after a feature has fully rolled out.
+# ---------------------------------------------------------------------------
+flag-archive:
+  extends: .phaseflag-base
+  stage: deploy
+  script:
+    - |
+      if [ -z "$PHASEFLAG_FLAG_KEY" ]; then
+        echo "ERROR: PHASEFLAG_FLAG_KEY is required" >&2
+        exit 1
+      fi
+
+      echo "Archiving flag: $PHASEFLAG_FLAG_KEY"
+
+      RESPONSE=$(curl --silent --fail \
+        --request POST \
+        --header "Authorization: Bearer $PHASEFLAG_API_KEY" \
+        --header "Content-Type: application/json" \
+        "$PHASEFLAG_API_URL/api/v1/flags/$PHASEFLAG_FLAG_KEY/archive")
+
+      if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to archive flag '$PHASEFLAG_FLAG_KEY'" >&2
+        exit 1
+      fi
+
+      echo "Flag '$PHASEFLAG_FLAG_KEY' archived successfully."
+      echo "$RESPONSE" | jq .
+  rules:
+    - when: manual
+      allow_failure: false

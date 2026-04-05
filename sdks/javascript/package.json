@@ -7,9 +7,9 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     }
   },
   "files": ["dist"],
@@ -18,7 +18,17 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "test": "echo 'No tests yet' && exit 0"
   },
-  "keywords": ["feature-flags", "phaseflag", "phase-flag", "sdk"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phaseflag/phaseflag.git",
+    "directory": "sdks/javascript"
+  },
+  "homepage": "https://docs.phaseflag.dev/sdks/javascript",
+  "bugs": {
+    "url": "https://github.com/phaseflag/phaseflag/issues"
+  },
+  "author": "Phase Flag <support@phaseflag.com>",
+  "keywords": ["feature-flags", "phaseflag", "phase-flag", "sdk", "feature-management"],
   "license": "Apache-2.0",
   "devDependencies": {
     "tsup": "^8.0.0",

@@ -1,0 +1,1050 @@
+{
+  "suite": "prerequisites",
+  "description": "Prerequisite flag chain evaluation. The evaluate_with_prerequisites function checks all prerequisite flags before evaluating the target. The flags dict is passed as the full flag set.",
+  "cases": [
+    {
+      "name": "prerequisite met \u2014 target flag evaluates normally",
+      "description": "gate-flag is ON (variation_key='on'), so feature-flag can evaluate normally",
+      "flags": {
+        "gate-flag": {
+          "id": "flag-gate-1",
+          "key": "gate-flag",
+          "name": "Gate Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-gate-off",
+          "variations": [
+            {
+              "id": "var-gate-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-gate-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-gate-on"
+            }
+          ],
+          "prerequisites": []
+        },
+        "feature-flag": {
+          "id": "flag-feature-1",
+          "key": "feature-flag",
+          "name": "Feature Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-feature-off",
+          "variations": [
+            {
+              "id": "var-feature-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-feature-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-feature-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "gate-flag",
+              "variation_key": "on"
+            }
+          ]
+        }
+      },
+      "target_flag": "feature-flag",
+      "context": {
+        "user_id": "user-1",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "feature-flag",
+        "value": true,
+        "variation_key": "on",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "prerequisite not met \u2014 target returns default",
+      "description": "gate-flag is OFF (variation_key='off'), so feature-flag returns default with prerequisite_failed reason",
+      "flags": {
+        "gate-flag-off": {
+          "id": "flag-gate-2",
+          "key": "gate-flag-off",
+          "name": "Gate Flag Off",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-gate-off",
+          "variations": [
+            {
+              "id": "var-gate-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-gate-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [],
+          "prerequisites": []
+        },
+        "feature-flag-prereq": {
+          "id": "flag-feature-2",
+          "key": "feature-flag-prereq",
+          "name": "Feature Flag Prereq",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-feature-off",
+          "variations": [
+            {
+              "id": "var-feature-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-feature-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-feature-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "gate-flag-off",
+              "variation_key": "on"
+            }
+          ]
+        }
+      },
+      "target_flag": "feature-flag-prereq",
+      "context": {
+        "user_id": "user-2",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "feature-flag-prereq",
+        "value": false,
+        "variation_key": "off",
+        "reason": "prerequisite_failed"
+      }
+    },
+    {
+      "name": "chained prerequisites \u2014 all met",
+      "description": "flag-c requires flag-b which requires flag-a. All pass, so flag-c evaluates normally",
+      "flags": {
+        "flag-a": {
+          "id": "flag-a-id",
+          "key": "flag-a",
+          "name": "Flag A",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-a-off",
+          "variations": [
+            {
+              "id": "var-a-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-a-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-a-on"
+            }
+          ],
+          "prerequisites": []
+        },
+        "flag-b": {
+          "id": "flag-b-id",
+          "key": "flag-b",
+          "name": "Flag B",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-b-off",
+          "variations": [
+            {
+              "id": "var-b-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-b-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-b-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "flag-a",
+              "variation_key": "on"
+            }
+          ]
+        },
+        "flag-c": {
+          "id": "flag-c-id",
+          "key": "flag-c",
+          "name": "Flag C",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-c-off",
+          "variations": [
+            {
+              "id": "var-c-on",
+              "key": "enabled",
+              "name": "Enabled",
+              "value": "enabled"
+            },
+            {
+              "id": "var-c-off",
+              "key": "disabled",
+              "name": "Disabled",
+              "value": "disabled"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-c-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "flag-b",
+              "variation_key": "on"
+            }
+          ]
+        }
+      },
+      "target_flag": "flag-c",
+      "context": {
+        "user_id": "user-3",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "flag-c",
+        "value": "enabled",
+        "variation_key": "enabled",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "chained prerequisites \u2014 middle link fails",
+      "description": "flag-c requires flag-b which requires flag-a. flag-a is OFF, flag-b fails, flag-c returns default",
+      "flags": {
+        "flag-a-off": {
+          "id": "flag-a-off-id",
+          "key": "flag-a-off",
+          "name": "Flag A Off",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-a-off",
+          "variations": [
+            {
+              "id": "var-a-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-a-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [],
+          "prerequisites": []
+        },
+        "flag-b-chained": {
+          "id": "flag-b-chained-id",
+          "key": "flag-b-chained",
+          "name": "Flag B Chained",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-b-off",
+          "variations": [
+            {
+              "id": "var-b-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-b-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-b-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "flag-a-off",
+              "variation_key": "on"
+            }
+          ]
+        },
+        "flag-c-chained": {
+          "id": "flag-c-chained-id",
+          "key": "flag-c-chained",
+          "name": "Flag C Chained",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-c-off",
+          "variations": [
+            {
+              "id": "var-c-on",
+              "key": "enabled",
+              "name": "Enabled",
+              "value": "enabled"
+            },
+            {
+              "id": "var-c-off",
+              "key": "disabled",
+              "name": "Disabled",
+              "value": "disabled"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-c-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "flag-b-chained",
+              "variation_key": "on"
+            }
+          ]
+        }
+      },
+      "target_flag": "flag-c-chained",
+      "context": {
+        "user_id": "user-4",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "flag-c-chained",
+        "value": "disabled",
+        "variation_key": "disabled",
+        "reason": "prerequisite_failed"
+      }
+    },
+    {
+      "name": "no prerequisites \u2014 evaluates normally",
+      "description": "A flag with an empty prerequisites array evaluates normally without any prerequisite checks",
+      "flags": {
+        "no-prereq-flag": {
+          "id": "flag-no-prereq",
+          "key": "no-prereq-flag",
+          "name": "No Prereq Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-on"
+            }
+          ],
+          "prerequisites": []
+        }
+      },
+      "target_flag": "no-prereq-flag",
+      "context": {
+        "user_id": "user-5",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "no-prereq-flag",
+        "value": true,
+        "variation_key": "on",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "prerequisite with specific non-boolean variation key",
+      "description": "Gate flag must be 'enabled' (string variation) for feature to activate",
+      "flags": {
+        "mode-gate": {
+          "id": "flag-mode-gate",
+          "key": "mode-gate",
+          "name": "Mode Gate",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-mode-disabled",
+          "variations": [
+            {
+              "id": "var-mode-enabled",
+              "key": "enabled",
+              "name": "Enabled",
+              "value": "enabled"
+            },
+            {
+              "id": "var-mode-disabled",
+              "key": "disabled",
+              "name": "Disabled",
+              "value": "disabled"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-mode-enabled"
+            }
+          ],
+          "prerequisites": []
+        },
+        "mode-feature": {
+          "id": "flag-mode-feature",
+          "key": "mode-feature",
+          "name": "Mode Feature",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-mf-off",
+          "variations": [
+            {
+              "id": "var-mf-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-mf-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-mf-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "mode-gate",
+              "variation_key": "enabled"
+            }
+          ]
+        }
+      },
+      "target_flag": "mode-feature",
+      "context": {
+        "user_id": "user-6",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "mode-feature",
+        "value": true,
+        "variation_key": "on",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "prerequisite variation key mismatch",
+      "description": "Gate flag evaluates to 'disabled' but prerequisite requires 'enabled' \u2014 fails",
+      "flags": {
+        "mode-gate-miss": {
+          "id": "flag-mode-gate-miss",
+          "key": "mode-gate-miss",
+          "name": "Mode Gate Miss",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-mode-dis",
+          "variations": [
+            {
+              "id": "var-mode-en",
+              "key": "enabled",
+              "name": "Enabled",
+              "value": "enabled"
+            },
+            {
+              "id": "var-mode-dis",
+              "key": "disabled",
+              "name": "Disabled",
+              "value": "disabled"
+            }
+          ],
+          "targeting_rules": [],
+          "prerequisites": []
+        },
+        "mode-feature-miss": {
+          "id": "flag-mode-feature-miss",
+          "key": "mode-feature-miss",
+          "name": "Mode Feature Miss",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-mf-off-2",
+          "variations": [
+            {
+              "id": "var-mf-on-2",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-mf-off-2",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-mf-on-2"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "mode-gate-miss",
+              "variation_key": "enabled"
+            }
+          ]
+        }
+      },
+      "target_flag": "mode-feature-miss",
+      "context": {
+        "user_id": "user-7",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "mode-feature-miss",
+        "value": false,
+        "variation_key": "off",
+        "reason": "prerequisite_failed"
+      }
+    },
+    {
+      "name": "prerequisite evaluated with user context \u2014 gate passes for beta user",
+      "description": "Gate flag is conditional: only beta users pass it, then target flag is evaluated",
+      "flags": {
+        "beta-gate": {
+          "id": "flag-beta-gate",
+          "key": "beta-gate",
+          "name": "Beta Gate",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-bg-off",
+          "variations": [
+            {
+              "id": "var-bg-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-bg-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "beta",
+                  "operator": "is",
+                  "value": "true"
+                }
+              ],
+              "variation_id": "var-bg-on"
+            }
+          ],
+          "prerequisites": []
+        },
+        "beta-feature": {
+          "id": "flag-beta-feature",
+          "key": "beta-feature",
+          "name": "Beta Feature",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-bf-off",
+          "variations": [
+            {
+              "id": "var-bf-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-bf-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-bf-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "beta-gate",
+              "variation_key": "on"
+            }
+          ]
+        }
+      },
+      "target_flag": "beta-feature",
+      "context": {
+        "user_id": "beta-user-1",
+        "attributes": {
+          "beta": "true"
+        }
+      },
+      "expected": {
+        "flag_key": "beta-feature",
+        "value": true,
+        "variation_key": "on",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "prerequisite evaluated with user context \u2014 gate fails for non-beta user",
+      "description": "Gate flag requires beta=true, non-beta user fails the gate",
+      "flags": {
+        "beta-gate-2": {
+          "id": "flag-beta-gate-2",
+          "key": "beta-gate-2",
+          "name": "Beta Gate 2",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-bg2-off",
+          "variations": [
+            {
+              "id": "var-bg2-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-bg2-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "beta",
+                  "operator": "is",
+                  "value": "true"
+                }
+              ],
+              "variation_id": "var-bg2-on"
+            }
+          ],
+          "prerequisites": []
+        },
+        "beta-feature-2": {
+          "id": "flag-beta-feature-2",
+          "key": "beta-feature-2",
+          "name": "Beta Feature 2",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-bf2-off",
+          "variations": [
+            {
+              "id": "var-bf2-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-bf2-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-bf2-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "beta-gate-2",
+              "variation_key": "on"
+            }
+          ]
+        }
+      },
+      "target_flag": "beta-feature-2",
+      "context": {
+        "user_id": "regular-user-1",
+        "attributes": {
+          "beta": "false"
+        }
+      },
+      "expected": {
+        "flag_key": "beta-feature-2",
+        "value": false,
+        "variation_key": "off",
+        "reason": "prerequisite_failed"
+      }
+    },
+    {
+      "name": "two independent prerequisites \u2014 both must pass",
+      "description": "Target flag has two prerequisites: auth-flag AND plan-flag must both be 'on'",
+      "flags": {
+        "auth-prereq": {
+          "id": "flag-auth-prereq",
+          "key": "auth-prereq",
+          "name": "Auth Prereq",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-ap-off",
+          "variations": [
+            {
+              "id": "var-ap-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-ap-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-ap-on"
+            }
+          ],
+          "prerequisites": []
+        },
+        "plan-prereq": {
+          "id": "flag-plan-prereq",
+          "key": "plan-prereq",
+          "name": "Plan Prereq",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-pp-off",
+          "variations": [
+            {
+              "id": "var-pp-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-pp-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "plan",
+                  "operator": "is_not",
+                  "value": "free"
+                }
+              ],
+              "variation_id": "var-pp-on"
+            }
+          ],
+          "prerequisites": []
+        },
+        "guarded-feature": {
+          "id": "flag-guarded-feature",
+          "key": "guarded-feature",
+          "name": "Guarded Feature",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-gf-off",
+          "variations": [
+            {
+              "id": "var-gf-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-gf-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-gf-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "auth-prereq",
+              "variation_key": "on"
+            },
+            {
+              "flag_key": "plan-prereq",
+              "variation_key": "on"
+            }
+          ]
+        }
+      },
+      "target_flag": "guarded-feature",
+      "context": {
+        "user_id": "paid-user-1",
+        "attributes": {
+          "plan": "pro"
+        }
+      },
+      "expected": {
+        "flag_key": "guarded-feature",
+        "value": true,
+        "variation_key": "on",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "two independent prerequisites \u2014 one fails",
+      "description": "Free plan user fails plan-prereq, so guarded-feature returns default",
+      "flags": {
+        "auth-prereq-ok": {
+          "id": "flag-auth-prereq-ok",
+          "key": "auth-prereq-ok",
+          "name": "Auth Prereq OK",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-aok-off",
+          "variations": [
+            {
+              "id": "var-aok-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-aok-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-aok-on"
+            }
+          ],
+          "prerequisites": []
+        },
+        "plan-prereq-fail": {
+          "id": "flag-plan-prereq-fail",
+          "key": "plan-prereq-fail",
+          "name": "Plan Prereq Fail",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-ppf-off",
+          "variations": [
+            {
+              "id": "var-ppf-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-ppf-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "plan",
+                  "operator": "is_not",
+                  "value": "free"
+                }
+              ],
+              "variation_id": "var-ppf-on"
+            }
+          ],
+          "prerequisites": []
+        },
+        "guarded-feature-fail": {
+          "id": "flag-guarded-feature-fail",
+          "key": "guarded-feature-fail",
+          "name": "Guarded Feature Fail",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-gff-off",
+          "variations": [
+            {
+              "id": "var-gff-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-gff-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-gff-on"
+            }
+          ],
+          "prerequisites": [
+            {
+              "flag_key": "auth-prereq-ok",
+              "variation_key": "on"
+            },
+            {
+              "flag_key": "plan-prereq-fail",
+              "variation_key": "on"
+            }
+          ]
+        }
+      },
+      "target_flag": "guarded-feature-fail",
+      "context": {
+        "user_id": "free-user-prereq",
+        "attributes": {
+          "plan": "free"
+        }
+      },
+      "expected": {
+        "flag_key": "guarded-feature-fail",
+        "value": false,
+        "variation_key": "off",
+        "reason": "prerequisite_failed"
+      }
+    }
+  ]
+}

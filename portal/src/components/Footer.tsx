@@ -61,10 +61,12 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm">&copy; {new Date().getFullYear()} Phase Flag. Apache 2.0 License.</p>
+          <p className="text-sm">&copy; {new Date().getFullYear()} Hextrot, Inc. (dba Phase Flag). Apache 2.0 License.</p>
           <div className="flex items-center gap-4 text-sm">
-            <a href="https://phaseflag.dev/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Privacy</a>
-            <a href="https://phaseflag.dev/terms" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Terms</a>
+            <a href="https://phaseflag.com/terms" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Terms of Service</a>
+            <a href="https://phaseflag.com/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Privacy Policy</a>
+            <a href="https://status.phaseflag.com" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Status</a>
+            <a href="https://docs.phaseflag.com" target="_blank" rel="noopener noreferrer" className="hover:text-pf-mint transition-colors">Documentation</a>
           </div>
         </div>
       </div>

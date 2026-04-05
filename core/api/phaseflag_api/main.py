@@ -23,6 +23,7 @@ from phaseflag_api.routers import (
     analytics,
     audit,
     auth,
+    automation,
     billing,
     code_refs,
     developer,
@@ -32,8 +33,10 @@ from phaseflag_api.routers import (
     flags,
     governance,
     health,
+    integrations,
     lifecycle,
     migrations,
+    notifications,
     observability,
     pipelines,
     projects,
@@ -170,6 +173,10 @@ _TAGS_METADATA = [
         "description": "Configure webhooks that fire on flag lifecycle events.",
     },
     {
+        "name": "notifications",
+        "description": "Configure Slack and Microsoft Teams incoming webhook notifications per project.",
+    },
+    {
         "name": "auth",
         "description": "User registration, login, and session management.",
     },
@@ -232,6 +239,18 @@ _TAGS_METADATA = [
         "description": "SSO configuration: SAML 2.0, OIDC, and SCIM 2.0 provisioning.",
     },
     {"name": "license", "description": "License and feature-gate information."},
+    {
+        "name": "automation",
+        "description": "Flag lifecycle automation: stale detection, auto-archival, bulk operations, cleanup reports.",
+    },
+    {
+        "name": "integrations",
+        "description": "Webhook marketplace: configure pre-built integrations (Datadog, PagerDuty, Jira).",
+    },
+    {
+        "name": "graphql",
+        "description": "GraphQL API endpoint — full feature flag graph with GraphiQL playground at /graphql.",
+    },
 ]
 
 app = FastAPI(
@@ -281,6 +300,8 @@ app.include_router(evaluation.router, prefix="/api/v1", tags=["evaluation"])
 app.include_router(lifecycle.router, prefix="/api/v1", tags=["lifecycle"])
 app.include_router(audit.router, prefix="/api/v1", tags=["audit"])
 app.include_router(webhooks.router, prefix="/api/v1", tags=["webhooks"])
+app.include_router(integrations.router, prefix="/api/v1", tags=["integrations"])
+app.include_router(notifications.router, prefix="/api/v1", tags=["notifications"])
 app.include_router(analytics.router, prefix="/api/v1", tags=["analytics"])
 
 # -- Multi-tenancy Routers --
@@ -318,6 +339,9 @@ app.include_router(developer.router, prefix="/api/v1", tags=["developer"])
 # -- Reporting --
 app.include_router(reporting.router, prefix="/api/v1", tags=["reporting"])
 
+# -- Automation (flag lifecycle automation) --
+app.include_router(automation.router, prefix="/api/v1", tags=["automation"])
+
 # -- Admin --
 app.include_router(admin.router, prefix="/api/v1", tags=["admin"])
 
@@ -331,6 +355,19 @@ app.add_api_route(
     methods=["GET"],
     tags=["license"],
 )
+
+# -- GraphQL API (Strawberry, mounted alongside REST) --
+try:
+    from phaseflag_api.graphql.schema import create_graphql_router
+
+    graphql_router = create_graphql_router()
+    app.include_router(graphql_router, prefix="/graphql", tags=["graphql"])
+    logger.info("GraphQL endpoint mounted at /graphql (GraphiQL enabled)")
+except ImportError:
+    logger.warning(
+        "strawberry-graphql not installed — GraphQL endpoint unavailable. "
+        "Add strawberry-graphql[fastapi] to dependencies."
+    )
 
 # -- Enterprise Routers (conditionally mounted) --
 if settings.DEPLOYMENT_MODE != DeploymentMode.OSS:

@@ -85,4 +85,4 @@ docker compose -f docker-compose.selfhosted.yml exec api alembic upgrade head
 
 ## Full Documentation
 
-See [docs.phaseflag.io/deployment/self-hosted](https://docs.phaseflag.io/deployment/self-hosted) for relay proxy setup, backup procedures, and systemd service configuration.
+See [docs.phaseflag.com/deployment/self-hosted](https://docs.phaseflag.com/deployment/self-hosted) for relay proxy setup, backup procedures, and systemd service configuration.

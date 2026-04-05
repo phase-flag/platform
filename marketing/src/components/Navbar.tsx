@@ -6,6 +6,7 @@ const navLinks = [
   { href: '#live-demo', label: 'Live Demo' },
   { href: '#pricing', label: 'Pricing' },
   { href: '#compare', label: 'Compare' },
+  { href: '#compare-full', label: 'vs Competitors' },
   { href: '#open-source', label: 'Open Source' },
 ];
 

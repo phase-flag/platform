@@ -1,0 +1,119 @@
+{
+  "name": "phaseflag",
+  "displayName": "Phase Flag",
+  "description": "Inline feature flag decorations, hover details, and code lens for Phase Flag.",
+  "version": "0.1.0",
+  "publisher": "phaseflag",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phaseflag/integrations"
+  },
+  "bugs": {
+    "url": "https://github.com/phaseflag/integrations/issues"
+  },
+  "homepage": "https://phaseflag.com",
+  "categories": [
+    "Other",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "feature flags",
+    "feature toggles",
+    "phaseflag",
+    "devops",
+    "a/b testing"
+  ],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:python",
+    "onLanguage:go",
+    "onLanguage:java"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "Phase Flag",
+      "properties": {
+        "phaseflag.apiUrl": {
+          "type": "string",
+          "default": "https://api.phaseflag.com",
+          "description": "Phase Flag API base URL.",
+          "scope": "machine-overridable"
+        },
+        "phaseflag.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Phase Flag API key. Store this in your user settings, not workspace settings.",
+          "scope": "machine"
+        },
+        "phaseflag.enableDecorations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inline decorations (green/red dots) next to flag references.",
+          "scope": "window"
+        },
+        "phaseflag.enableCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show code lens with flag evaluation counts.",
+          "scope": "window"
+        },
+        "phaseflag.cacheTtlSeconds": {
+          "type": "number",
+          "default": 60,
+          "description": "How long (in seconds) to cache flag data from the API.",
+          "scope": "window"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "phaseflag.refreshFlags",
+        "title": "Phase Flag: Refresh Flags",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "phaseflag.showFlagDetails",
+        "title": "Phase Flag: Show Flag Details"
+      },
+      {
+        "command": "phaseflag.openInDashboard",
+        "title": "Phase Flag: Open in Dashboard"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "phaseflag.refreshFlags",
+          "when": "editorIsOpen",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "build": "tsc -p ./",
+    "lint": "eslint src --ext ts",
+    "pretest": "npm run compile",
+    "vscode:prepublish": "npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}

@@ -5,13 +5,13 @@ Official JavaScript/TypeScript SDK for the Phase Flag feature flagging platform.
 ## Installation
 
 ```bash
-npm install @phaseflag/sdk-js
+npm install @phaseflag/js-sdk
 ```
 
 ## Quick Start
 
 ```typescript
-import { PhaseFlagClient, createClient } from '@phaseflag/sdk-js';
+import { PhaseFlagClient, createClient } from '@phaseflag/js-sdk';
 
 // Option 1: Factory function (creates and starts the client)
 const pf = await createClient({

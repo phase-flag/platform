@@ -1,0 +1,380 @@
+{
+  "suite": "segments",
+  "description": "Segment-based targeting tests. Segments are pre-defined groups of users. In the evaluation engine, segments are resolved via conditions on the context attributes — segment membership is checked by matching conditions defined in the targeting rule.",
+  "cases": [
+    {
+      "name": "segment match via country attribute",
+      "description": "Users in 'US' segment (country=US) get the feature",
+      "flags": {
+        "us-segment-flag": {
+          "id": "flag-us-seg",
+          "key": "us-segment-flag",
+          "name": "US Segment Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "country", "operator": "one_of", "value": ["US", "CA", "GB"]}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-1", "attributes": {"country": "US"}},
+      "expected": {"flag_key": "us-segment-flag", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "segment no match via country attribute",
+      "description": "Users NOT in 'US/CA/GB' segment get the default",
+      "flags": {
+        "us-segment-flag-miss": {
+          "id": "flag-us-seg-miss",
+          "key": "us-segment-flag-miss",
+          "name": "US Segment Flag Miss",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "country", "operator": "one_of", "value": ["US", "CA", "GB"]}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-2", "attributes": {"country": "DE"}},
+      "expected": {"flag_key": "us-segment-flag-miss", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "beta segment — email domain match",
+      "description": "Beta users identified by corporate email domain get early access",
+      "flags": {
+        "beta-segment-flag": {
+          "id": "flag-beta-seg",
+          "key": "beta-segment-flag",
+          "name": "Beta Segment Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "email", "operator": "contains", "value": "@acme.io"}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-3", "attributes": {"email": "alice@acme.io"}},
+      "expected": {"flag_key": "beta-segment-flag", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "enterprise segment — plan and employee count",
+      "description": "Enterprise users with high employee count qualify for advanced features",
+      "flags": {
+        "enterprise-segment-flag": {
+          "id": "flag-ent-seg",
+          "key": "enterprise-segment-flag",
+          "name": "Enterprise Segment Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "enterprise"},
+                {"attribute": "employee_count", "operator": "gt", "value": 100}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-4", "attributes": {"plan": "enterprise", "employee_count": 500}},
+      "expected": {"flag_key": "enterprise-segment-flag", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "enterprise segment partial match — plan matches but count too low",
+      "description": "Plan matches but employee count is too low — fails AND condition",
+      "flags": {
+        "enterprise-segment-partial": {
+          "id": "flag-ent-seg-partial",
+          "key": "enterprise-segment-partial",
+          "name": "Enterprise Segment Partial",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "enterprise"},
+                {"attribute": "employee_count", "operator": "gt", "value": 100}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-5", "attributes": {"plan": "enterprise", "employee_count": 50}},
+      "expected": {"flag_key": "enterprise-segment-partial", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "tiered segment — multiple rules for different tiers",
+      "description": "Gold tier gets variant A, silver gets variant B, others get default",
+      "flags": {
+        "tiered-segment-flag": {
+          "id": "flag-tiered-seg",
+          "key": "tiered-segment-flag",
+          "name": "Tiered Segment Flag",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-basic",
+          "variations": [
+            {"id": "var-premium", "key": "premium", "name": "Premium", "value": "premium"},
+            {"id": "var-standard", "key": "standard", "name": "Standard", "value": "standard"},
+            {"id": "var-basic", "key": "basic", "name": "Basic", "value": "basic"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "tier", "operator": "is", "value": "gold"}],
+              "variation_id": "var-premium"
+            },
+            {
+              "priority": 2,
+              "conditions": [{"attribute": "tier", "operator": "is", "value": "silver"}],
+              "variation_id": "var-standard"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-6", "attributes": {"tier": "gold"}},
+      "expected": {"flag_key": "tiered-segment-flag", "value": "premium", "variation_key": "premium", "reason": "targeting_match"}
+    },
+    {
+      "name": "tiered segment — silver tier user",
+      "description": "Silver tier gets standard variant",
+      "flags": {
+        "tiered-segment-silver": {
+          "id": "flag-tiered-seg-silver",
+          "key": "tiered-segment-silver",
+          "name": "Tiered Segment Silver",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-basic",
+          "variations": [
+            {"id": "var-premium", "key": "premium", "name": "Premium", "value": "premium"},
+            {"id": "var-standard", "key": "standard", "name": "Standard", "value": "standard"},
+            {"id": "var-basic", "key": "basic", "name": "Basic", "value": "basic"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "tier", "operator": "is", "value": "gold"}],
+              "variation_id": "var-premium"
+            },
+            {
+              "priority": 2,
+              "conditions": [{"attribute": "tier", "operator": "is", "value": "silver"}],
+              "variation_id": "var-standard"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-7", "attributes": {"tier": "silver"}},
+      "expected": {"flag_key": "tiered-segment-silver", "value": "standard", "variation_key": "standard", "reason": "targeting_match"}
+    },
+    {
+      "name": "tiered segment — unrecognized tier gets default",
+      "description": "Bronze tier is not in any rule, gets basic default",
+      "flags": {
+        "tiered-segment-default": {
+          "id": "flag-tiered-seg-default",
+          "key": "tiered-segment-default",
+          "name": "Tiered Segment Default",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-basic",
+          "variations": [
+            {"id": "var-premium", "key": "premium", "name": "Premium", "value": "premium"},
+            {"id": "var-standard", "key": "standard", "name": "Standard", "value": "standard"},
+            {"id": "var-basic", "key": "basic", "name": "Basic", "value": "basic"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "tier", "operator": "is", "value": "gold"}],
+              "variation_id": "var-premium"
+            },
+            {
+              "priority": 2,
+              "conditions": [{"attribute": "tier", "operator": "is", "value": "silver"}],
+              "variation_id": "var-standard"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-8", "attributes": {"tier": "bronze"}},
+      "expected": {"flag_key": "tiered-segment-default", "value": "basic", "variation_key": "basic", "reason": "default"}
+    },
+    {
+      "name": "geographic segment — exclude certain countries",
+      "description": "Feature available globally except for excluded regions",
+      "flags": {
+        "geo-exclude-flag": {
+          "id": "flag-geo-exclude",
+          "key": "geo-exclude-flag",
+          "name": "Geo Exclude Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-on",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "country", "operator": "one_of", "value": ["BLOCKED1", "BLOCKED2"]}
+              ],
+              "variation_id": "var-off"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-9", "attributes": {"country": "US"}},
+      "expected": {"flag_key": "geo-exclude-flag", "value": true, "variation_key": "on", "reason": "default"}
+    },
+    {
+      "name": "internal employees segment — user_id prefix match",
+      "description": "Internal users with IDs matching pattern get internal features",
+      "flags": {
+        "internal-segment-flag": {
+          "id": "flag-internal-seg",
+          "key": "internal-segment-flag",
+          "name": "Internal Segment Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "user_id", "operator": "matches_regex", "value": "^int-[0-9]+$"}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "int-12345", "attributes": {}},
+      "expected": {"flag_key": "internal-segment-flag", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "version segment — only users on recent app version",
+      "description": "Feature only available for users on app version >= 3.0.0 (using version_gt 2.99.99)",
+      "flags": {
+        "version-segment-flag": {
+          "id": "flag-version-seg",
+          "key": "version-segment-flag",
+          "name": "Version Segment Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "app_version", "operator": "version_gt", "value": "2.99.99"}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-10", "attributes": {"app_version": "3.1.0"}},
+      "expected": {"flag_key": "version-segment-flag", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "version segment — old app version excluded",
+      "description": "User on old version 2.0.0 does not get the feature",
+      "flags": {
+        "version-segment-old": {
+          "id": "flag-version-seg-old",
+          "key": "version-segment-old",
+          "name": "Version Segment Old",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "app_version", "operator": "version_gt", "value": "2.99.99"}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-11", "attributes": {"app_version": "2.0.0"}},
+      "expected": {"flag_key": "version-segment-old", "value": false, "variation_key": "off", "reason": "default"}
+    }
+  ]
+}

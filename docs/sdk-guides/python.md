@@ -73,4 +73,4 @@ with PhaseFlagClient(api_key="sdk-dev-xxxxxxxxxxxx", environment="production") a
 
 ## Further Reading
 
-See the [full Python SDK guide](https://docs.phaseflag.io/sdks/python) for async FastAPI integration, detailed evaluation, and more.
+See the [full Python SDK guide](https://docs.phaseflag.com/sdks/python) for async FastAPI integration, detailed evaluation, and more.

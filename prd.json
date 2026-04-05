@@ -7,7 +7,7 @@
     "name": "Phase Flag",
     "slug": "phaseflag",
     "description": "Production-grade feature flagging SaaS — OSS, SaaS, and Enterprise deployment modes",
-    "domain": "phaseflag.io"
+    "domain": "phaseflag.com"
   },
   "phases": [
     "PHASE 1: Migration & Scaffold Setup",
@@ -16,7 +16,12 @@
     "PHASE 4: SaaS Portal & Billing",
     "PHASE 5: SDK Publishing Pipeline",
     "PHASE 6: Documentation Site",
-    "PHASE 7: Quality, Security & Performance"
+    "PHASE 7: Quality, Security & Performance",
+    "PHASE 8: Foundation Hardening",
+    "PHASE 9: Open-Source Launch",
+    "PHASE 10: SaaS Launch",
+    "PHASE 11: Growth Features",
+    "PHASE 12: Platform Expansion"
   ],
   "stories": [
     {
@@ -205,18 +210,18 @@
     },
     {
       "id": "US-012",
-      "title": "Configure DNS for all phaseflag.io domains",
+      "title": "Configure DNS for all phaseflag.com domains",
       "priority": 12,
       "phase": "PHASE 3: Production Infrastructure",
       "description": "Add DNS A and CNAME records for all Phase Flag domains. API and relay point to the Droplet; frontend apps point to Vercel.",
       "acceptance_criteria": [
-        "A record: api.phaseflag.io → Droplet IP",
-        "A record: relay.phaseflag.io → Droplet IP",
-        "CNAME or A: app.phaseflag.io → Vercel",
-        "CNAME or A: portal.phaseflag.io → Vercel",
-        "CNAME or A: phaseflag.io → Vercel (apex domain)",
-        "CNAME: docs.phaseflag.io → Vercel or Netlify",
-        "DNS propagation verified: dig api.phaseflag.io +short returns Droplet IP"
+        "A record: api.phaseflag.com → Droplet IP",
+        "A record: relay.phaseflag.com → Droplet IP",
+        "CNAME or A: app.phaseflag.com → Vercel",
+        "CNAME or A: portal.phaseflag.com → Vercel",
+        "CNAME or A: phaseflag.com → Vercel (apex domain)",
+        "CNAME: docs.phaseflag.com → Vercel or Netlify",
+        "DNS propagation verified: dig api.phaseflag.com +short returns Droplet IP"
       ],
       "passes": true
     },
@@ -225,15 +230,15 @@
       "title": "Issue SSL certificates (Let's Encrypt)",
       "priority": 13,
       "phase": "PHASE 3: Production Infrastructure",
-      "description": "Use certbot to issue SSL certificates for api.phaseflag.io and relay.phaseflag.io. Configure nginx for HTTPS with auto-renewal.",
+      "description": "Use certbot to issue SSL certificates for api.phaseflag.com and relay.phaseflag.com. Configure nginx for HTTPS with auto-renewal.",
       "acceptance_criteria": [
         "certbot installed on Droplet",
-        "SSL cert issued for api.phaseflag.io",
-        "SSL cert issued for relay.phaseflag.io",
+        "SSL cert issued for api.phaseflag.com",
+        "SSL cert issued for relay.phaseflag.com",
         "nginx HTTP → HTTPS redirect active on port 80",
         "nginx SSL block active for both domains",
         "nginx -t passes with SSL config",
-        "curl https://api.phaseflag.io/health returns 200 with valid cert",
+        "curl https://api.phaseflag.com/health returns 200 with valid cert",
         "certbot renew --dry-run passes (auto-renewal verified)"
       ],
       "passes": true
@@ -253,8 +258,8 @@
         "API container healthy: docker compose ps shows healthy",
         "Postgres container healthy with persistent pgdata volume",
         "Alembic migrations run on production DB: poetry run alembic upgrade head",
-        "curl https://api.phaseflag.io/health returns 200",
-        "curl https://api.phaseflag.io/docs returns 200 (Swagger UI)"
+        "curl https://api.phaseflag.com/health returns 200",
+        "curl https://api.phaseflag.com/docs returns 200 (Swagger UI)"
       ],
       "passes": true
     },
@@ -263,13 +268,13 @@
       "title": "Deploy relay to production",
       "priority": 15,
       "phase": "PHASE 3: Production Infrastructure",
-      "description": "Build the relay Docker image and deploy it to the Droplet. Configure nginx to route relay.phaseflag.io to the relay service.",
+      "description": "Build the relay Docker image and deploy it to the Droplet. Configure nginx to route relay.phaseflag.com to the relay service.",
       "acceptance_criteria": [
         "Relay Docker image built (either on Droplet or pulled from GHCR)",
         "Relay container running on Droplet port 8001",
-        "nginx config routes relay.phaseflag.io → localhost:8001",
-        "SSL cert active for relay.phaseflag.io (from US-013)",
-        "curl https://relay.phaseflag.io/health returns 200",
+        "nginx config routes relay.phaseflag.com → localhost:8001",
+        "SSL cert active for relay.phaseflag.com (from US-013)",
+        "curl https://relay.phaseflag.com/health returns 200",
         "Relay logs show successful connection to production API"
       ],
       "passes": true
@@ -281,14 +286,14 @@
       "phase": "PHASE 3: Production Infrastructure",
       "description": "Deploy the three frontend Vite apps to Vercel with custom domains and correct VITE_API_URL environment variables.",
       "acceptance_criteria": [
-        "core/dashboard deployed to Vercel, domain: app.phaseflag.io",
-        "portal/ deployed to Vercel, domain: portal.phaseflag.io",
-        "marketing/ deployed to Vercel, domain: phaseflag.io",
-        "VITE_API_URL=https://api.phaseflag.io set in dashboard Vercel env",
+        "core/dashboard deployed to Vercel, domain: app.phaseflag.com",
+        "portal/ deployed to Vercel, domain: portal.phaseflag.com",
+        "marketing/ deployed to Vercel, domain: phaseflag.com",
+        "VITE_API_URL=https://api.phaseflag.com set in dashboard Vercel env",
         "All three Vercel deployments show status: Ready",
-        "curl https://app.phaseflag.io returns 200",
-        "curl https://portal.phaseflag.io returns 200",
-        "curl https://phaseflag.io returns 200"
+        "curl https://app.phaseflag.com returns 200",
+        "curl https://portal.phaseflag.com returns 200",
+        "curl https://phaseflag.com returns 200"
       ],
       "passes": true
     },
@@ -360,7 +365,7 @@
         "Step 2: Choose SDK language (JS, Python, Go, React, etc.) — shows install command",
         "Step 3: Copy SDK initialization snippet with project API key pre-filled",
         "Onboarding marks as complete after Step 3 (stored in localStorage or API)",
-        "Completed onboarding redirects to app.phaseflag.io dashboard",
+        "Completed onboarding redirects to app.phaseflag.com dashboard",
         "npm run build succeeds"
       ],
       "passes": true
@@ -475,7 +480,7 @@
         "Existing markdown content from docs/ imported",
         "npm run build succeeds for docs site",
         "Local preview: npm run dev serves docs at localhost:3001 (or similar)",
-        "CNAME docs.phaseflag.io configured in DNS"
+        "CNAME docs.phaseflag.com configured in DNS"
       ],
       "passes": true
     },
@@ -519,25 +524,25 @@
       "phase": "PHASE 6: Documentation Site",
       "description": "Generate and publish comprehensive API reference documentation from the FastAPI OpenAPI spec.",
       "acceptance_criteria": [
-        "OpenAPI spec accessible at https://api.phaseflag.io/openapi.json",
+        "OpenAPI spec accessible at https://api.phaseflag.com/openapi.json",
         "Spec exported to docs/api-reference/openapi.json (committed to repo)",
         "Docs site renders API reference (Mintlify API pages or Redoc component)",
         "All endpoint groups documented: flags, segments, environments, experiments, auth, webhooks, evaluation, SDK",
         "curl and JavaScript code examples for key endpoints",
-        "docs.phaseflag.io/api-reference renders correctly"
+        "docs.phaseflag.com/api-reference renders correctly"
       ],
       "passes": true
     },
     {
       "id": "US-031",
-      "title": "Deploy documentation site to docs.phaseflag.io",
+      "title": "Deploy documentation site to docs.phaseflag.com",
       "priority": 31,
       "phase": "PHASE 6: Documentation Site",
-      "description": "Deploy the documentation site to Vercel or Netlify at docs.phaseflag.io.",
+      "description": "Deploy the documentation site to Vercel or Netlify at docs.phaseflag.com.",
       "acceptance_criteria": [
         "Docs site deployed to Vercel or Netlify",
-        "Custom domain docs.phaseflag.io configured",
-        "curl https://docs.phaseflag.io returns 200",
+        "Custom domain docs.phaseflag.com configured",
+        "curl https://docs.phaseflag.com returns 200",
         "All navigation links resolve (no 404s)",
         "Deployment triggers automatically on push to main (CI configured)"
       ],
@@ -592,7 +597,7 @@
         "SQL injection test: flag key with SQL metacharacters returns 422, not 500",
         "JWT expiry enforced: expired token returns 401 Unauthorized",
         "API keys not exposed in logs (grep for api_key in log output)",
-        "Safety headers verified: curl -I https://api.phaseflag.io/health shows all required headers",
+        "Safety headers verified: curl -I https://api.phaseflag.com/health shows all required headers",
         "Security findings documented in docs/security.md"
       ],
       "passes": true
@@ -604,19 +609,503 @@
       "phase": "PHASE 7: Quality, Security & Performance",
       "description": "Perform full end-to-end verification of the deployed platform. Confirm every domain resolves, auth flows work, and core features function in production.",
       "acceptance_criteria": [
-        "curl https://api.phaseflag.io/health → 200 OK",
-        "curl https://api.phaseflag.io/docs → Swagger UI loads",
-        "curl https://relay.phaseflag.io/health → 200 OK",
-        "curl https://app.phaseflag.io → dashboard loads",
-        "curl https://portal.phaseflag.io → portal loads",
-        "curl https://phaseflag.io → marketing site loads",
-        "curl https://docs.phaseflag.io → docs site loads",
+        "curl https://api.phaseflag.com/health → 200 OK",
+        "curl https://api.phaseflag.com/docs → Swagger UI loads",
+        "curl https://relay.phaseflag.com/health → 200 OK",
+        "curl https://app.phaseflag.com → dashboard loads",
+        "curl https://portal.phaseflag.com → portal loads",
+        "curl https://phaseflag.com → marketing site loads",
+        "curl https://docs.phaseflag.com → docs site loads",
         "Sign up flow: POST /auth/signup → success with JWT returned",
         "Login flow: POST /auth/login → JWT and refresh token returned",
         "Authenticated request to GET /sdk/flags → returns ruleset",
         "All Docker containers on Droplet healthy: docker compose ps shows healthy",
         "All Vercel deployments show status: Ready",
         "GitHub Actions: all workflows passing on main branch"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-036",
+      "title": "SDK conformance test suite — language-agnostic JSON fixtures",
+      "priority": 36,
+      "phase": "PHASE 8: Foundation Hardening",
+      "description": "Build a language-agnostic SDK test specification as JSON fixture files. Define 200+ test cases covering: flag evaluation with all 11 targeting operators, percentage rollout determinism (DJB2 hashing), prerequisite flag evaluation, default value fallback, variation selection, segment matching, and edge cases (empty context, missing attributes, malformed rules). Each fixture: { input: { flagDefinition, context }, expected: { value, variationIndex, reason } }. Then write test runners for the top 4 SDKs (JavaScript, Python, Go, Java) that load these fixtures and validate evaluation results match.",
+      "acceptance_criteria": [
+        "tests/sdk-conformance/ directory created with fixture JSON files",
+        "At least 200 test cases covering: all 11 operators (is, is_not, contains, not_contains, one_of, not_one_of, gt, lt, matches_regex, version_gt, version_lt), percentage rollout with known hash seeds, prerequisite chains, default values, segment-based targeting",
+        "JavaScript test runner at sdks/javascript/tests/conformance.test.ts passes all fixtures",
+        "Python test runner at sdks/python/tests/test_conformance.py passes all fixtures",
+        "Go test runner at sdks/go/conformance_test.go passes all fixtures",
+        "Java test runner at sdks/java/src/test/java/dev/phaseflag/sdk/ConformanceTest.java passes all fixtures",
+        "All 4 SDKs produce identical evaluation results for every fixture",
+        "CI workflow updated to run conformance tests on SDK changes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-037",
+      "title": "API integration test suite — full router coverage",
+      "priority": 37,
+      "phase": "PHASE 8: Foundation Hardening",
+      "description": "Write comprehensive integration tests covering all 26 core API routers. Each router should have happy-path tests (CRUD operations succeed, correct status codes, response shapes) and error-path tests (invalid input returns 422, unauthorized returns 401, not-found returns 404). Tests should run against a real PostgreSQL database using Docker, not mocks.",
+      "acceptance_criteria": [
+        "core/api/tests/integration/ contains test files for all core routers: flags, segments, evaluation, auth, projects, environments, governance, experiments, pipelines, rollback, remote_config, migrations, lifecycle, analytics, observability, reporting, developer, webhooks, sso, code_refs, admin, health, sdk, audit, billing",
+        "Each router test file has at least 3 happy-path and 2 error-path tests",
+        "Tests run against real PostgreSQL (Docker) — no mocking of database layer",
+        "All tests pass with exit code 0",
+        "Test coverage report generated showing >80% line coverage for routers/",
+        "CI workflow runs integration tests on API changes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-038",
+      "title": "Performance benchmarks — evaluation throughput and latency",
+      "priority": 38,
+      "phase": "PHASE 8: Foundation Hardening",
+      "description": "Create performance benchmarks for the core evaluation engine. Measure: single flag evaluation latency (p50/p95/p99), batch evaluation throughput (flags/sec), API endpoint response times under load, relay proxy throughput, and SDK local evaluation speed. Publish results in a benchmarks/ directory with reproducible scripts.",
+      "acceptance_criteria": [
+        "benchmarks/ directory created at project root",
+        "API benchmark script that measures /api/v1/flags/evaluate response times at 100, 1000, 10000 concurrent requests",
+        "SDK benchmark scripts for JavaScript and Python measuring local evaluations/second",
+        "Relay proxy benchmark measuring cached evaluation throughput",
+        "Results documented in benchmarks/RESULTS.md with p50/p95/p99 latency and throughput numbers",
+        "Benchmark scripts are reproducible (Docker-based, deterministic test data)"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-039",
+      "title": "Unify frontend design tokens and shared configuration",
+      "priority": 39,
+      "phase": "PHASE 8: Foundation Hardening",
+      "description": "Extract shared design tokens (colors, typography, spacing, brand assets) into a shared configuration that Dashboard (Tailwind 3), Portal (Tailwind 4), and Marketing (Tailwind 4) can consume. Create a shared ESLint/Prettier config. Ensure consistent brand identity across all three frontends.",
+      "acceptance_criteria": [
+        "design/tokens/ directory created with shared color palette, typography scale, and spacing values as JSON/CSS custom properties",
+        "Dashboard, Portal, and Marketing tailwind configs reference shared brand colors",
+        "Primary brand color (#34D399 green) consistent across all three apps",
+        "Shared favicon and meta tags across all apps",
+        "All three frontends build successfully after design token integration"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-040",
+      "title": "Security audit — fix known gaps in enterprise auth and licensing",
+      "priority": 40,
+      "phase": "PHASE 8: Foundation Hardening",
+      "description": "Address the documented security TODOs in enterprise modules: (1) SAML signature verification in enterprise/auth — integrate xmlsec or signxml library, (2) OIDC JWKS signature verification — implement RS256 token validation with JWKS endpoint discovery, (3) RSA license key verification in enterprise/licensing — add cryptography library for RS256 signature validation. Also verify rate limiting, CORS, and security headers are properly configured.",
+      "acceptance_criteria": [
+        "enterprise/auth/ SAML assertion validates XML signatures (not just parses)",
+        "enterprise/auth/ OIDC callback verifies ID token signature via JWKS endpoint",
+        "enterprise/licensing/ validates RS256-signed license JWTs with public key",
+        "Rate limiting verified: 120 req/min per IP returns 429 on excess",
+        "Security headers verified on all API responses: X-Content-Type-Options, X-Frame-Options, Strict-Transport-Security, Content-Security-Policy",
+        "CORS rejects wildcard origins in saas/enterprise mode",
+        "All security fixes have corresponding test cases"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-041",
+      "title": "Apply licenses — MIT for SDKs, Apache 2.0 for core, BSL for enterprise",
+      "priority": 41,
+      "phase": "PHASE 9: Open-Source Launch",
+      "description": "Choose and apply appropriate open-source licenses to all components. SDKs and CLI get MIT (maximum adoption). Core API and Dashboard get Apache 2.0 (protects against cloud re-hosting). Enterprise modules get Business Source License 1.1 (prevents managed-service competition, converts to Apache 2.0 after 3 years). Add LICENSE files to each component directory and a root LICENSE file.",
+      "acceptance_criteria": [
+        "Root LICENSE file with Apache 2.0 for the core project",
+        "sdks/*/LICENSE — MIT license in every SDK directory",
+        "core/cli/LICENSE — MIT license",
+        "core/relay/LICENSE — MIT license",
+        "enterprise/LICENSE — BSL 1.1 with 3-year change date and Apache 2.0 change license",
+        "All source files have SPDX license identifier headers",
+        "README.md updated with license badges and explanation of dual licensing"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-042",
+      "title": "Publish SDK packages — npm, PyPI, Go modules, Maven Central",
+      "priority": 42,
+      "phase": "PHASE 9: Open-Source Launch",
+      "description": "Publish the top 4 SDKs and framework bindings to their respective package registries. JavaScript (@phaseflag/js-sdk, @phaseflag/react) to npm. Python (phaseflag) to PyPI. Go (github.com/phaseflag/go-sdk) to pkg.go.dev. Java (dev.phaseflag:phaseflag-sdk) to Maven Central. Ensure each package has proper metadata, README, and version 0.1.0.",
+      "acceptance_criteria": [
+        "@phaseflag/js-sdk published on npm with README and types",
+        "@phaseflag/react published on npm with peer dep on @phaseflag/js-sdk",
+        "phaseflag published on PyPI with README and type stubs",
+        "github.com/phaseflag/go-sdk tagged v0.1.0 and visible on pkg.go.dev",
+        "All published packages install cleanly in a fresh project",
+        "Each package README has quickstart example code",
+        "CI publish workflow triggers on version tags"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-043",
+      "title": "GitHub organization and repository setup",
+      "priority": 43,
+      "phase": "PHASE 9: Open-Source Launch",
+      "description": "Set up the phaseflag GitHub organization with proper repository configuration. Create issue templates, PR templates, CONTRIBUTING.md, CODE_OF_CONDUCT.md, and SECURITY.md. Configure branch protection rules, required status checks, and GitHub Actions workflows. Set up GitHub Discussions for community support.",
+      "acceptance_criteria": [
+        "GitHub organization phaseflag has the main repository",
+        ".github/ISSUE_TEMPLATE/ with bug_report.md, feature_request.md, and config.yml",
+        ".github/PULL_REQUEST_TEMPLATE.md with checklist",
+        "CONTRIBUTING.md with development setup, coding standards, and PR process",
+        "CODE_OF_CONDUCT.md (Contributor Covenant)",
+        "SECURITY.md with vulnerability reporting process",
+        "Branch protection on main: require PR reviews, require status checks, no force push",
+        "GitHub Discussions enabled with categories: Announcements, Q&A, Ideas, Show and Tell"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-044",
+      "title": "Documentation site polish — 5-minute quickstart and guides",
+      "priority": 44,
+      "phase": "PHASE 9: Open-Source Launch",
+      "description": "Polish the VitePress documentation site with a quickstart guide that takes under 5 minutes (Docker one-liner → create flag → evaluate via SDK). Add interactive code snippets, deployment guides (Docker, Kubernetes, self-hosted), SDK reference docs for the top 4 languages, and API reference generated from OpenAPI spec. Deploy to docs.phaseflag.com.",
+      "acceptance_criteria": [
+        "Quickstart page: Docker one-liner to running stack in under 5 minutes",
+        "SDK guides for JavaScript, Python, Go, Java with copy-paste code examples",
+        "Deployment guides: Docker Compose, Kubernetes/Helm, self-hosted production",
+        "API reference page generated from OpenAPI spec",
+        "Architecture overview with system diagram",
+        "Site builds successfully with zero dead links",
+        "Deployed and accessible at docs domain",
+        "Search functionality works across all pages"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-045",
+      "title": "Competitor comparison pages and positioning",
+      "priority": 45,
+      "phase": "PHASE 9: Open-Source Launch",
+      "description": "Create comparison pages for the marketing site and documentation site: Phase Flag vs LaunchDarkly, vs Unleash, vs Flagsmith, vs Split.io. Each page should have an honest feature comparison table, pricing comparison, and clear positioning of Phase Flag advantages (SDK breadth, deployment flexibility, enterprise modules).",
+      "acceptance_criteria": [
+        "marketing site has /compare route with comparison landing page",
+        "Individual comparison pages: vs-launchdarkly, vs-unleash, vs-flagsmith, vs-split",
+        "Each page has feature comparison table (flags, segments, experiments, SDKs, deployment, pricing)",
+        "docs/site/ has corresponding comparison pages",
+        "Comparison data is factually accurate (no false claims about competitors)",
+        "SEO meta tags on each comparison page"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-046",
+      "title": "Docker Hub and GHCR — publish official container images",
+      "priority": 46,
+      "phase": "PHASE 9: Open-Source Launch",
+      "description": "Publish official Docker images for API, Relay, and Dashboard to GitHub Container Registry (ghcr.io/phaseflag/). Set up automated builds on version tags. Images should be multi-arch (linux/amd64, linux/arm64) and include proper labels, healthchecks, and minimal attack surface.",
+      "acceptance_criteria": [
+        "ghcr.io/phaseflag/api:latest and :v0.1.0 images published (multi-arch)",
+        "ghcr.io/phaseflag/relay:latest and :v0.1.0 images published (multi-arch)",
+        "ghcr.io/phaseflag/dashboard:latest and :v0.1.0 images published (multi-arch)",
+        "All images have OCI labels (org.opencontainers.image.*)",
+        "All images have HEALTHCHECK instructions",
+        "docker-publish.yml workflow builds and pushes on v* tags",
+        "Images pull and run successfully on both amd64 and arm64"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-047",
+      "title": "Production infrastructure deployment",
+      "priority": 47,
+      "phase": "PHASE 10: SaaS Launch",
+      "description": "Deploy the full Phase Flag stack to production. API, Relay, and database on a cloud server. Dashboard, Portal, and Marketing on Vercel or similar CDN. Configure DNS for all phaseflag.com subdomains. Set up SSL certificates, production environment variables, and health monitoring.",
+      "acceptance_criteria": [
+        "API accessible at https://api.phaseflag.com/health returning 200",
+        "Relay accessible at https://relay.phaseflag.com/health returning 200",
+        "Dashboard accessible at https://app.phaseflag.com",
+        "Portal accessible at https://portal.phaseflag.com",
+        "Marketing accessible at https://phaseflag.com",
+        "Docs accessible at https://docs.phaseflag.com",
+        "SSL certificates valid on all domains",
+        "Database backups configured (daily)",
+        "Production environment variables set via secure method (not in git)"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-048",
+      "title": "Stripe billing activation with tier enforcement",
+      "priority": 48,
+      "phase": "PHASE 10: SaaS Launch",
+      "description": "Activate Stripe billing with three tiers: Free (1000 MTU, 10 flags, 1 project), Pro (/seat/mo, 50K MTU, unlimited flags), Enterprise (custom, unlimited). Implement usage metering for Monthly Tracked Users (MTU). Enforce limits in the API — return 402/403 when limits exceeded.",
+      "acceptance_criteria": [
+        "Stripe products and prices created for Free, Pro, Enterprise tiers",
+        "Portal billing page shows current plan and upgrade CTA",
+        "Stripe Checkout flow works for Pro upgrade",
+        "API enforces flag count limits per tier (Free: 10, Pro: unlimited)",
+        "API enforces project count limits per tier (Free: 1, Pro: 10, Enterprise: unlimited)",
+        "API tracks MTU and returns 402 when exceeded",
+        "Webhook handles subscription.created, subscription.updated, subscription.deleted",
+        "Downgrade path works (Pro → Free removes access to excess resources)"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-049",
+      "title": "Usage metering and tier limit enforcement",
+      "priority": 49,
+      "phase": "PHASE 10: SaaS Launch",
+      "description": "Implement Monthly Tracked Users (MTU) metering in the evaluation pipeline. Count unique user IDs per organization per calendar month. Enforce tier-specific limits: Free (1000 MTU), Pro (50,000 MTU), Enterprise (unlimited). Add usage dashboard to Portal showing current MTU, flag count, and project count vs limits.",
+      "acceptance_criteria": [
+        "Evaluation endpoint tracks unique user IDs per org per month",
+        "MTU count accessible via API endpoint: GET /api/v1/billing/usage",
+        "Portal dashboard shows MTU usage bar with limit",
+        "API returns 429 with clear error message when MTU limit exceeded",
+        "MTU counter resets on the 1st of each month",
+        "Usage data persisted in database (not in-memory)",
+        "Admin API can view MTU for any organization"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-050",
+      "title": "Onboarding wizard — project creation to first flag evaluation",
+      "priority": 50,
+      "phase": "PHASE 10: SaaS Launch",
+      "description": "Build an onboarding flow in the Portal: (1) Create organization, (2) Create first project, (3) Choose SDK language, (4) Copy API key and SDK snippet, (5) Create first flag, (6) See first evaluation event. The wizard should be interactive with real-time feedback — when the SDK connects, show a success animation.",
+      "acceptance_criteria": [
+        "Portal /onboarding route with step-by-step wizard",
+        "Step 1: Create organization (name, slug)",
+        "Step 2: Create project with default environments (dev, staging, prod)",
+        "Step 3: SDK language selector showing code snippets for JS, Python, Go, Java",
+        "Step 4: Copy-able API key and installation command",
+        "Step 5: Create a sample boolean flag with toggle",
+        "Step 6: Real-time connection indicator — shows when SDK connects and evaluates",
+        "Wizard state persists across page refreshes",
+        "Skip option for experienced users"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-051",
+      "title": "Transactional emails — welcome, billing, invitations",
+      "priority": 51,
+      "phase": "PHASE 10: SaaS Launch",
+      "description": "Implement transactional email sending for key user lifecycle events: welcome email on signup, billing confirmation on plan change, team invitation emails, password reset emails. Use a simple email provider (Resend, SendGrid, or SES).",
+      "acceptance_criteria": [
+        "Welcome email sent on user registration",
+        "Billing confirmation email on plan upgrade/downgrade",
+        "Team invitation email with accept link",
+        "Password reset email with secure token",
+        "Email provider configurable via environment variable (PHASEFLAG_EMAIL_PROVIDER)",
+        "HTML email templates with Phase Flag branding",
+        "Emails work in SaaS mode only (disabled in OSS/enterprise)"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-052",
+      "title": "Status page and uptime monitoring",
+      "priority": 52,
+      "phase": "PHASE 10: SaaS Launch",
+      "description": "Set up a public status page at status.phaseflag.com showing health of all services (API, Relay, Dashboard, Portal, Docs). Configure uptime monitoring with alerting. Show historical uptime percentage and incident timeline.",
+      "acceptance_criteria": [
+        "Status page accessible at https://status.phaseflag.com",
+        "Shows health status for: API, Relay, Dashboard, Portal, Marketing, Docs",
+        "Uptime monitoring pings all services every 60 seconds",
+        "Alerts sent to team on service degradation or outage",
+        "Historical uptime percentage displayed (30-day and 90-day)",
+        "Incident timeline with manual update capability"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-053",
+      "title": "Terraform provider for Phase Flag",
+      "priority": 53,
+      "phase": "PHASE 11: Growth Features",
+      "description": "Build a Terraform provider (terraform-provider-phaseflag) that manages Phase Flag resources as infrastructure-as-code. Support resources: phaseflag_project, phaseflag_environment, phaseflag_flag, phaseflag_segment, phaseflag_webhook. Data sources: phaseflag_flag, phaseflag_flags. Publish to Terraform Registry.",
+      "acceptance_criteria": [
+        "Terraform provider written in Go using terraform-plugin-sdk",
+        "Resources: phaseflag_project, phaseflag_environment, phaseflag_flag, phaseflag_segment",
+        "Data sources: phaseflag_flag (single), phaseflag_flags (list)",
+        "Provider accepts api_url and api_key configuration",
+        "terraform plan and terraform apply work for flag CRUD",
+        "Provider published to Terraform Registry",
+        "Example Terraform configs in infra/terraform/examples/"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-054",
+      "title": "GitHub Actions integration for flag-gated deployments",
+      "priority": 54,
+      "phase": "PHASE 11: Growth Features",
+      "description": "Create a GitHub Action (phaseflag/flag-check-action) that checks flag state during CI/CD. Use cases: gate deployments on kill switch flags, auto-archive flags when feature branches merge, report flag coverage in PRs.",
+      "acceptance_criteria": [
+        "GitHub Action published to GitHub Marketplace",
+        "Action checks if a flag is enabled/disabled before proceeding",
+        "Action can toggle flags on successful deployment",
+        "Action supports flag archival on branch merge",
+        "Example workflow files in .github/examples/",
+        "Action README with usage examples"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-055",
+      "title": "Slack and Teams notification integration",
+      "priority": 55,
+      "phase": "PHASE 11: Growth Features",
+      "description": "Add Slack and Microsoft Teams webhook integration for flag lifecycle notifications. Notify channels on: flag created, flag toggled, flag archived, approval requested, freeze window activated. Configurable per-project notification preferences.",
+      "acceptance_criteria": [
+        "Slack incoming webhook integration in Dashboard settings",
+        "Microsoft Teams incoming webhook integration",
+        "Notifications for: flag.created, flag.toggled, flag.archived, approval.requested, freeze.activated",
+        "Per-project notification channel configuration",
+        "Rich message formatting with flag details, actor, and timestamp",
+        "Test notification button in settings UI"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-056",
+      "title": "CI/CD integrations — GitLab CI, CircleCI, Jenkins",
+      "priority": 56,
+      "phase": "PHASE 11: Growth Features",
+      "description": "Create CI/CD integration packages for GitLab CI (reusable template), CircleCI (orb), and Jenkins (shared library). Each integration provides flag-check, flag-toggle, and flag-archive steps.",
+      "acceptance_criteria": [
+        "GitLab CI reusable template (.gitlab-ci-template.yml) with flag-check job",
+        "CircleCI orb (phaseflag/flag-check) published",
+        "Jenkins shared library with flagCheck() step",
+        "Each integration documented with example pipeline configs",
+        "All integrations authenticate via PHASEFLAG_API_KEY environment variable"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-057",
+      "title": "VS Code extension for flag references",
+      "priority": 57,
+      "phase": "PHASE 11: Growth Features",
+      "description": "Build a VS Code extension that shows inline flag references, flag status (enabled/disabled), hover documentation, and code lens for flag usage. The extension connects to the Phase Flag API to show real-time flag state.",
+      "acceptance_criteria": [
+        "VS Code extension published to marketplace",
+        "Inline decoration showing flag status (green=enabled, red=disabled)",
+        "Hover card showing flag details (description, variations, targeting rules)",
+        "Code lens showing evaluation count and last modified date",
+        "Extension settings for API URL and API key",
+        "Supports JavaScript, TypeScript, Python, Go, Java file types"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-058",
+      "title": "GraphQL API alongside REST",
+      "priority": 58,
+      "phase": "PHASE 11: Growth Features",
+      "description": "Add a GraphQL endpoint (/graphql) alongside the existing REST API. Support queries for flags, segments, projects, environments, and evaluations. Support mutations for flag CRUD and toggle. Use Strawberry or Ariadne for the Python GraphQL implementation.",
+      "acceptance_criteria": [
+        "GraphQL endpoint at /graphql with GraphiQL playground",
+        "Queries: flags, flag(key), segments, projects, environments, evaluations",
+        "Mutations: createFlag, updateFlag, toggleFlag, deleteFlag, createSegment",
+        "Subscriptions: flagChanged (real-time via WebSocket)",
+        "Authentication via same JWT/API key as REST endpoints",
+        "GraphQL schema documented and exported as SDL"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-059",
+      "title": "Webhook marketplace — pre-built integrations",
+      "priority": 59,
+      "phase": "PHASE 11: Growth Features",
+      "description": "Create a webhook integration marketplace in the Dashboard with pre-built templates for: Datadog (flag change events as custom events), PagerDuty (incident creation on rollback), Jira (automatic ticket creation for stale flags), and generic webhook templates.",
+      "acceptance_criteria": [
+        "Dashboard Integrations page shows available webhook templates",
+        "Datadog integration: sends flag change events as Datadog custom events",
+        "PagerDuty integration: creates incident on rollback trigger",
+        "Jira integration: creates ticket for stale flags",
+        "One-click setup for each integration (just paste API key)",
+        "Custom webhook template builder for arbitrary endpoints"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-060",
+      "title": "Remote Configuration as first-class product feature",
+      "priority": 60,
+      "phase": "PHASE 12: Platform Expansion",
+      "description": "Elevate the existing remote_config router into a first-class product feature. Add dedicated UI pages in Dashboard for config management, version history with diff view, JSON schema validation in the editor, and SDK support for remote config fetching (separate from flags). Position as Feature Flags + Remote Config unified platform.",
+      "acceptance_criteria": [
+        "Dashboard has dedicated Remote Config section with CRUD UI",
+        "Config editor with JSON schema validation and syntax highlighting",
+        "Version history with diff view between versions",
+        "SDK clients support getConfig(key) and getAllConfigs() methods",
+        "Remote configs have their own API key scope (separate from flag keys)",
+        "Marketing site updated to highlight Remote Config as product feature"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-061",
+      "title": "A/B Testing platform with experiment management UI",
+      "priority": 61,
+      "phase": "PHASE 12: Platform Expansion",
+      "description": "Build out the experimentation platform by connecting the enterprise analytics (Bayesian + frequentist A/B testing), autonomous (Thompson Sampling), and experimentation (mutual exclusion layers) modules into a cohesive UI. Add experiment creation wizard, results dashboard with statistical significance visualization, and automatic winner declaration.",
+      "acceptance_criteria": [
+        "Dashboard Experiments page with create/manage experiments",
+        "Experiment creation wizard: hypothesis, metric, variations, traffic allocation",
+        "Results dashboard with conversion rate charts, confidence intervals, and p-values",
+        "Statistical significance visualization (Bayesian probability bar)",
+        "Automatic winner declaration when significance threshold reached",
+        "Mutual exclusion layer management in UI",
+        "Thompson Sampling toggle for automatic traffic optimization"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-062",
+      "title": "Progressive delivery with Kubernetes integration",
+      "priority": 62,
+      "phase": "PHASE 12: Platform Expansion",
+      "description": "Enhance progressive delivery pipelines with direct Kubernetes integration. Connect canary/blue-green stages to K8s deployments via the Kubernetes API. Auto-rollback based on Prometheus metrics. Integrate with Argo Rollouts and Flagger for advanced deployment strategies.",
+      "acceptance_criteria": [
+        "Pipeline stages can reference Kubernetes Deployment resources",
+        "Canary stage automatically adjusts K8s traffic splitting",
+        "Prometheus metric queries for health gate evaluation",
+        "Auto-rollback triggers K8s rollback on metric threshold breach",
+        "Integration with Argo Rollouts CustomResource",
+        "Dashboard UI shows deployment progress with pod status"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-063",
+      "title": "Developer productivity — flag lifecycle automation",
+      "priority": 63,
+      "phase": "PHASE 12: Platform Expansion",
+      "description": "Build automated flag lifecycle management: auto-detect stale flags (no evaluations in 90 days), auto-archive expired flags, generate cleanup reports for engineering teams, and provide a CLI command for bulk flag cleanup. Position for engineering leaders as technical debt reduction tool.",
+      "acceptance_criteria": [
+        "Automated weekly stale flag detection job (configurable threshold)",
+        "Email/Slack notification to flag owners when flag becomes stale",
+        "Auto-archive flags past expiration date (with 7-day grace period)",
+        "Dashboard reporting page: stale flags by team, cleanup scorecard, trend over time",
+        "pfctl cleanup command: list stale flags, archive in bulk, generate report",
+        "API endpoint: GET /api/v1/reporting/flag-health with tech debt metrics"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-064",
+      "title": "Compliance-as-Code for regulated industries",
+      "priority": 64,
+      "phase": "PHASE 12: Platform Expansion",
+      "description": "Elevate the compliance module into a marketable feature for regulated industries (healthcare, fintech, government). Add pre-built compliance policy packs (GDPR, HIPAA, SOC2, FedRAMP), audit log export in standard formats (CSV, SIEM-compatible JSON), data residency controls, and compliance dashboard with evidence collection.",
+      "acceptance_criteria": [
+        "Pre-built policy packs: GDPR (8 rules), HIPAA (6 rules), SOC2 (10 rules)",
+        "One-click policy pack activation in Dashboard",
+        "Audit log export: CSV, JSON (SIEM-compatible), with date range filtering",
+        "Data residency configuration: restrict data to specific regions",
+        "Compliance dashboard: policy adherence score, evidence timeline, violation alerts",
+        "Compliance report generation (PDF) for auditor review"
       ],
       "passes": true
     }

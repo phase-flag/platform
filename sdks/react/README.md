@@ -1,11 +1,11 @@
 # Phase Flag SDK -- React
 
-Official React SDK for the Phase Flag feature flagging platform. Provides React hooks, a provider component, and conditional rendering utilities for client-side feature flag evaluation. Built on top of `@phaseflag/sdk-js`.
+Official React SDK for the Phase Flag feature flagging platform. Provides React hooks, a provider component, and conditional rendering utilities for client-side feature flag evaluation. Built on top of `@phaseflag/js-sdk`.
 
 ## Installation
 
 ```bash
-npm install @phaseflag/react @phaseflag/sdk-js
+npm install @phaseflag/react @phaseflag/js-sdk
 ```
 
 Requires React 18+.

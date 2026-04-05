@@ -36,6 +36,16 @@ class Settings(BaseSettings):
     DEPLOYMENT_MODE: DeploymentMode = DeploymentMode.OSS
     LICENSE_KEY: str = ""
 
+    # Email (SaaS/Enterprise mode)
+    EMAIL_PROVIDER: str = ""          # smtp | resend | sendgrid | "" (no-op)
+    EMAIL_FROM: str = "noreply@phaseflag.com"
+    SMTP_HOST: str = "localhost"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    RESEND_API_KEY: str = ""
+    SENDGRID_API_KEY: str = ""
+
     # Stripe billing (SaaS mode)
     STRIPE_SECRET_KEY: str = "sk_test_placeholder"
     STRIPE_WEBHOOK_SECRET: str = "whsec_placeholder"

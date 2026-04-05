@@ -2,12 +2,8 @@ name: Docker Publish
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'core/api/**'
-      - 'core/relay/**'
-      - 'core/dashboard/**'
-      - '.github/workflows/docker-publish.yml'
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -16,10 +12,13 @@ permissions:
 
 jobs:
   api:
-    name: Build & Push API (dev)
+    name: Build & Push API
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -35,25 +34,37 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/phase-flag/api
+          images: ghcr.io/phaseflag/api
           tags: |
-            type=sha
-            type=raw,value=dev
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.source=https://github.com/phaseflag/phaseflag
+            org.opencontainers.image.description=Phase Flag API — FastAPI feature flag management service
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.vendor=Phase Flag
 
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: core/api
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   relay:
-    name: Build & Push Relay (dev)
+    name: Build & Push Relay
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -69,25 +80,37 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/phase-flag/relay
+          images: ghcr.io/phaseflag/relay
           tags: |
-            type=sha
-            type=raw,value=dev
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.source=https://github.com/phaseflag/phaseflag
+            org.opencontainers.image.description=Phase Flag Relay — Go edge evaluation proxy
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.vendor=Phase Flag
 
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: core/relay
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   dashboard:
-    name: Build & Push Dashboard (dev)
+    name: Build & Push Dashboard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -103,16 +126,25 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/phase-flag/dashboard
+          images: ghcr.io/phaseflag/dashboard
           tags: |
-            type=sha
-            type=raw,value=dev
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.source=https://github.com/phaseflag/phaseflag
+            org.opencontainers.image.description=Phase Flag Dashboard — React admin UI served by nginx
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.vendor=Phase Flag
 
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: core/dashboard
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

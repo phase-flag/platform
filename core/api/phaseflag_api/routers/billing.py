@@ -1,4 +1,4 @@
-"""Stripe billing endpoints: plans, checkout, webhook."""
+"""Stripe billing endpoints: plans, checkout, webhook, and usage metering."""
 
 import logging
 from typing import Any
@@ -12,6 +12,8 @@ from phaseflag_api.config import settings
 from phaseflag_api.database import get_session
 from phaseflag_api.middleware.auth import get_current_user, require_api_key
 from phaseflag_api.models.projects import OrganizationDB
+from phaseflag_api.services import email_service
+from phaseflag_api.services.billing_service import handle_subscription_webhook
 
 logger = logging.getLogger(__name__)
 
@@ -166,32 +168,54 @@ async def stripe_webhook(
         except Exception as exc:
             raise HTTPException(status_code=400, detail="Invalid JSON payload") from exc
 
-    event_type = event.get("type") if isinstance(event, dict) else event.type
-    event_data: dict[str, Any] = event.get("data", {}) if isinstance(event, dict) else event.data
+    event_dict: dict[str, Any] = event if isinstance(event, dict) else {
+        "type": event.type,
+        "data": event.data,
+    }
 
+    event_type = event_dict.get("type", "")
     logger.info("Stripe webhook received: %s", event_type)
 
-    if event_type == "checkout.session.completed":
-        obj = event_data.get("object", {})
-        metadata = obj.get("metadata", {})
-        org_id = metadata.get("org_id")
-        plan_id = metadata.get("plan_id")
-        if org_id and plan_id:
-            await session.execute(
-                update(OrganizationDB).where(OrganizationDB.id == org_id).values(subscription_tier=plan_id)
-            )
-            await session.commit()
-            logger.info("Organization %s subscription updated to %s", org_id, plan_id)
+    # Delegate all tier-update logic to the billing service
+    result = await handle_subscription_webhook(event_dict, session)
+    logger.debug("Webhook processing result: %s", result)
 
-    elif event_type in ("customer.subscription.updated", "customer.subscription.deleted"):
-        obj = event_data.get("object", {})
-        metadata = obj.get("metadata", {})
-        org_id = metadata.get("org_id")
-        if org_id:
-            new_tier = "free" if event_type.endswith("deleted") else metadata.get("plan_id", "free")
-            await session.execute(
-                update(OrganizationDB).where(OrganizationDB.id == org_id).values(subscription_tier=new_tier)
-            )
-            await session.commit()
+    # Send a billing email for checkout completions (best-effort)
+    if event_type == "checkout.session.completed" and result.get("processed"):
+        obj = event_dict.get("data", {}).get("object", {})
+        user_email = obj.get("customer_email") or obj.get("metadata", {}).get("user_email", "")
+        plan_id = result.get("tier", "free")
+        if user_email:
+            plan_label = next((p["name"] for p in _PLANS if p["id"] == plan_id), plan_id)
+            try:
+                email_service.send_billing_email(user_email, plan_label, "upgrade")
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Failed to send billing email to %s: %s", user_email, exc)
 
     return {"received": True}
+
+
+# ---------------------------------------------------------------------------
+# Usage metering endpoint
+# ---------------------------------------------------------------------------
+
+
+class UsageResponse(BaseModel):
+    org_id: str
+    month: str
+    tier: str
+    mtu_count: int
+    mtu_limit: int
+    unlimited: bool
+
+
+@router.get("/billing/usage", response_model=UsageResponse, dependencies=[Depends(require_api_key)])
+async def get_usage(
+    org_id: str,
+    session: AsyncSession = Depends(get_session),
+):
+    """Return current Monthly Tracked Users (MTU) count and limit for an organization."""
+    from phaseflag_api.services.usage_service import get_usage as _get_usage
+
+    usage = await _get_usage(session, org_id)
+    return UsageResponse(**usage)

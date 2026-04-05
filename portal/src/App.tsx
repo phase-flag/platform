@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import CookieConsent from './components/CookieConsent';
 import Home from './pages/Home';
 import FlagDemo from './pages/FlagDemo';
 import EvaluationDemo from './pages/EvaluationDemo';
@@ -12,6 +14,9 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Onboarding from './pages/Onboarding';
 import Billing from './pages/Billing';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Settings from './pages/Settings';
 
 function NotFound() {
   return (
@@ -51,11 +56,14 @@ function AppRoutes() {
       {/* Auth pages — no shell */}
       <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
       <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
+      <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Protected pages — no shell */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
       <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
       {/* Public pages with shell */}
       <Route path="/" element={<ShellLayout><Home /></ShellLayout>} />
@@ -71,7 +79,10 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
+      <ToastProvider>
+        <AppRoutes />
+        <CookieConsent />
+      </ToastProvider>
     </AuthProvider>
   );
 }

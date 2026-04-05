@@ -1,0 +1,1423 @@
+{
+  "suite": "variations",
+  "description": "Multi-variation selection and weighted allocation tests",
+  "cases": [
+    {
+      "name": "boolean flag \u2014 on variation",
+      "description": "Simple boolean flag targeting returns true value",
+      "flags": {
+        "bool-flag-on": {
+          "id": "flag-bool-on",
+          "key": "bool-flag-on",
+          "name": "Bool Flag On",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-false",
+          "variations": [
+            {
+              "id": "var-true",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-false",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-true"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-1",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "bool-flag-on",
+        "value": true,
+        "variation_key": "on",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "boolean flag \u2014 off variation (default)",
+      "description": "Boolean flag with no rule match returns false default",
+      "flags": {
+        "bool-flag-off": {
+          "id": "flag-bool-off",
+          "key": "bool-flag-off",
+          "name": "Bool Flag Off",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-false",
+          "variations": [
+            {
+              "id": "var-true",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-false",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "beta",
+                  "operator": "is",
+                  "value": "true"
+                }
+              ],
+              "variation_id": "var-true"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-2",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "bool-flag-off",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "string flag \u2014 three string variations",
+      "description": "String flag with three possible values, rule matches first",
+      "flags": {
+        "str-three-var": {
+          "id": "flag-str-three",
+          "key": "str-three-var",
+          "name": "String Three Variations",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-c",
+          "variations": [
+            {
+              "id": "var-a",
+              "key": "layout_a",
+              "name": "Layout A",
+              "value": "layout_a"
+            },
+            {
+              "id": "var-b",
+              "key": "layout_b",
+              "name": "Layout B",
+              "value": "layout_b"
+            },
+            {
+              "id": "var-c",
+              "key": "layout_c",
+              "name": "Layout C",
+              "value": "layout_c"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "group",
+                  "operator": "is",
+                  "value": "A"
+                }
+              ],
+              "variation_id": "var-a"
+            },
+            {
+              "priority": 2,
+              "conditions": [
+                {
+                  "attribute": "group",
+                  "operator": "is",
+                  "value": "B"
+                }
+              ],
+              "variation_id": "var-b"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-3",
+        "attributes": {
+          "group": "A"
+        }
+      },
+      "expected": {
+        "flag_key": "str-three-var",
+        "value": "layout_a",
+        "variation_key": "layout_a",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "number flag \u2014 integer value variation",
+      "description": "Number flag returns integer value",
+      "flags": {
+        "num-flag-int": {
+          "id": "flag-num-int",
+          "key": "num-flag-int",
+          "name": "Number Flag Int",
+          "flag_type": "number",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-5",
+          "variations": [
+            {
+              "id": "var-100",
+              "key": "hundred",
+              "name": "100",
+              "value": 100
+            },
+            {
+              "id": "var-50",
+              "key": "fifty",
+              "name": "50",
+              "value": 50
+            },
+            {
+              "id": "var-5",
+              "key": "five",
+              "name": "5",
+              "value": 5
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "plan",
+                  "operator": "is",
+                  "value": "enterprise"
+                }
+              ],
+              "variation_id": "var-100"
+            },
+            {
+              "priority": 2,
+              "conditions": [
+                {
+                  "attribute": "plan",
+                  "operator": "is",
+                  "value": "pro"
+                }
+              ],
+              "variation_id": "var-50"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-4",
+        "attributes": {
+          "plan": "enterprise"
+        }
+      },
+      "expected": {
+        "flag_key": "num-flag-int",
+        "value": 100,
+        "variation_key": "hundred",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "number flag \u2014 float value variation",
+      "description": "Number flag returns float value",
+      "flags": {
+        "num-flag-float": {
+          "id": "flag-num-float",
+          "key": "num-flag-float",
+          "name": "Number Flag Float",
+          "flag_type": "number",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-1-0",
+          "variations": [
+            {
+              "id": "var-1-5",
+              "key": "multiplier_1_5",
+              "name": "1.5x",
+              "value": 1.5
+            },
+            {
+              "id": "var-1-0",
+              "key": "multiplier_1_0",
+              "name": "1.0x",
+              "value": 1.0
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "vip",
+                  "operator": "is",
+                  "value": "true"
+                }
+              ],
+              "variation_id": "var-1-5"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-5",
+        "attributes": {
+          "vip": "true"
+        }
+      },
+      "expected": {
+        "flag_key": "num-flag-float",
+        "value": 1.5,
+        "variation_key": "multiplier_1_5",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "JSON flag \u2014 simple object value",
+      "description": "JSON flag returns complex object",
+      "flags": {
+        "json-flag-obj": {
+          "id": "flag-json-obj",
+          "key": "json-flag-obj",
+          "name": "JSON Flag Object",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-default",
+          "variations": [
+            {
+              "id": "var-new",
+              "key": "new_ui",
+              "name": "New UI",
+              "value": {
+                "sidebar": true,
+                "topbar": false,
+                "theme": "dark"
+              }
+            },
+            {
+              "id": "var-default",
+              "key": "classic_ui",
+              "name": "Classic UI",
+              "value": {
+                "sidebar": false,
+                "topbar": true,
+                "theme": "light"
+              }
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "new_ui_beta",
+                  "operator": "is",
+                  "value": "true"
+                }
+              ],
+              "variation_id": "var-new"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-6",
+        "attributes": {
+          "new_ui_beta": "true"
+        }
+      },
+      "expected": {
+        "flag_key": "json-flag-obj",
+        "value": {
+          "sidebar": true,
+          "topbar": false,
+          "theme": "dark"
+        },
+        "variation_key": "new_ui",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "JSON flag \u2014 array value",
+      "description": "JSON flag returns array value",
+      "flags": {
+        "json-flag-arr": {
+          "id": "flag-json-arr",
+          "key": "json-flag-arr",
+          "name": "JSON Flag Array",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-basic-features",
+          "variations": [
+            {
+              "id": "var-all-features",
+              "key": "all_features",
+              "name": "All Features",
+              "value": [
+                "search",
+                "export",
+                "analytics",
+                "audit"
+              ]
+            },
+            {
+              "id": "var-basic-features",
+              "key": "basic_features",
+              "name": "Basic Features",
+              "value": [
+                "search"
+              ]
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "plan",
+                  "operator": "is",
+                  "value": "enterprise"
+                }
+              ],
+              "variation_id": "var-all-features"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-7",
+        "attributes": {
+          "plan": "enterprise"
+        }
+      },
+      "expected": {
+        "flag_key": "json-flag-arr",
+        "value": [
+          "search",
+          "export",
+          "analytics",
+          "audit"
+        ],
+        "variation_key": "all_features",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "JSON flag \u2014 null value variation",
+      "description": "JSON flag with null as one of the variation values",
+      "flags": {
+        "json-flag-null": {
+          "id": "flag-json-null",
+          "key": "json-flag-null",
+          "name": "JSON Flag Null",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-null",
+          "variations": [
+            {
+              "id": "var-config",
+              "key": "with_config",
+              "name": "With Config",
+              "value": {
+                "setting": "value"
+              }
+            },
+            {
+              "id": "var-null",
+              "key": "no_config",
+              "name": "No Config",
+              "value": null
+            }
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {
+        "user_id": "user-8",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "json-flag-null",
+        "value": null,
+        "variation_key": "no_config",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "multivariate string flag \u2014 4 variations",
+      "description": "A/B/C/D test with 4 string variations based on user segment",
+      "flags": {
+        "abcd-test": {
+          "id": "flag-abcd",
+          "key": "abcd-test",
+          "name": "ABCD Test",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-d",
+          "variations": [
+            {
+              "id": "var-a",
+              "key": "headline_a",
+              "name": "Headline A",
+              "value": "Buy Now!"
+            },
+            {
+              "id": "var-b",
+              "key": "headline_b",
+              "name": "Headline B",
+              "value": "Get Started"
+            },
+            {
+              "id": "var-c",
+              "key": "headline_c",
+              "name": "Headline C",
+              "value": "Try Free"
+            },
+            {
+              "id": "var-d",
+              "key": "headline_d",
+              "name": "Headline D",
+              "value": "Learn More"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "group",
+                  "operator": "is",
+                  "value": "A"
+                }
+              ],
+              "variation_id": "var-a"
+            },
+            {
+              "priority": 2,
+              "conditions": [
+                {
+                  "attribute": "group",
+                  "operator": "is",
+                  "value": "B"
+                }
+              ],
+              "variation_id": "var-b"
+            },
+            {
+              "priority": 3,
+              "conditions": [
+                {
+                  "attribute": "group",
+                  "operator": "is",
+                  "value": "C"
+                }
+              ],
+              "variation_id": "var-c"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-9",
+        "attributes": {
+          "group": "B"
+        }
+      },
+      "expected": {
+        "flag_key": "abcd-test",
+        "value": "Get Started",
+        "variation_key": "headline_b",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "multivariate rollout \u2014 variation_id correctly maps to value",
+      "description": "Percentage rollout returns correct variation_key and value from variation map",
+      "hash_seed": {
+        "flag_key": "multivar-flag",
+        "user_id": "user-002",
+        "expected_bucket": 8
+      },
+      "flags": {
+        "multivar-flag": {
+          "id": "flag-multivar",
+          "key": "multivar-flag",
+          "name": "Multivar Flag",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-default",
+          "variations": [
+            {
+              "id": "var-control",
+              "key": "control",
+              "name": "Control",
+              "value": "control"
+            },
+            {
+              "id": "var-variant-a",
+              "key": "variant_a",
+              "name": "Variant A",
+              "value": "variant_a"
+            },
+            {
+              "id": "var-variant-b",
+              "key": "variant_b",
+              "name": "Variant B",
+              "value": "variant_b"
+            },
+            {
+              "id": "var-default",
+              "key": "off",
+              "name": "Off",
+              "value": "off"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {
+                    "variation_id": "var-control",
+                    "weight": 33
+                  },
+                  {
+                    "variation_id": "var-variant-a",
+                    "weight": 33
+                  },
+                  {
+                    "variation_id": "var-variant-b",
+                    "weight": 34
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-002",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "multivar-flag",
+        "value": "control",
+        "variation_key": "control",
+        "reason": "percentage_rollout"
+      }
+    },
+    {
+      "name": "variation with nested JSON object value",
+      "description": "Complex nested JSON configuration returned as variation value",
+      "flags": {
+        "nested-json-flag": {
+          "id": "flag-nested-json",
+          "key": "nested-json-flag",
+          "name": "Nested JSON Flag",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-nested-default",
+          "variations": [
+            {
+              "id": "var-nested-exp",
+              "key": "experimental",
+              "name": "Experimental",
+              "value": {
+                "api": {
+                  "timeout": 5000,
+                  "retries": 3,
+                  "endpoints": {
+                    "primary": "api-v2.example.com",
+                    "fallback": "api-v1.example.com"
+                  }
+                },
+                "ui": {
+                  "animations": true,
+                  "density": "compact"
+                }
+              }
+            },
+            {
+              "id": "var-nested-default",
+              "key": "stable",
+              "name": "Stable",
+              "value": {
+                "api": {
+                  "timeout": 10000,
+                  "retries": 1,
+                  "endpoints": {
+                    "primary": "api.example.com",
+                    "fallback": null
+                  }
+                },
+                "ui": {
+                  "animations": false,
+                  "density": "normal"
+                }
+              }
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "channel",
+                  "operator": "is",
+                  "value": "canary"
+                }
+              ],
+              "variation_id": "var-nested-exp"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-10",
+        "attributes": {
+          "channel": "canary"
+        }
+      },
+      "expected": {
+        "flag_key": "nested-json-flag",
+        "value": {
+          "api": {
+            "timeout": 5000,
+            "retries": 3,
+            "endpoints": {
+              "primary": "api-v2.example.com",
+              "fallback": "api-v1.example.com"
+            }
+          },
+          "ui": {
+            "animations": true,
+            "density": "compact"
+          }
+        },
+        "variation_key": "experimental",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "weighted allocation \u2014 even 50/50 split verifiable",
+      "description": "Verify user-010 (bucket=3) gets var-on with 50% allocation",
+      "hash_seed": {
+        "flag_key": "weighted-even",
+        "user_id": "user-010",
+        "expected_bucket": null
+      },
+      "flags": {
+        "weighted-even": {
+          "id": "flag-weighted-even",
+          "key": "weighted-even",
+          "name": "Weighted Even",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-b",
+          "variations": [
+            {
+              "id": "var-a",
+              "key": "variant_a",
+              "name": "Variant A",
+              "value": "a"
+            },
+            {
+              "id": "var-b",
+              "key": "variant_b",
+              "name": "Variant B",
+              "value": "b"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {
+                    "variation_id": "var-a",
+                    "weight": 100
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-010",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "weighted-even",
+        "value": "a",
+        "variation_key": "variant_a",
+        "reason": "percentage_rollout"
+      }
+    },
+    {
+      "name": "variation \u2014 empty string is valid value",
+      "description": "Empty string as variation value is returned correctly",
+      "flags": {
+        "empty-val-flag": {
+          "id": "flag-empty-val",
+          "key": "empty-val-flag",
+          "name": "Empty Val Flag",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-empty",
+          "variations": [
+            {
+              "id": "var-full",
+              "key": "full",
+              "name": "Full",
+              "value": "full-value"
+            },
+            {
+              "id": "var-empty",
+              "key": "empty",
+              "name": "Empty",
+              "value": ""
+            }
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {
+        "user_id": "user-x1",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "empty-val-flag",
+        "value": "",
+        "variation_key": "empty",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "variation \u2014 large integer value",
+      "description": "Large integer value in variation is returned intact",
+      "flags": {
+        "large-int-flag": {
+          "id": "flag-large-int",
+          "key": "large-int-flag",
+          "name": "Large Int Flag",
+          "flag_type": "number",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-large",
+          "variations": [
+            {
+              "id": "var-large",
+              "key": "large_val",
+              "name": "Large",
+              "value": 9007199254740992
+            }
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {
+        "user_id": "user-x2",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "large-int-flag",
+        "value": 9007199254740992,
+        "variation_key": "large_val",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "variation \u2014 boolean true via targeting match returns variation_key",
+      "description": "Targeting match returns both value AND variation_key and reason",
+      "flags": {
+        "bool-targeting-result": {
+          "id": "flag-bool-target-res",
+          "key": "bool-targeting-result",
+          "name": "Bool Targeting Result",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-def",
+          "variations": [
+            {
+              "id": "var-match",
+              "key": "enabled",
+              "name": "Enabled",
+              "value": true
+            },
+            {
+              "id": "var-def",
+              "key": "disabled",
+              "name": "Disabled",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "feature_enabled",
+                  "operator": "is",
+                  "value": "yes"
+                }
+              ],
+              "variation_id": "var-match"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-x3",
+        "attributes": {
+          "feature_enabled": "yes"
+        }
+      },
+      "expected": {
+        "flag_key": "bool-targeting-result",
+        "value": true,
+        "variation_key": "enabled",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "variation \u2014 float negative value",
+      "description": "Negative float value is returned correctly",
+      "flags": {
+        "neg-float-flag": {
+          "id": "flag-neg-float",
+          "key": "neg-float-flag",
+          "name": "Negative Float Flag",
+          "flag_type": "number",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-neg",
+          "variations": [
+            {
+              "id": "var-pos",
+              "key": "positive",
+              "name": "Positive",
+              "value": 1.5
+            },
+            {
+              "id": "var-neg",
+              "key": "negative",
+              "name": "Negative",
+              "value": -1.5
+            }
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {
+        "user_id": "user-x4",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "neg-float-flag",
+        "value": -1.5,
+        "variation_key": "negative",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "variation \u2014 JSON with deeply nested value",
+      "description": "Deep nesting in JSON variation value is preserved",
+      "flags": {
+        "deep-json-flag": {
+          "id": "flag-deep-json",
+          "key": "deep-json-flag",
+          "name": "Deep JSON Flag",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-deep",
+          "variations": [
+            {
+              "id": "var-deep",
+              "key": "deep_config",
+              "name": "Deep Config",
+              "value": {
+                "level1": {
+                  "level2": {
+                    "level3": {
+                      "value": 42,
+                      "enabled": true
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {
+        "user_id": "user-x5",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "deep-json-flag",
+        "value": {
+          "level1": {
+            "level2": {
+              "level3": {
+                "value": 42,
+                "enabled": true
+              }
+            }
+          }
+        },
+        "variation_key": "deep_config",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "variation \u2014 multiple rules hit by different users \u2014 second rule result",
+      "description": "User in group C hits rule 3 returning 'layout_c'",
+      "flags": {
+        "str-three-var-c": {
+          "id": "flag-str-three-c",
+          "key": "str-three-var-c",
+          "name": "String Three Variations C",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-c",
+          "variations": [
+            {
+              "id": "var-a",
+              "key": "layout_a",
+              "name": "Layout A",
+              "value": "layout_a"
+            },
+            {
+              "id": "var-b",
+              "key": "layout_b",
+              "name": "Layout B",
+              "value": "layout_b"
+            },
+            {
+              "id": "var-c",
+              "key": "layout_c",
+              "name": "Layout C",
+              "value": "layout_c"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "group",
+                  "operator": "is",
+                  "value": "A"
+                }
+              ],
+              "variation_id": "var-a"
+            },
+            {
+              "priority": 2,
+              "conditions": [
+                {
+                  "attribute": "group",
+                  "operator": "is",
+                  "value": "B"
+                }
+              ],
+              "variation_id": "var-b"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-c",
+        "attributes": {
+          "group": "C"
+        }
+      },
+      "expected": {
+        "flag_key": "str-three-var-c",
+        "value": "layout_c",
+        "variation_key": "layout_c",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "variation \u2014 targeting rule with empty string value",
+      "description": "Targeting rule matches empty string attribute value",
+      "flags": {
+        "empty-attr-match": {
+          "id": "flag-empty-attr",
+          "key": "empty-attr-match",
+          "name": "Empty Attr Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "promo_code",
+                  "operator": "is_not",
+                  "value": ""
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-promo",
+        "attributes": {
+          "promo_code": "SAVE20"
+        }
+      },
+      "expected": {
+        "flag_key": "empty-attr-match",
+        "value": true,
+        "variation_key": "on",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "variation \u2014 exact integer variation index",
+      "description": "Rollout returns correct variation by ID lookup, not by index",
+      "hash_seed": {
+        "flag_key": "multivar-flag",
+        "user_id": "user-003",
+        "expected_bucket": 9
+      },
+      "flags": {
+        "multivar-idx-check": {
+          "id": "flag-multivar-idx",
+          "key": "multivar-idx-check",
+          "name": "Multivar Index Check",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-ix-d",
+          "variations": [
+            {
+              "id": "var-ix-a",
+              "key": "first",
+              "name": "First",
+              "value": "first"
+            },
+            {
+              "id": "var-ix-b",
+              "key": "second",
+              "name": "Second",
+              "value": "second"
+            },
+            {
+              "id": "var-ix-c",
+              "key": "third",
+              "name": "Third",
+              "value": "third"
+            },
+            {
+              "id": "var-ix-d",
+              "key": "fourth",
+              "name": "Fourth",
+              "value": "fourth"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {
+                    "variation_id": "var-ix-a",
+                    "weight": 25
+                  },
+                  {
+                    "variation_id": "var-ix-b",
+                    "weight": 25
+                  },
+                  {
+                    "variation_id": "var-ix-c",
+                    "weight": 25
+                  },
+                  {
+                    "variation_id": "var-ix-d",
+                    "weight": 25
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-003",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "multivar-idx-check",
+        "value": "first",
+        "variation_key": "first",
+        "reason": "percentage_rollout"
+      }
+    },
+    {
+      "name": "variation \u2014 rollout with only one variation defined",
+      "description": "Percentage rollout with only one entry covering 100% \u2014 always returns it",
+      "flags": {
+        "single-rollout": {
+          "id": "flag-single-rollout",
+          "key": "single-rollout",
+          "name": "Single Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {
+                    "variation_id": "var-on",
+                    "weight": 100
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "any-user-42",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "single-rollout",
+        "value": true,
+        "variation_key": "on",
+        "reason": "percentage_rollout"
+      }
+    },
+    {
+      "name": "variation \u2014 json flag boolean true in array",
+      "description": "JSON array containing true boolean value is returned correctly",
+      "flags": {
+        "json-bool-arr": {
+          "id": "flag-json-bool-arr",
+          "key": "json-bool-arr",
+          "name": "JSON Bool Array",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-bool-arr",
+          "variations": [
+            {
+              "id": "var-bool-arr",
+              "key": "flags_arr",
+              "name": "Flags Array",
+              "value": [
+                true,
+                false,
+                true,
+                true
+              ]
+            }
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {
+        "user_id": "user-x9",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "json-bool-arr",
+        "value": [
+          true,
+          false,
+          true,
+          true
+        ],
+        "variation_key": "flags_arr",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "variation \u2014 string variation with url value",
+      "description": "String variation can hold a URL value",
+      "flags": {
+        "url-flag": {
+          "id": "flag-url",
+          "key": "url-flag",
+          "name": "URL Flag",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-url-prod",
+          "variations": [
+            {
+              "id": "var-url-staging",
+              "key": "staging",
+              "name": "Staging",
+              "value": "https://staging.api.example.com/v2"
+            },
+            {
+              "id": "var-url-prod",
+              "key": "production",
+              "name": "Production",
+              "value": "https://api.example.com/v1"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "env",
+                  "operator": "is",
+                  "value": "staging"
+                }
+              ],
+              "variation_id": "var-url-staging"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-staging",
+        "attributes": {
+          "env": "staging"
+        }
+      },
+      "expected": {
+        "flag_key": "url-flag",
+        "value": "https://staging.api.example.com/v2",
+        "variation_key": "staging",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "variation \u2014 integer attribute matched via contains on string coercion",
+      "description": "contains checks if str(42) contains '4', which it does",
+      "flags": {
+        "int-contains": {
+          "id": "flag-int-contains",
+          "key": "int-contains",
+          "name": "Int Contains",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "code",
+                  "operator": "contains",
+                  "value": "4"
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-code",
+        "attributes": {
+          "code": 42
+        }
+      },
+      "expected": {
+        "flag_key": "int-contains",
+        "value": true,
+        "variation_key": "on",
+        "reason": "targeting_match"
+      }
+    }
+  ]
+}

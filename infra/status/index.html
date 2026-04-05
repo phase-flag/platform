@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phase Flag — Status</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f172a;
+      --surface:   #1e2535;
+      --surface2:  #111827;
+      --border:    #1e293b;
+      --green:     #34D399;
+      --yellow:    #fbbf24;
+      --red:       #f87171;
+      --text:      #f8fafc;
+      --muted:     #94a3b8;
+      --dim:       #475569;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 0 16px 64px;
+    }
+
+    header {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo { font-size: 22px; font-weight: 700; color: var(--green); letter-spacing: -0.5px; }
+
+    #overall-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      flex-shrink: 0;
+    }
+    .dot.degraded { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+    .dot.down     { background: var(--red);    box-shadow: 0 0 8px var(--red); }
+
+    main { max-width: 860px; margin: 40px auto 0; }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+
+    .services { display: flex; flex-direction: column; gap: 10px; margin-bottom: 48px; }
+
+    .service-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .service-info { flex: 1; min-width: 0; }
+    .service-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .service-url  { font-size: 12px; color: var(--dim); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .service-status {
+      font-size: 13px;
+      font-weight: 600;
+      min-width: 80px;
+      text-align: right;
+    }
+    .service-status.operational { color: var(--green); }
+    .service-status.degraded    { color: var(--yellow); }
+    .service-status.down        { color: var(--red); }
+    .service-status.checking    { color: var(--dim); }
+
+    .latency {
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 56px;
+      text-align: right;
+    }
+
+    /* 24h history bars */
+    .history {
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+      height: 28px;
+      min-width: 144px;
+    }
+    .history-bar {
+      flex: 1;
+      border-radius: 2px;
+      height: 100%;
+      transition: opacity 0.2s;
+      cursor: default;
+      position: relative;
+    }
+    .history-bar.up      { background: var(--green); opacity: 0.7; }
+    .history-bar.partial { background: var(--yellow); opacity: 0.8; }
+    .history-bar.down    { background: var(--red); opacity: 0.9; }
+    .history-bar.unknown { background: var(--dim); opacity: 0.4; }
+    .history-bar:hover { opacity: 1; }
+
+    /* Incident panel */
+    #incidents {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 48px;
+    }
+    #incidents h2 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+    #incidents p  { font-size: 14px; color: var(--muted); }
+
+    footer {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--dim);
+    }
+    #refresh-countdown { color: var(--muted); }
+
+    @media (max-width: 600px) {
+      .history { display: none; }
+      .latency { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚑ Phase Flag</div>
+  <div id="overall-status">
+    <span class="dot" id="overall-dot"></span>
+    <span id="overall-label">Checking…</span>
+  </div>
+</header>
+
+<main>
+  <p class="section-title">Services</p>
+  <div class="services" id="services-list"></div>
+
+  <div id="incidents">
+    <h2>Recent Incidents</h2>
+    <p id="incidents-text">No incidents reported in the last 24 hours.</p>
+  </div>
+
+  <p class="section-title">24-hour history (newest right)</p>
+  <div class="services" id="history-list"></div>
+</main>
+
+<footer>
+  <span>Auto-refreshes every 60 seconds</span>
+  <span id="refresh-countdown">Next check in 60s</span>
+</footer>
+
+<script>
+// ─── Service catalogue ────────────────────────────────────────────────────────
+const SERVICES = [
+  {
+    id:    'api',
+    name:  'API',
+    url:   'https://api.phaseflag.com/health',
+    local: 'http://localhost:8000/health',
+  },
+  {
+    id:    'relay',
+    name:  'Relay (Edge Proxy)',
+    url:   'https://relay.phaseflag.com/health',
+    local: 'http://localhost:8001/health',
+  },
+  {
+    id:    'dashboard',
+    name:  'Dashboard',
+    url:   'https://app.phaseflag.com',
+    local: 'http://localhost:3000',
+  },
+  {
+    id:    'portal',
+    name:  'Portal',
+    url:   'https://portal.phaseflag.com',
+    local: 'http://localhost:5174',
+  },
+  {
+    id:    'marketing',
+    name:  'Marketing Site',
+    url:   'https://phaseflag.com',
+    local: 'http://localhost:5175',
+  },
+  {
+    id:    'docs',
+    name:  'Docs',
+    url:   'https://docs.phaseflag.com',
+    local: null,
+  },
+];
+
+// ─── LocalStorage history ─────────────────────────────────────────────────────
+const HISTORY_KEY  = 'pf_status_history';
+const HISTORY_BINS = 24; // hours to keep
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function saveHistory(h) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+}
+
+function recordResult(id, status) {
+  const h = loadHistory();
+  if (!h[id]) h[id] = [];
+  const now = Date.now();
+  h[id].push({ ts: now, status });
+  // Prune entries older than 24 hours
+  const cutoff = now - HISTORY_BINS * 60 * 60 * 1000;
+  h[id] = h[id].filter(e => e.ts >= cutoff);
+  saveHistory(h);
+}
+
+function getBins(id) {
+  // Bucket the history into HISTORY_BINS hour-wide slots
+  const h = loadHistory();
+  const entries = h[id] || [];
+  const now = Date.now();
+  const bins = [];
+  for (let i = HISTORY_BINS - 1; i >= 0; i--) {
+    const slotStart = now - (i + 1) * 60 * 60 * 1000;
+    const slotEnd   = now - i * 60 * 60 * 1000;
+    const inSlot = entries.filter(e => e.ts >= slotStart && e.ts < slotEnd);
+    if (!inSlot.length) { bins.push('unknown'); continue; }
+    const ups = inSlot.filter(e => e.status === 'operational').length;
+    if (ups === inSlot.length) bins.push('up');
+    else if (ups === 0)        bins.push('down');
+    else                       bins.push('partial');
+  }
+  return bins;
+}
+
+// ─── DOM helpers ─────────────────────────────────────────────────────────────
+function statusClass(s) {
+  if (s === 'operational') return 'operational';
+  if (s === 'degraded')    return 'degraded';
+  if (s === 'down')        return 'down';
+  return 'checking';
+}
+
+function statusLabel(s) {
+  if (s === 'operational') return 'Operational';
+  if (s === 'degraded')    return 'Degraded';
+  if (s === 'down')        return 'Down';
+  return 'Checking…';
+}
+
+function renderServices(results) {
+  const list = document.getElementById('services-list');
+  list.innerHTML = '';
+  SERVICES.forEach(svc => {
+    const r = results[svc.id] || { status: 'checking', latencyMs: null };
+    const sc = statusClass(r.status);
+    const card = document.createElement('div');
+    card.className = 'service-card';
+    card.innerHTML = `
+      <span class="dot ${sc === 'operational' ? '' : sc}"></span>
+      <div class="service-info">
+        <div class="service-name">${svc.name}</div>
+        <div class="service-url">${svc.url}</div>
+      </div>
+      <span class="latency">${r.latencyMs != null ? r.latencyMs + ' ms' : '—'}</span>
+      <span class="service-status ${sc}">${statusLabel(r.status)}</span>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function renderHistoryBars(results) {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  SERVICES.forEach(svc => {
+    const bins = getBins(svc.id);
+    const card = document.createElement('div');
+    card.className = 'service-card';
+    const barsHtml = bins.map(b =>
+      `<div class="history-bar ${b}" title="${b}"></div>`
+    ).join('');
+    card.innerHTML = `
+      <div class="service-info">
+        <div class="service-name">${svc.name}</div>
+      </div>
+      <div class="history">${barsHtml}</div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function updateOverall(results) {
+  const statuses = Object.values(results).map(r => r.status);
+  const dot   = document.getElementById('overall-dot');
+  const label = document.getElementById('overall-label');
+  if (statuses.every(s => s === 'operational')) {
+    dot.className = 'dot';
+    label.textContent = 'All systems operational';
+  } else if (statuses.some(s => s === 'down')) {
+    dot.className = 'dot down';
+    label.textContent = 'Service disruption detected';
+  } else {
+    dot.className = 'dot degraded';
+    label.textContent = 'Partial degradation';
+  }
+}
+
+// ─── Health checks ────────────────────────────────────────────────────────────
+async function checkService(svc) {
+  const urls = [svc.url];
+  if (svc.local) urls.unshift(svc.local);
+
+  for (const url of urls) {
+    const t0 = Date.now();
+    try {
+      const resp = await fetch(url, {
+        method: 'GET',
+        mode: 'no-cors',   // allows checking cross-origin pages that don't set CORS headers
+        signal: AbortSignal.timeout(5000),
+      });
+      const latencyMs = Date.now() - t0;
+      // no-cors gives opaque responses (status 0) — treat as up if no error thrown
+      const status = (resp.ok || resp.type === 'opaque') ? 'operational' : 'degraded';
+      return { status, latencyMs };
+    } catch {
+      // Try next URL or fall through
+    }
+  }
+  return { status: 'down', latencyMs: null };
+}
+
+async function runChecks() {
+  const results = {};
+  await Promise.all(
+    SERVICES.map(async svc => {
+      const r = await checkService(svc);
+      results[svc.id] = r;
+      recordResult(svc.id, r.status);
+    })
+  );
+  renderServices(results);
+  renderHistoryBars(results);
+  updateOverall(results);
+}
+
+// ─── Countdown + auto-refresh ─────────────────────────────────────────────────
+let secondsLeft = 60;
+const countdownEl = document.getElementById('refresh-countdown');
+
+function tick() {
+  secondsLeft--;
+  countdownEl.textContent = `Next check in ${secondsLeft}s`;
+  if (secondsLeft <= 0) {
+    secondsLeft = 60;
+    runChecks();
+  }
+}
+
+// ─── Boot ────────────────────────────────────────────────────────────────────
+runChecks();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>

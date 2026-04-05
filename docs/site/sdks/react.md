@@ -1,7 +1,9 @@
 ---
 title: "React SDK"
-description: "Use Phase Flag feature flags in your React application with hooks and a context provider."
+description: "Use Phase Flag feature flags in your React application with hooks and a context provider — built on the JavaScript SDK."
 ---
+
+# React SDK
 
 ## Installation
 
@@ -29,9 +31,12 @@ import App from "./App";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <PhaseFlagProvider
+      apiUrl="https://api.phaseflag.com/api/v1"
       apiKey="sdk-dev-xxxxxxxxxxxx"
-      environment="production"
-      user={{ userKey: "user-123", attributes: { plan: "pro" } }}
+      context={{
+        userId: "user-123",
+        attributes: { plan: "pro" },
+      }}
     >
       <App />
     </PhaseFlagProvider>
@@ -39,19 +44,19 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 );
 ```
 
-The provider initializes the underlying `PhaseFlagClient`, fetches the ruleset, and makes it available to all child components.
+The provider initializes the underlying `PhaseFlagClient`, fetches the ruleset, and makes it available to all child components via React context.
 
 ---
 
-## useFlag Hook
+## useBooleanFlag Hook
 
-`useFlag` returns a boolean indicating whether the flag is enabled for the current user:
+The most common hook — returns a boolean for simple on/off flags:
 
 ```tsx
-import { useFlag } from "@phaseflag/react";
+import { useBooleanFlag } from "@phaseflag/react";
 
 function CheckoutButton() {
-  const isNewCheckout = useFlag("new-checkout-flow");
+  const isNewCheckout = useBooleanFlag("new-checkout-flow", false);
 
   if (isNewCheckout) {
     return <NewCheckoutButton />;
@@ -61,19 +66,19 @@ function CheckoutButton() {
 }
 ```
 
-While the ruleset is loading, `useFlag` returns `false` (safe default). A `<Suspense>` boundary is not required but is supported.
+While the ruleset is loading, `useBooleanFlag` returns the `defaultValue` (safe fallback). Suspense is not required.
 
 ---
 
-## useFlagVariation Hook
+## useFlagValue Hook
 
-`useFlagVariation` returns the raw flag value — useful for multivariate flags:
+Returns the raw flag value — useful for multivariate (string, number, JSON) flags:
 
 ```tsx
-import { useFlagVariation } from "@phaseflag/react";
+import { useFlagValue } from "@phaseflag/react";
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const theme = useFlagVariation<string>("ui-theme", "light"); // second arg is default
+  const theme = useFlagValue<string>("ui-theme", "light");
   return <div data-theme={theme}>{children}</div>;
 }
 ```
@@ -87,7 +92,7 @@ interface PricingConfig {
 }
 
 function PricingPage() {
-  const config = useFlagVariation<PricingConfig>("pricing-config", {
+  const config = useFlagValue<PricingConfig>("pricing-config", {
     monthlyPrice: 49,
     trialDays: 14,
     showAnnualDiscount: false,
@@ -104,28 +109,23 @@ function PricingPage() {
 
 ---
 
-## useFlagWithDetail Hook
+## useFeatureFlag Hook
 
-For debugging or analytics, get the full evaluation result:
+Returns the value, variation details, and loading state:
 
 ```tsx
-import { useFlagWithDetail } from "@phaseflag/react";
+import { useFeatureFlag } from "@phaseflag/react";
 
-function DebugBadge() {
-  const result = useFlagWithDetail("new-checkout-flow");
+function CheckoutPage() {
+  const { value, variation, loading, flag } = useFeatureFlag("new-checkout-flow");
+
+  if (loading) return <Spinner />;
 
   return (
-    <pre>
-      {JSON.stringify(
-        {
-          value: result.value,
-          reason: result.reason,
-          ruleId: result.ruleId,
-        },
-        null,
-        2
-      )}
-    </pre>
+    <div>
+      <p>Flag: {String(value)}</p>
+      <p>Variation: {variation?.key}</p>
+    </div>
   );
 }
 ```
@@ -134,7 +134,7 @@ function DebugBadge() {
 
 ## Updating the User Context
 
-When the user logs in or their attributes change, call `identify` via the context:
+When the user logs in or their attributes change, update the context on the underlying client:
 
 ```tsx
 import { usePhaseFlagClient } from "@phaseflag/react";
@@ -146,12 +146,11 @@ function LoginButton() {
     await doLogin(user);
 
     // Update the evaluation context — all hook values will re-render
-    client.identify({
-      userKey: user.id,
+    client.setContext({
+      userId: user.id,
       attributes: {
         email: user.email,
         plan: user.plan,
-        orgId: user.orgId,
       },
     });
   };
@@ -164,42 +163,97 @@ function LoginButton() {
 
 ## Loading and Error States
 
+Access the loading and error state from the provider:
+
 ```tsx
-import { usePhaseFlagStatus } from "@phaseflag/react";
+import { useContext } from "react";
+import { PhaseFlagContext } from "@phaseflag/react";
 
 function App() {
-  const { isLoading, error } = usePhaseFlagStatus();
+  // The provider exposes loading state through the context
+  // Use useBooleanFlag / useFlagValue — they return defaultValue while loading
+  const darkMode = useBooleanFlag("dark-mode", false);
 
-  if (isLoading) return <LoadingSpinner />;
-  if (error) console.warn("Phase Flag failed to initialize:", error.message);
-
-  return <Main />;
+  return <main data-theme={darkMode ? "dark" : "light"}>...</main>;
 }
+```
+
+---
+
+## Flag Mocking (Testing)
+
+Use the underlying client's override API in tests:
+
+```tsx
+import { render } from "@testing-library/react";
+import { PhaseFlagProvider } from "@phaseflag/react";
+import { PhaseFlagClient } from "@phaseflag/js-sdk";
+
+// In your test helpers
+function renderWithFlags(
+  ui: React.ReactElement,
+  overrides: Record<string, unknown> = {}
+) {
+  // We use a ref to access the client after render
+  const clientRef = { current: null as PhaseFlagClient | null };
+
+  const Wrapper = ({ children }: { children: React.ReactNode }) => {
+    return (
+      <PhaseFlagProvider
+        apiUrl=""
+        apiKey=""
+        offlineMode
+      >
+        {children}
+      </PhaseFlagProvider>
+    );
+  };
+
+  return render(ui, { wrapper: Wrapper });
+}
+```
+
+For simpler unit tests, mock the hooks directly:
+
+```tsx
+import { useBooleanFlag } from "@phaseflag/react";
+
+vi.mock("@phaseflag/react", () => ({
+  useBooleanFlag: (key: string, def: boolean) => {
+    if (key === "new-checkout-flow") return true;
+    return def;
+  },
+  useFlagValue: (_key: string, def: unknown) => def,
+}));
 ```
 
 ---
 
 ## SSR Considerations
 
-When using Server-Side Rendering (e.g., with Vite SSR), the `PhaseFlagProvider` must only render on the client. Use a dynamic import or a client-only guard:
+When using Server-Side Rendering (e.g., Vite SSR or Remix), mount the `PhaseFlagProvider` only on the client:
 
 ```tsx
-// Only renders after hydration
-const [mounted, setMounted] = React.useState(false);
-React.useEffect(() => setMounted(true), []);
+function ClientPhaseFlagProvider({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
 
-if (!mounted) return <>{children}</>;
+  if (!mounted) return <>{children}</>;
 
-return <PhaseFlagProvider {...props}>{children}</PhaseFlagProvider>;
+  return (
+    <PhaseFlagProvider
+      apiUrl={import.meta.env.VITE_PHASEFLAG_API_URL}
+      apiKey={import.meta.env.VITE_PHASEFLAG_API_KEY}
+    >
+      {children}
+    </PhaseFlagProvider>
+  );
+}
 ```
 
 ---
 
-## Next.js Integration
-
-<Note>
-  Phase Flag's Admin Dashboard and Portal are Vite-based, not Next.js. The React SDK can still be used with Next.js App Router in your own applications.
-</Note>
+## Next.js App Router Integration
 
 In Next.js App Router, wrap your root layout with the provider in a client component:
 
@@ -212,9 +266,9 @@ import { PhaseFlagProvider } from "@phaseflag/react";
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <PhaseFlagProvider
+      apiUrl={process.env.NEXT_PUBLIC_PHASEFLAG_API_URL!}
       apiKey={process.env.NEXT_PUBLIC_PHASEFLAG_API_KEY!}
-      environment={process.env.NODE_ENV === "production" ? "production" : "development"}
-      user={{ userKey: "anonymous" }}
+      context={{ userId: "anonymous" }}
     >
       {children}
     </PhaseFlagProvider>
@@ -243,10 +297,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
+| `apiUrl` | `string` | Yes | API base URL (including `/api/v1`) |
 | `apiKey` | `string` | Yes | SDK API key from project settings |
-| `environment` | `string` | Yes | Target environment name |
-| `user` | `EvaluationContext` | Yes | Initial user context |
-| `baseUrl` | `string` | No | Override API base URL |
+| `context` | `EvaluationContext` | No | Initial evaluation context |
 | `pollingInterval` | `number` | No | Ms between ruleset fetches (default: 30000) |
-| `streaming` | `boolean` | No | Use SSE for real-time updates |
-| `fallback` | `ReactNode` | No | Rendered while loading |
+| `bootstrap` | `BootstrapData` | No | Pre-loaded flag data for instant startup |
+| `bootstrapUrl` | `string` | No | URL to fetch bootstrap data from |
+| `offlineMode` | `boolean` | No | Use cached data when API is unreachable |
+| `children` | `ReactNode` | Yes | Child components |
+
+---
+
+## Hooks Reference
+
+| Hook | Returns | Description |
+|------|---------|-------------|
+| `useBooleanFlag(key, default)` | `boolean` | Evaluate a boolean flag |
+| `useFlagValue<T>(key, default)` | `T` | Evaluate any flag type |
+| `useFeatureFlag(key)` | `{ value, variation, loading, flag }` | Full evaluation result |
+| `usePhaseFlagClient()` | `PhaseFlagClient` | Direct access to the underlying client |

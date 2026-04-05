@@ -1,0 +1,1032 @@
+{
+  "suite": "operators",
+  "description": "Tests all 11 targeting operators across various data types",
+  "cases": [
+    {
+      "name": "is operator matches exact string",
+      "description": "Condition: country is 'US' — user country is 'US'",
+      "flags": {
+        "op-is-match": {
+          "id": "flag-op-is-1",
+          "key": "op-is-match",
+          "name": "Is Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "country", "operator": "is", "value": "US"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-1", "attributes": {"country": "US"}},
+      "expected": {"flag_key": "op-is-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "is operator no match",
+      "description": "Condition: country is 'US' — user country is 'CA'",
+      "flags": {
+        "op-is-no-match": {
+          "id": "flag-op-is-2",
+          "key": "op-is-no-match",
+          "name": "Is No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "country", "operator": "is", "value": "US"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-2", "attributes": {"country": "CA"}},
+      "expected": {"flag_key": "op-is-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "is_not operator matches when values differ",
+      "description": "Condition: plan is_not 'free' — user has plan 'pro'",
+      "flags": {
+        "op-is-not-match": {
+          "id": "flag-op-is-not-1",
+          "key": "op-is-not-match",
+          "name": "Is Not Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "plan", "operator": "is_not", "value": "free"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-3", "attributes": {"plan": "pro"}},
+      "expected": {"flag_key": "op-is-not-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "is_not operator no match when values equal",
+      "description": "Condition: plan is_not 'free' — user has plan 'free'",
+      "flags": {
+        "op-is-not-no-match": {
+          "id": "flag-op-is-not-2",
+          "key": "op-is-not-no-match",
+          "name": "Is Not No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "plan", "operator": "is_not", "value": "free"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-4", "attributes": {"plan": "free"}},
+      "expected": {"flag_key": "op-is-not-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "is_not operator matches missing attribute",
+      "description": "Condition: plan is_not 'free' — plan attribute missing (returns true for negation)",
+      "flags": {
+        "op-is-not-missing": {
+          "id": "flag-op-is-not-3",
+          "key": "op-is-not-missing",
+          "name": "Is Not Missing Attr",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "plan", "operator": "is_not", "value": "free"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-5", "attributes": {}},
+      "expected": {"flag_key": "op-is-not-missing", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "contains operator matches substring",
+      "description": "Condition: email contains '@example.com' — user email contains the domain",
+      "flags": {
+        "op-contains-match": {
+          "id": "flag-op-contains-1",
+          "key": "op-contains-match",
+          "name": "Contains Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "email", "operator": "contains", "value": "@example.com"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-6", "attributes": {"email": "alice@example.com"}},
+      "expected": {"flag_key": "op-contains-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "contains operator no match",
+      "description": "Condition: email contains '@example.com' — user has different domain",
+      "flags": {
+        "op-contains-no-match": {
+          "id": "flag-op-contains-2",
+          "key": "op-contains-no-match",
+          "name": "Contains No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "email", "operator": "contains", "value": "@example.com"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-7", "attributes": {"email": "bob@other.com"}},
+      "expected": {"flag_key": "op-contains-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "not_contains operator matches when substring absent",
+      "description": "Condition: user_agent not_contains 'bot' — normal browser",
+      "flags": {
+        "op-not-contains-match": {
+          "id": "flag-op-not-contains-1",
+          "key": "op-not-contains-match",
+          "name": "Not Contains Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "user_agent", "operator": "not_contains", "value": "bot"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-8", "attributes": {"user_agent": "Mozilla/5.0 Chrome/120"}},
+      "expected": {"flag_key": "op-not-contains-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "not_contains operator no match when substring present",
+      "description": "Condition: user_agent not_contains 'bot' — crawler user agent",
+      "flags": {
+        "op-not-contains-no-match": {
+          "id": "flag-op-not-contains-2",
+          "key": "op-not-contains-no-match",
+          "name": "Not Contains No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "user_agent", "operator": "not_contains", "value": "bot"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-9", "attributes": {"user_agent": "Googlebot/2.1"}},
+      "expected": {"flag_key": "op-not-contains-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "not_contains operator matches missing attribute",
+      "description": "Condition: email not_contains '@bad.com' — email missing (negation matches)",
+      "flags": {
+        "op-not-contains-missing": {
+          "id": "flag-op-not-contains-3",
+          "key": "op-not-contains-missing",
+          "name": "Not Contains Missing",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "email", "operator": "not_contains", "value": "@bad.com"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-10", "attributes": {}},
+      "expected": {"flag_key": "op-not-contains-missing", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "one_of operator matches when value in list",
+      "description": "Condition: role one_of ['admin','moderator'] — user is admin",
+      "flags": {
+        "op-one-of-match": {
+          "id": "flag-op-one-of-1",
+          "key": "op-one-of-match",
+          "name": "One Of Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "one_of", "value": ["admin", "moderator"]}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-11", "attributes": {"role": "admin"}},
+      "expected": {"flag_key": "op-one-of-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "one_of operator matches second item in list",
+      "description": "Condition: role one_of ['admin','moderator'] — user is moderator",
+      "flags": {
+        "op-one-of-second": {
+          "id": "flag-op-one-of-2",
+          "key": "op-one-of-second",
+          "name": "One Of Second",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "one_of", "value": ["admin", "moderator"]}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-12", "attributes": {"role": "moderator"}},
+      "expected": {"flag_key": "op-one-of-second", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "one_of operator no match when value not in list",
+      "description": "Condition: role one_of ['admin','moderator'] — user is viewer",
+      "flags": {
+        "op-one-of-no-match": {
+          "id": "flag-op-one-of-3",
+          "key": "op-one-of-no-match",
+          "name": "One Of No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "one_of", "value": ["admin", "moderator"]}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-13", "attributes": {"role": "viewer"}},
+      "expected": {"flag_key": "op-one-of-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "not_one_of operator matches when value not in list",
+      "description": "Condition: country not_one_of ['CN','RU'] — user is from US",
+      "flags": {
+        "op-not-one-of-match": {
+          "id": "flag-op-not-one-of-1",
+          "key": "op-not-one-of-match",
+          "name": "Not One Of Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "country", "operator": "not_one_of", "value": ["CN", "RU"]}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-14", "attributes": {"country": "US"}},
+      "expected": {"flag_key": "op-not-one-of-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "not_one_of operator no match when value in list",
+      "description": "Condition: country not_one_of ['CN','RU'] — user is from CN",
+      "flags": {
+        "op-not-one-of-no-match": {
+          "id": "flag-op-not-one-of-2",
+          "key": "op-not-one-of-no-match",
+          "name": "Not One Of No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "country", "operator": "not_one_of", "value": ["CN", "RU"]}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-15", "attributes": {"country": "CN"}},
+      "expected": {"flag_key": "op-not-one-of-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "not_one_of operator matches missing attribute",
+      "description": "Condition: country not_one_of ['CN','RU'] — country missing (negation matches)",
+      "flags": {
+        "op-not-one-of-missing": {
+          "id": "flag-op-not-one-of-3",
+          "key": "op-not-one-of-missing",
+          "name": "Not One Of Missing",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "country", "operator": "not_one_of", "value": ["CN", "RU"]}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-16", "attributes": {}},
+      "expected": {"flag_key": "op-not-one-of-missing", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "gt operator matches when actual is greater",
+      "description": "Condition: age gt 18 — user age is 25",
+      "flags": {
+        "op-gt-match": {
+          "id": "flag-op-gt-1",
+          "key": "op-gt-match",
+          "name": "GT Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "age", "operator": "gt", "value": 18}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-17", "attributes": {"age": 25}},
+      "expected": {"flag_key": "op-gt-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "gt operator no match when actual equals threshold",
+      "description": "Condition: age gt 18 — user age is exactly 18 (not strictly greater)",
+      "flags": {
+        "op-gt-equal": {
+          "id": "flag-op-gt-2",
+          "key": "op-gt-equal",
+          "name": "GT Equal",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "age", "operator": "gt", "value": 18}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-18", "attributes": {"age": 18}},
+      "expected": {"flag_key": "op-gt-equal", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "gt operator no match when actual is less",
+      "description": "Condition: age gt 18 — user age is 16",
+      "flags": {
+        "op-gt-no-match": {
+          "id": "flag-op-gt-3",
+          "key": "op-gt-no-match",
+          "name": "GT No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "age", "operator": "gt", "value": 18}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-19", "attributes": {"age": 16}},
+      "expected": {"flag_key": "op-gt-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "gt operator with string numeric value",
+      "description": "Condition: score gt 100 — score is string '150' (coerced to number)",
+      "flags": {
+        "op-gt-string-num": {
+          "id": "flag-op-gt-4",
+          "key": "op-gt-string-num",
+          "name": "GT String Numeric",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "score", "operator": "gt", "value": 100}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-20", "attributes": {"score": "150"}},
+      "expected": {"flag_key": "op-gt-string-num", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "lt operator matches when actual is less",
+      "description": "Condition: latency lt 200 — actual latency is 100ms",
+      "flags": {
+        "op-lt-match": {
+          "id": "flag-op-lt-1",
+          "key": "op-lt-match",
+          "name": "LT Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "latency", "operator": "lt", "value": 200}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-21", "attributes": {"latency": 100}},
+      "expected": {"flag_key": "op-lt-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "lt operator no match when actual equals threshold",
+      "description": "Condition: latency lt 200 — actual latency is exactly 200",
+      "flags": {
+        "op-lt-equal": {
+          "id": "flag-op-lt-2",
+          "key": "op-lt-equal",
+          "name": "LT Equal",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "latency", "operator": "lt", "value": 200}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-22", "attributes": {"latency": 200}},
+      "expected": {"flag_key": "op-lt-equal", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "lt operator no match when actual is greater",
+      "description": "Condition: latency lt 200 — actual latency is 500ms",
+      "flags": {
+        "op-lt-no-match": {
+          "id": "flag-op-lt-3",
+          "key": "op-lt-no-match",
+          "name": "LT No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "latency", "operator": "lt", "value": 200}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-23", "attributes": {"latency": 500}},
+      "expected": {"flag_key": "op-lt-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "matches_regex operator matches pattern",
+      "description": "Condition: email matches_regex '^[a-z]+@company\\.com$' — corporate email",
+      "flags": {
+        "op-regex-match": {
+          "id": "flag-op-regex-1",
+          "key": "op-regex-match",
+          "name": "Regex Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "email", "operator": "matches_regex", "value": "^[a-z]+@company\\.com$"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-24", "attributes": {"email": "alice@company.com"}},
+      "expected": {"flag_key": "op-regex-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "matches_regex operator no match",
+      "description": "Condition: email matches_regex '^[a-z]+@company\\.com$' — personal email",
+      "flags": {
+        "op-regex-no-match": {
+          "id": "flag-op-regex-2",
+          "key": "op-regex-no-match",
+          "name": "Regex No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "email", "operator": "matches_regex", "value": "^[a-z]+@company\\.com$"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-25", "attributes": {"email": "bob@gmail.com"}},
+      "expected": {"flag_key": "op-regex-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "matches_regex with digit pattern",
+      "description": "Condition: user_id matches_regex '^user-[0-9]+$' — numeric user ID",
+      "flags": {
+        "op-regex-digits": {
+          "id": "flag-op-regex-3",
+          "key": "op-regex-digits",
+          "name": "Regex Digits",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "user_id", "operator": "matches_regex", "value": "^user-[0-9]+$"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-123", "attributes": {}},
+      "expected": {"flag_key": "op-regex-digits", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "version_gt operator matches newer version",
+      "description": "Condition: app_version version_gt '2.0.0' — user has 3.1.0",
+      "flags": {
+        "op-version-gt-match": {
+          "id": "flag-op-vgt-1",
+          "key": "op-version-gt-match",
+          "name": "Version GT Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "app_version", "operator": "version_gt", "value": "2.0.0"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-26", "attributes": {"app_version": "3.1.0"}},
+      "expected": {"flag_key": "op-version-gt-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "version_gt operator no match for older version",
+      "description": "Condition: app_version version_gt '2.0.0' — user has 1.9.9",
+      "flags": {
+        "op-version-gt-no-match": {
+          "id": "flag-op-vgt-2",
+          "key": "op-version-gt-no-match",
+          "name": "Version GT No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "app_version", "operator": "version_gt", "value": "2.0.0"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-27", "attributes": {"app_version": "1.9.9"}},
+      "expected": {"flag_key": "op-version-gt-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "version_gt operator no match for equal version",
+      "description": "Condition: app_version version_gt '2.0.0' — user has exactly 2.0.0",
+      "flags": {
+        "op-version-gt-equal": {
+          "id": "flag-op-vgt-3",
+          "key": "op-version-gt-equal",
+          "name": "Version GT Equal",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "app_version", "operator": "version_gt", "value": "2.0.0"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-28", "attributes": {"app_version": "2.0.0"}},
+      "expected": {"flag_key": "op-version-gt-equal", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "version_lt operator matches older version",
+      "description": "Condition: app_version version_lt '3.0.0' — user has 2.5.1",
+      "flags": {
+        "op-version-lt-match": {
+          "id": "flag-op-vlt-1",
+          "key": "op-version-lt-match",
+          "name": "Version LT Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "app_version", "operator": "version_lt", "value": "3.0.0"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-29", "attributes": {"app_version": "2.5.1"}},
+      "expected": {"flag_key": "op-version-lt-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "version_lt operator no match for newer version",
+      "description": "Condition: app_version version_lt '3.0.0' — user has 4.0.0",
+      "flags": {
+        "op-version-lt-no-match": {
+          "id": "flag-op-vlt-2",
+          "key": "op-version-lt-no-match",
+          "name": "Version LT No Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "app_version", "operator": "version_lt", "value": "3.0.0"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-30", "attributes": {"app_version": "4.0.0"}},
+      "expected": {"flag_key": "op-version-lt-no-match", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "version_lt minor version comparison",
+      "description": "Condition: app_version version_lt '2.1.0' — user has 2.0.9 (minor matters)",
+      "flags": {
+        "op-version-lt-minor": {
+          "id": "flag-op-vlt-3",
+          "key": "op-version-lt-minor",
+          "name": "Version LT Minor",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "app_version", "operator": "version_lt", "value": "2.1.0"}],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-31", "attributes": {"app_version": "2.0.9"}},
+      "expected": {"flag_key": "op-version-lt-minor", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "multiple conditions AND logic — all match",
+      "description": "Two conditions: country is 'US' AND plan is 'pro' — both true",
+      "flags": {
+        "op-multi-and-match": {
+          "id": "flag-op-multi-1",
+          "key": "op-multi-and-match",
+          "name": "Multi AND Match",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "country", "operator": "is", "value": "US"},
+                {"attribute": "plan", "operator": "is", "value": "pro"}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-32", "attributes": {"country": "US", "plan": "pro"}},
+      "expected": {"flag_key": "op-multi-and-match", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "multiple conditions AND logic — one fails",
+      "description": "Two conditions: country is 'US' AND plan is 'pro' — country wrong",
+      "flags": {
+        "op-multi-and-fail": {
+          "id": "flag-op-multi-2",
+          "key": "op-multi-and-fail",
+          "name": "Multi AND Fail",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "country", "operator": "is", "value": "US"},
+                {"attribute": "plan", "operator": "is", "value": "pro"}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-33", "attributes": {"country": "CA", "plan": "pro"}},
+      "expected": {"flag_key": "op-multi-and-fail", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "priority ordering — lower priority number wins",
+      "description": "Two rules: priority 1 (admin) and priority 2 (all users) — admin user hits rule 1",
+      "flags": {
+        "op-priority-order": {
+          "id": "flag-op-priority-1",
+          "key": "op-priority-order",
+          "name": "Priority Order",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-default",
+          "variations": [
+            {"id": "var-admin", "key": "admin-feature", "name": "Admin Feature", "value": "admin"},
+            {"id": "var-standard", "key": "standard-feature", "name": "Standard Feature", "value": "standard"},
+            {"id": "var-default", "key": "off", "name": "Off", "value": "off"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 2,
+              "conditions": [{"attribute": "role", "operator": "one_of", "value": ["admin", "user"]}],
+              "variation_id": "var-standard"
+            },
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "is", "value": "admin"}],
+              "variation_id": "var-admin"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-34", "attributes": {"role": "admin"}},
+      "expected": {"flag_key": "op-priority-order", "value": "admin", "variation_key": "admin-feature", "reason": "targeting_match"}
+    },
+    {
+      "name": "priority ordering — second rule matches when first fails",
+      "description": "Two rules: priority 1 (admin) and priority 2 (all users) — regular user hits rule 2",
+      "flags": {
+        "op-priority-fallthrough": {
+          "id": "flag-op-priority-2",
+          "key": "op-priority-fallthrough",
+          "name": "Priority Fallthrough",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-default",
+          "variations": [
+            {"id": "var-admin", "key": "admin-feature", "name": "Admin Feature", "value": "admin"},
+            {"id": "var-standard", "key": "standard-feature", "name": "Standard Feature", "value": "standard"},
+            {"id": "var-default", "key": "off", "name": "Off", "value": "off"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "is", "value": "admin"}],
+              "variation_id": "var-admin"
+            },
+            {
+              "priority": 2,
+              "conditions": [{"attribute": "role", "operator": "one_of", "value": ["admin", "user"]}],
+              "variation_id": "var-standard"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-35", "attributes": {"role": "user"}},
+      "expected": {"flag_key": "op-priority-fallthrough", "value": "standard", "variation_key": "standard-feature", "reason": "targeting_match"}
+    }
+  ]
+}

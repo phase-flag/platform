@@ -27,7 +27,7 @@ Evaluate one or more flags for a given user context. Returns the variation value
 ### Request
 
 ```bash
-curl -X POST https://api.phaseflag.io/api/v1/evaluate \
+curl -X POST https://api.phaseflag.com/api/v1/evaluate \
   -H "X-API-Key: sdk-prod-xxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
@@ -96,7 +96,7 @@ curl -X POST https://api.phaseflag.io/api/v1/evaluate \
 ### Evaluate a Single Flag
 
 ```bash
-curl -X POST https://api.phaseflag.io/api/v1/evaluate \
+curl -X POST https://api.phaseflag.com/api/v1/evaluate \
   -H "X-API-Key: sdk-prod-xxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
@@ -108,7 +108,7 @@ curl -X POST https://api.phaseflag.io/api/v1/evaluate \
 ### JavaScript Example
 
 ```typescript
-const response = await fetch("https://api.phaseflag.io/api/v1/evaluate", {
+const response = await fetch("https://api.phaseflag.com/api/v1/evaluate", {
   method: "POST",
   headers: {
     "X-API-Key": "sdk-prod-xxxxxxxxxxxx",
@@ -139,7 +139,7 @@ Fetch the complete compiled ruleset for a given environment. This is what SDKs c
 ### Request
 
 ```bash
-curl https://api.phaseflag.io/api/v1/sdk/ruleset \
+curl https://api.phaseflag.com/api/v1/sdk/ruleset \
   -H "X-API-Key: sdk-prod-xxxxxxxxxxxx"
 ```
 
@@ -148,7 +148,7 @@ curl https://api.phaseflag.io/api/v1/sdk/ruleset \
 The ruleset endpoint supports ETag-based conditional requests to save bandwidth. SDKs include the `If-None-Match` header with the last received ETag:
 
 ```bash
-curl https://api.phaseflag.io/api/v1/sdk/ruleset \
+curl https://api.phaseflag.com/api/v1/sdk/ruleset \
   -H "X-API-Key: sdk-prod-xxxxxxxxxxxx" \
   -H 'If-None-Match: "etag-v42-abc123"'
 # Returns 304 Not Modified if nothing has changed

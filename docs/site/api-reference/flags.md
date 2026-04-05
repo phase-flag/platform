@@ -26,7 +26,7 @@ List all feature flags in an environment.
 ### Request
 
 ```bash
-curl "https://api.phaseflag.io/api/v1/flags?environment_id=env_abc&page=1&per_page=50" \
+curl "https://api.phaseflag.com/api/v1/flags?environment_id=env_abc&page=1&per_page=50" \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -84,7 +84,7 @@ Create a new feature flag.
 ### Request
 
 ```bash
-curl -X POST "https://api.phaseflag.io/api/v1/flags?environment_id=env_abc" \
+curl -X POST "https://api.phaseflag.com/api/v1/flags?environment_id=env_abc" \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -155,7 +155,7 @@ Get a single feature flag with all its targeting rules.
 ### Request
 
 ```bash
-curl "https://api.phaseflag.io/api/v1/flags/flg_01HXKQ4R9C2BVNZFM5T7WE6J8D?environment_id=env_abc" \
+curl "https://api.phaseflag.com/api/v1/flags/flg_01HXKQ4R9C2BVNZFM5T7WE6J8D?environment_id=env_abc" \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -209,7 +209,7 @@ Update a feature flag's metadata or targeting rules.
 ### Request
 
 ```bash
-curl -X PUT "https://api.phaseflag.io/api/v1/flags/flg_01HXKQ4R9C2BVNZFM5T7WE6J8D?environment_id=env_abc" \
+curl -X PUT "https://api.phaseflag.com/api/v1/flags/flg_01HXKQ4R9C2BVNZFM5T7WE6J8D?environment_id=env_abc" \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -237,7 +237,7 @@ Enable or disable a flag without modifying its targeting rules.
 ### Request
 
 ```bash
-curl -X POST "https://api.phaseflag.io/api/v1/flags/flg_01HXKQ4R9C2BVNZFM5T7WE6J8D/toggle?environment_id=env_abc" \
+curl -X POST "https://api.phaseflag.com/api/v1/flags/flg_01HXKQ4R9C2BVNZFM5T7WE6J8D/toggle?environment_id=env_abc" \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{"enabled": true}'
@@ -264,7 +264,7 @@ Archive a flag (soft delete). Archived flags still appear in the audit log and c
 ### Request
 
 ```bash
-curl -X DELETE "https://api.phaseflag.io/api/v1/flags/flg_01HXKQ4R9C2BVNZFM5T7WE6J8D?environment_id=env_abc" \
+curl -X DELETE "https://api.phaseflag.com/api/v1/flags/flg_01HXKQ4R9C2BVNZFM5T7WE6J8D?environment_id=env_abc" \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -279,7 +279,7 @@ Get the full audit history for a flag.
 ### Request
 
 ```bash
-curl "https://api.phaseflag.io/api/v1/flags/flg_01HXKQ4R9C2BVNZFM5T7WE6J8D/history?environment_id=env_abc" \
+curl "https://api.phaseflag.com/api/v1/flags/flg_01HXKQ4R9C2BVNZFM5T7WE6J8D/history?environment_id=env_abc" \
   -H "Authorization: Bearer <token>"
 ```
 

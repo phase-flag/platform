@@ -12,7 +12,7 @@ Whether you're running a single-service startup or a multi-team enterprise, Phas
 | Mode | Best For |
 |------|----------|
 | **OSS** | Self-hosted teams who want full control, no license required |
-| **SaaS** | Teams who want the managed service at [phaseflag.io](https://app.phaseflag.io) |
+| **SaaS** | Teams who want the managed service at [phaseflag.com](https://app.phaseflag.com) |
 | **Enterprise** | Organizations needing SSO, compliance, advanced governance, and audit trails |
 
 ---
@@ -101,7 +101,7 @@ Phase Flag separates **management** from **evaluation**:
   <Card title="OSS Docker" icon="docker" href="/deployment/oss-docker">
     Run the full stack locally with a single `docker compose up`. No license required.
   </Card>
-  <Card title="SaaS (Managed)" icon="cloud" href="https://app.phaseflag.io/signup">
+  <Card title="SaaS (Managed)" icon="cloud" href="https://app.phaseflag.com/signup">
     Start in 60 seconds. We manage the infrastructure, you manage your flags.
   </Card>
   <Card title="Self-Hosted" icon="server" href="/deployment/self-hosted">

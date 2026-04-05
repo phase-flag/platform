@@ -110,11 +110,11 @@ services:
   # Routes /api/v1/* → API, / → Dashboard, /portal → Portal, /marketing → Marketing
   gateway:
     <<: *restart
-    image: nginx:alpine
+    build:
+      context: ./infra/docker/gateway
+      dockerfile: Dockerfile
     ports:
       - "80:80"
-    volumes:
-      - ./infra/docker/nginx.local.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - api
       - dashboard

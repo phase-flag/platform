@@ -1,0 +1,750 @@
+{
+  "suite": "combined",
+  "description": "Complex real-world scenarios combining targeting, rollout, segments, multiple rules and flag types",
+  "cases": [
+    {
+      "name": "feature launch — admin bypass then segment then rollout",
+      "description": "Three-tier rollout: admins always get it, beta users 100%, others 10%",
+      "flags": {
+        "feature-launch": {
+          "id": "flag-feature-launch",
+          "key": "feature-launch",
+          "name": "Feature Launch",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "is", "value": "admin"}],
+              "variation_id": "var-on"
+            },
+            {
+              "priority": 2,
+              "conditions": [{"attribute": "beta", "operator": "is", "value": "true"}],
+              "variation_id": "var-on"
+            },
+            {
+              "priority": 3,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 10},
+                  {"variation_id": "var-off", "weight": 90}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "admin-user", "attributes": {"role": "admin"}},
+      "expected": {"flag_key": "feature-launch", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "feature launch — beta user gets it",
+      "description": "Beta user hits priority 2 rule",
+      "flags": {
+        "feature-launch-beta": {
+          "id": "flag-feature-launch-beta",
+          "key": "feature-launch-beta",
+          "name": "Feature Launch Beta",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "is", "value": "admin"}],
+              "variation_id": "var-on"
+            },
+            {
+              "priority": 2,
+              "conditions": [{"attribute": "beta", "operator": "is", "value": "true"}],
+              "variation_id": "var-on"
+            },
+            {
+              "priority": 3,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 10},
+                  {"variation_id": "var-off", "weight": 90}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-100", "attributes": {"beta": "true", "role": "user"}},
+      "expected": {"flag_key": "feature-launch-beta", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "pricing experiment — enterprise plan with region",
+      "description": "Show different pricing config based on plan and region combination",
+      "flags": {
+        "pricing-experiment": {
+          "id": "flag-pricing-exp",
+          "key": "pricing-experiment",
+          "name": "Pricing Experiment",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-price-default",
+          "variations": [
+            {
+              "id": "var-price-ent-us",
+              "key": "enterprise_us",
+              "name": "Enterprise US",
+              "value": {"currency": "USD", "discount": 0.20, "seats": "unlimited"}
+            },
+            {
+              "id": "var-price-ent-eu",
+              "key": "enterprise_eu",
+              "name": "Enterprise EU",
+              "value": {"currency": "EUR", "discount": 0.25, "seats": "unlimited"}
+            },
+            {
+              "id": "var-price-default",
+              "key": "standard",
+              "name": "Standard",
+              "value": {"currency": "USD", "discount": 0, "seats": 5}
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "enterprise"},
+                {"attribute": "region", "operator": "is", "value": "EU"}
+              ],
+              "variation_id": "var-price-ent-eu"
+            },
+            {
+              "priority": 2,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "enterprise"}
+              ],
+              "variation_id": "var-price-ent-us"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-eu-1", "attributes": {"plan": "enterprise", "region": "EU"}},
+      "expected": {
+        "flag_key": "pricing-experiment",
+        "value": {"currency": "EUR", "discount": 0.25, "seats": "unlimited"},
+        "variation_key": "enterprise_eu",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "pricing experiment — enterprise US",
+      "description": "Enterprise user not in EU gets US pricing (priority 2 matches)",
+      "flags": {
+        "pricing-experiment-us": {
+          "id": "flag-pricing-exp-us",
+          "key": "pricing-experiment-us",
+          "name": "Pricing Experiment US",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-price-default",
+          "variations": [
+            {
+              "id": "var-price-ent-us",
+              "key": "enterprise_us",
+              "name": "Enterprise US",
+              "value": {"currency": "USD", "discount": 0.20, "seats": "unlimited"}
+            },
+            {
+              "id": "var-price-ent-eu",
+              "key": "enterprise_eu",
+              "name": "Enterprise EU",
+              "value": {"currency": "EUR", "discount": 0.25, "seats": "unlimited"}
+            },
+            {
+              "id": "var-price-default",
+              "key": "standard",
+              "name": "Standard",
+              "value": {"currency": "USD", "discount": 0, "seats": 5}
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "enterprise"},
+                {"attribute": "region", "operator": "is", "value": "EU"}
+              ],
+              "variation_id": "var-price-ent-eu"
+            },
+            {
+              "priority": 2,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "enterprise"}
+              ],
+              "variation_id": "var-price-ent-us"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-us-1", "attributes": {"plan": "enterprise", "region": "US"}},
+      "expected": {
+        "flag_key": "pricing-experiment-us",
+        "value": {"currency": "USD", "discount": 0.20, "seats": "unlimited"},
+        "variation_key": "enterprise_us",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "onboarding flow — multiple attributes determine variation",
+      "description": "New users from mobile on premium plan see enhanced onboarding",
+      "flags": {
+        "onboarding-flow": {
+          "id": "flag-onboarding",
+          "key": "onboarding-flow",
+          "name": "Onboarding Flow",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-basic-onboard",
+          "variations": [
+            {"id": "var-premium-mobile", "key": "premium_mobile", "name": "Premium Mobile", "value": "premium_mobile_v2"},
+            {"id": "var-premium-web", "key": "premium_web", "name": "Premium Web", "value": "premium_web_v2"},
+            {"id": "var-basic-onboard", "key": "basic", "name": "Basic", "value": "basic_v1"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "premium"},
+                {"attribute": "platform", "operator": "is", "value": "mobile"},
+                {"attribute": "is_new_user", "operator": "is", "value": "true"}
+              ],
+              "variation_id": "var-premium-mobile"
+            },
+            {
+              "priority": 2,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "premium"},
+                {"attribute": "is_new_user", "operator": "is", "value": "true"}
+              ],
+              "variation_id": "var-premium-web"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "new-user-1",
+        "attributes": {"plan": "premium", "platform": "mobile", "is_new_user": "true"}
+      },
+      "expected": {"flag_key": "onboarding-flow", "value": "premium_mobile_v2", "variation_key": "premium_mobile", "reason": "targeting_match"}
+    },
+    {
+      "name": "onboarding flow — premium web user",
+      "description": "Premium web user hits priority 2 onboarding rule",
+      "flags": {
+        "onboarding-flow-web": {
+          "id": "flag-onboarding-web",
+          "key": "onboarding-flow-web",
+          "name": "Onboarding Flow Web",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-basic-onboard",
+          "variations": [
+            {"id": "var-premium-mobile", "key": "premium_mobile", "name": "Premium Mobile", "value": "premium_mobile_v2"},
+            {"id": "var-premium-web", "key": "premium_web", "name": "Premium Web", "value": "premium_web_v2"},
+            {"id": "var-basic-onboard", "key": "basic", "name": "Basic", "value": "basic_v1"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "premium"},
+                {"attribute": "platform", "operator": "is", "value": "mobile"},
+                {"attribute": "is_new_user", "operator": "is", "value": "true"}
+              ],
+              "variation_id": "var-premium-mobile"
+            },
+            {
+              "priority": 2,
+              "conditions": [
+                {"attribute": "plan", "operator": "is", "value": "premium"},
+                {"attribute": "is_new_user", "operator": "is", "value": "true"}
+              ],
+              "variation_id": "var-premium-web"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "new-user-2",
+        "attributes": {"plan": "premium", "platform": "web", "is_new_user": "true"}
+      },
+      "expected": {"flag_key": "onboarding-flow-web", "value": "premium_web_v2", "variation_key": "premium_web", "reason": "targeting_match"}
+    },
+    {
+      "name": "dark mode — version and platform check",
+      "description": "Dark mode available for users on desktop with app version > 4.0.0",
+      "flags": {
+        "dark-mode-flag": {
+          "id": "flag-dark-mode",
+          "key": "dark-mode-flag",
+          "name": "Dark Mode Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-no-dark",
+          "variations": [
+            {"id": "var-dark", "key": "enabled", "name": "Dark Mode On", "value": true},
+            {"id": "var-no-dark", "key": "disabled", "name": "Dark Mode Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "platform", "operator": "is", "value": "desktop"},
+                {"attribute": "app_version", "operator": "version_gt", "value": "4.0.0"}
+              ],
+              "variation_id": "var-dark"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-desktop", "attributes": {"platform": "desktop", "app_version": "4.2.1"}},
+      "expected": {"flag_key": "dark-mode-flag", "value": true, "variation_key": "enabled", "reason": "targeting_match"}
+    },
+    {
+      "name": "dark mode — mobile user excluded",
+      "description": "Mobile user does not meet platform condition",
+      "flags": {
+        "dark-mode-mobile": {
+          "id": "flag-dark-mode-mobile",
+          "key": "dark-mode-mobile",
+          "name": "Dark Mode Mobile",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-no-dark",
+          "variations": [
+            {"id": "var-dark", "key": "enabled", "name": "Dark Mode On", "value": true},
+            {"id": "var-no-dark", "key": "disabled", "name": "Dark Mode Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "platform", "operator": "is", "value": "desktop"},
+                {"attribute": "app_version", "operator": "version_gt", "value": "4.0.0"}
+              ],
+              "variation_id": "var-dark"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-mobile", "attributes": {"platform": "mobile", "app_version": "5.0.0"}},
+      "expected": {"flag_key": "dark-mode-mobile", "value": false, "variation_key": "disabled", "reason": "default"}
+    },
+    {
+      "name": "rate limiting — tiered by plan",
+      "description": "API rate limits differ by plan: enterprise=10000, pro=1000, free=100",
+      "flags": {
+        "rate-limit-flag": {
+          "id": "flag-rate-limit",
+          "key": "rate-limit-flag",
+          "name": "Rate Limit Flag",
+          "flag_type": "number",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-rl-free",
+          "variations": [
+            {"id": "var-rl-enterprise", "key": "enterprise_limit", "name": "Enterprise Limit", "value": 10000},
+            {"id": "var-rl-pro", "key": "pro_limit", "name": "Pro Limit", "value": 1000},
+            {"id": "var-rl-free", "key": "free_limit", "name": "Free Limit", "value": 100}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "plan", "operator": "is", "value": "enterprise"}],
+              "variation_id": "var-rl-enterprise"
+            },
+            {
+              "priority": 2,
+              "conditions": [{"attribute": "plan", "operator": "is", "value": "pro"}],
+              "variation_id": "var-rl-pro"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "pro-user-1", "attributes": {"plan": "pro"}},
+      "expected": {"flag_key": "rate-limit-flag", "value": 1000, "variation_key": "pro_limit", "reason": "targeting_match"}
+    },
+    {
+      "name": "A/B test with region exclusion",
+      "description": "A/B test runs globally except EU (GDPR), EU users get control",
+      "flags": {
+        "ab-test-global": {
+          "id": "flag-ab-global",
+          "key": "ab-test-global",
+          "name": "AB Test Global",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-control",
+          "variations": [
+            {"id": "var-control", "key": "control", "name": "Control", "value": "control"},
+            {"id": "var-treatment", "key": "treatment", "name": "Treatment", "value": "treatment"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "region", "operator": "one_of", "value": ["EU", "EEA"]}],
+              "variation_id": "var-control"
+            },
+            {
+              "priority": 2,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-control", "weight": 50},
+                  {"variation_id": "var-treatment", "weight": 50}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "eu-user", "attributes": {"region": "EU"}},
+      "expected": {"flag_key": "ab-test-global", "value": "control", "variation_key": "control", "reason": "targeting_match"}
+    },
+    {
+      "name": "kill switch — blocks all users when triggered",
+      "description": "Kill switch flag: when enabled (default on), specific kill-switch condition disables all",
+      "flags": {
+        "kill-switch": {
+          "id": "flag-kill-switch",
+          "key": "kill-switch",
+          "name": "Kill Switch",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-enabled",
+          "variations": [
+            {"id": "var-enabled", "key": "enabled", "name": "Enabled", "value": true},
+            {"id": "var-disabled", "key": "disabled", "name": "Disabled", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "kill_switch_active", "operator": "is", "value": "true"}],
+              "variation_id": "var-disabled"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "any-user", "attributes": {}},
+      "expected": {"flag_key": "kill-switch", "value": true, "variation_key": "enabled", "reason": "default"}
+    },
+    {
+      "name": "gradual rollout with version gate",
+      "description": "Feature for users on v3+ app and in the first 25% rollout bucket",
+      "hash_seed": {"flag_key": "v3-rollout", "user_id": "user-006", "expected_bucket": null},
+      "flags": {
+        "v3-rollout": {
+          "id": "flag-v3-rollout",
+          "key": "v3-rollout",
+          "name": "V3 Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "app_version", "operator": "version_gt", "value": "2.9.99"}
+              ],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 100}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-006", "attributes": {"app_version": "3.1.0"}},
+      "expected": {"flag_key": "v3-rollout", "value": true, "variation_key": "on", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "gradual rollout — old version excluded before rollout check",
+      "description": "User on old version fails version_gt condition, skips rollout rule",
+      "flags": {
+        "v3-rollout-old": {
+          "id": "flag-v3-rollout-old",
+          "key": "v3-rollout-old",
+          "name": "V3 Rollout Old",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "app_version", "operator": "version_gt", "value": "2.9.99"}
+              ],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 100}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-006", "attributes": {"app_version": "2.5.0"}},
+      "expected": {"flag_key": "v3-rollout-old", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "feature flag with contains and version combination",
+      "description": "Email domain check combined with minimum app version for early access",
+      "flags": {
+        "early-access": {
+          "id": "flag-early-access",
+          "key": "early-access",
+          "name": "Early Access",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "email", "operator": "contains", "value": "@partner.com"},
+                {"attribute": "app_version", "operator": "version_gt", "value": "3.0.0"}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "partner-user", "attributes": {"email": "john@partner.com", "app_version": "3.5.0"}},
+      "expected": {"flag_key": "early-access", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "config flag — returns different config objects per segment",
+      "description": "Different feature configurations for enterprise vs pro vs free tiers",
+      "flags": {
+        "feature-config": {
+          "id": "flag-feature-config",
+          "key": "feature-config",
+          "name": "Feature Config",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-free-config",
+          "variations": [
+            {
+              "id": "var-ent-config",
+              "key": "enterprise_config",
+              "name": "Enterprise Config",
+              "value": {"max_seats": 500, "sso": true, "analytics": true, "custom_domain": true}
+            },
+            {
+              "id": "var-pro-config",
+              "key": "pro_config",
+              "name": "Pro Config",
+              "value": {"max_seats": 25, "sso": false, "analytics": true, "custom_domain": false}
+            },
+            {
+              "id": "var-free-config",
+              "key": "free_config",
+              "name": "Free Config",
+              "value": {"max_seats": 3, "sso": false, "analytics": false, "custom_domain": false}
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "plan", "operator": "is", "value": "enterprise"}],
+              "variation_id": "var-ent-config"
+            },
+            {
+              "priority": 2,
+              "conditions": [{"attribute": "plan", "operator": "is", "value": "pro"}],
+              "variation_id": "var-pro-config"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "free-user-1", "attributes": {"plan": "free"}},
+      "expected": {
+        "flag_key": "feature-config",
+        "value": {"max_seats": 3, "sso": false, "analytics": false, "custom_domain": false},
+        "variation_key": "free_config",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "experiment with not_one_of exclusion list and rollout",
+      "description": "Internal IPs excluded from experiment, others enter 50% rollout",
+      "flags": {
+        "experiment-with-exclusion": {
+          "id": "flag-exp-exclusion",
+          "key": "experiment-with-exclusion",
+          "name": "Experiment With Exclusion",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-control",
+          "variations": [
+            {"id": "var-control", "key": "control", "name": "Control", "value": false},
+            {"id": "var-treatment", "key": "treatment", "name": "Treatment", "value": true}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "ip_range", "operator": "one_of", "value": ["internal", "staging"]}
+              ],
+              "variation_id": "var-control"
+            },
+            {
+              "priority": 2,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-control", "weight": 50},
+                  {"variation_id": "var-treatment", "weight": 50}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "internal-user", "attributes": {"ip_range": "internal"}},
+      "expected": {"flag_key": "experiment-with-exclusion", "value": false, "variation_key": "control", "reason": "targeting_match"}
+    },
+    {
+      "name": "regex-based user ID routing",
+      "description": "Users with UUID-formatted IDs get new feature, legacy numeric IDs get default",
+      "flags": {
+        "uuid-routing": {
+          "id": "flag-uuid-routing",
+          "key": "uuid-routing",
+          "name": "UUID Routing",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-legacy",
+          "variations": [
+            {"id": "var-new", "key": "new_system", "name": "New System", "value": true},
+            {"id": "var-legacy", "key": "legacy_system", "name": "Legacy System", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "user_id",
+                  "operator": "matches_regex",
+                  "value": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              ],
+              "variation_id": "var-new"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "550e8400-e29b-41d4-a716-446655440000", "attributes": {}},
+      "expected": {"flag_key": "uuid-routing", "value": true, "variation_key": "new_system", "reason": "targeting_match"}
+    },
+    {
+      "name": "high-value customer detection",
+      "description": "Users with LTV > 1000 and account age > 365 days get VIP features",
+      "flags": {
+        "vip-feature": {
+          "id": "flag-vip-feature",
+          "key": "vip-feature",
+          "name": "VIP Feature",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "ltv", "operator": "gt", "value": 1000},
+                {"attribute": "account_age_days", "operator": "gt", "value": 365}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "vip-user-1", "attributes": {"ltv": 5000, "account_age_days": 730}},
+      "expected": {"flag_key": "vip-feature", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "high-value customer detection — fails age condition",
+      "description": "High LTV but new account doesn't qualify",
+      "flags": {
+        "vip-feature-new": {
+          "id": "flag-vip-new",
+          "key": "vip-feature-new",
+          "name": "VIP Feature New",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "production",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {"attribute": "ltv", "operator": "gt", "value": 1000},
+                {"attribute": "account_age_days", "operator": "gt", "value": 365}
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "new-rich-user", "attributes": {"ltv": 5000, "account_age_days": 30}},
+      "expected": {"flag_key": "vip-feature-new", "value": false, "variation_key": "off", "reason": "default"}
+    }
+  ]
+}

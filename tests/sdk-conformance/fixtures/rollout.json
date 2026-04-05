@@ -1,0 +1,556 @@
+{
+  "suite": "rollout",
+  "description": "Percentage rollout tests using deterministic DJB2 hash bucketing. Hash: djb2(flagKey:userId) % 100",
+  "hash_notes": {
+    "algorithm": "DJB2 — seed=5381, h=((h<<5)+h+char) & 0xFFFFFFFF, bucket=hash%100",
+    "input_format": "{flag_key}:{user_id}"
+  },
+  "cases": [
+    {
+      "name": "50% rollout — user in rollout (bucket < 50)",
+      "description": "rollout-50:user-010 -> bucket=3, which is < 50, so user gets 'on' variation",
+      "hash_seed": {"flag_key": "rollout-50", "user_id": "user-010", "expected_bucket": 3},
+      "flags": {
+        "rollout-50": {
+          "id": "flag-rollout-50",
+          "key": "rollout-50",
+          "name": "50 Percent Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 50},
+                  {"variation_id": "var-off", "weight": 50}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-010", "attributes": {}},
+      "expected": {"flag_key": "rollout-50", "value": true, "variation_key": "on", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "50% rollout — user outside rollout (bucket >= 50)",
+      "description": "rollout-50:user-001 -> bucket=71, which is >= 50, so user gets 'off' variation",
+      "hash_seed": {"flag_key": "rollout-50", "user_id": "user-001", "expected_bucket": 71},
+      "flags": {
+        "rollout-50": {
+          "id": "flag-rollout-50",
+          "key": "rollout-50",
+          "name": "50 Percent Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 50},
+                  {"variation_id": "var-off", "weight": 50}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-001", "attributes": {}},
+      "expected": {"flag_key": "rollout-50", "value": false, "variation_key": "off", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "100% rollout — all users get on variation",
+      "description": "rollout-100:user-001 -> any bucket < 100, so always matches",
+      "flags": {
+        "rollout-100": {
+          "id": "flag-rollout-100",
+          "key": "rollout-100",
+          "name": "100 Percent Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 100}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-999", "attributes": {}},
+      "expected": {"flag_key": "rollout-100", "value": true, "variation_key": "on", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "0% rollout — no users get on variation (falls to default)",
+      "description": "Weight of 0 means no one falls in the bucket, default is returned",
+      "flags": {
+        "rollout-0": {
+          "id": "flag-rollout-0",
+          "key": "rollout-0",
+          "name": "0 Percent Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 0},
+                  {"variation_id": "var-off", "weight": 100}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-001", "attributes": {}},
+      "expected": {"flag_key": "rollout-0", "value": false, "variation_key": "off", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "rollout with no user_id returns default",
+      "description": "Percentage rollout requires user_id or session_id to bucket; without one, returns default",
+      "flags": {
+        "rollout-no-user": {
+          "id": "flag-rollout-no-user",
+          "key": "rollout-no-user",
+          "name": "Rollout No User",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 100}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"attributes": {}},
+      "expected": {"flag_key": "rollout-no-user", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "rollout uses session_id as fallback when user_id absent",
+      "description": "Percentage rollout falls back to session_id for bucketing",
+      "hash_seed": {"flag_key": "rollout-session", "user_id": "session-abc", "expected_bucket": null},
+      "flags": {
+        "rollout-session": {
+          "id": "flag-rollout-session",
+          "key": "rollout-session",
+          "name": "Rollout Session",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 100}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"session_id": "session-abc", "attributes": {}},
+      "expected": {"flag_key": "rollout-session", "value": true, "variation_key": "on", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "3-way rollout control group",
+      "description": "multivar-flag:user-001 -> bucket=7 < 33, maps to control variation",
+      "hash_seed": {"flag_key": "multivar-flag", "user_id": "user-001", "expected_bucket": 7},
+      "flags": {
+        "multivar-flag": {
+          "id": "flag-multivar",
+          "key": "multivar-flag",
+          "name": "Multivar Flag",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-default",
+          "variations": [
+            {"id": "var-control", "key": "control", "name": "Control", "value": "control"},
+            {"id": "var-variant-a", "key": "variant_a", "name": "Variant A", "value": "variant_a"},
+            {"id": "var-variant-b", "key": "variant_b", "name": "Variant B", "value": "variant_b"},
+            {"id": "var-default", "key": "off", "name": "Off", "value": "off"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-control", "weight": 33},
+                  {"variation_id": "var-variant-a", "weight": 33},
+                  {"variation_id": "var-variant-b", "weight": 34}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-001", "attributes": {}},
+      "expected": {"flag_key": "multivar-flag", "value": "control", "variation_key": "control", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "3-way rollout variant A group",
+      "description": "multivar-flag:user-010 -> bucket=39, which is >= 33 and < 66, maps to variant_a",
+      "hash_seed": {"flag_key": "multivar-flag", "user_id": "user-010", "expected_bucket": 39},
+      "flags": {
+        "multivar-flag": {
+          "id": "flag-multivar",
+          "key": "multivar-flag",
+          "name": "Multivar Flag",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-default",
+          "variations": [
+            {"id": "var-control", "key": "control", "name": "Control", "value": "control"},
+            {"id": "var-variant-a", "key": "variant_a", "name": "Variant A", "value": "variant_a"},
+            {"id": "var-variant-b", "key": "variant_b", "name": "Variant B", "value": "variant_b"},
+            {"id": "var-default", "key": "off", "name": "Off", "value": "off"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-control", "weight": 33},
+                  {"variation_id": "var-variant-a", "weight": 33},
+                  {"variation_id": "var-variant-b", "weight": 34}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-010", "attributes": {}},
+      "expected": {"flag_key": "multivar-flag", "value": "variant_a", "variation_key": "variant_a", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "3-way rollout variant B group",
+      "description": "multivar-flag:user-020 -> bucket=72, which is >= 66, maps to variant_b",
+      "hash_seed": {"flag_key": "multivar-flag", "user_id": "user-020", "expected_bucket": 72},
+      "flags": {
+        "multivar-flag": {
+          "id": "flag-multivar",
+          "key": "multivar-flag",
+          "name": "Multivar Flag",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-default",
+          "variations": [
+            {"id": "var-control", "key": "control", "name": "Control", "value": "control"},
+            {"id": "var-variant-a", "key": "variant_a", "name": "Variant A", "value": "variant_a"},
+            {"id": "var-variant-b", "key": "variant_b", "name": "Variant B", "value": "variant_b"},
+            {"id": "var-default", "key": "off", "name": "Off", "value": "off"}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-control", "weight": 33},
+                  {"variation_id": "var-variant-a", "weight": 33},
+                  {"variation_id": "var-variant-b", "weight": 34}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-020", "attributes": {}},
+      "expected": {"flag_key": "multivar-flag", "value": "variant_b", "variation_key": "variant_b", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "targeted rollout — only matching users enter rollout",
+      "description": "Rollout only for beta users via targeting condition, non-beta gets default",
+      "flags": {
+        "targeted-rollout": {
+          "id": "flag-targeted-rollout",
+          "key": "targeted-rollout",
+          "name": "Targeted Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "beta", "operator": "is", "value": "true"}],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 100}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-010", "attributes": {"beta": "true"}},
+      "expected": {"flag_key": "targeted-rollout", "value": true, "variation_key": "on", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "targeted rollout — non-matching user gets default",
+      "description": "Rollout only for beta users; non-beta user gets default",
+      "flags": {
+        "targeted-rollout-miss": {
+          "id": "flag-targeted-rollout-miss",
+          "key": "targeted-rollout-miss",
+          "name": "Targeted Rollout Miss",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "beta", "operator": "is", "value": "true"}],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 100}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-001", "attributes": {"beta": "false"}},
+      "expected": {"flag_key": "targeted-rollout-miss", "value": false, "variation_key": "off", "reason": "default"}
+    },
+    {
+      "name": "rollout with additional targeting rule — exact match wins over rollout",
+      "description": "Admin user hits exact targeting rule (priority 1) before rollout rule (priority 2)",
+      "hash_seed": {"flag_key": "rollout-with-target", "user_id": "admin-user", "expected_bucket": null},
+      "flags": {
+        "rollout-with-target": {
+          "id": "flag-rollout-with-target",
+          "key": "rollout-with-target",
+          "name": "Rollout With Target",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [{"attribute": "role", "operator": "is", "value": "admin"}],
+              "variation_id": "var-on"
+            },
+            {
+              "priority": 2,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 10},
+                  {"variation_id": "var-off", "weight": 90}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "admin-user", "attributes": {"role": "admin"}},
+      "expected": {"flag_key": "rollout-with-target", "value": true, "variation_key": "on", "reason": "targeting_match"}
+    },
+    {
+      "name": "rollout-flag user-006 in 10% rollout",
+      "description": "rollout-flag:user-006 -> bucket=21, which is >= 10, user is outside the 10% rollout",
+      "hash_seed": {"flag_key": "rollout-flag", "user_id": "user-006", "expected_bucket": 21},
+      "flags": {
+        "rollout-flag": {
+          "id": "flag-rollout-10pct",
+          "key": "rollout-flag",
+          "name": "10 Percent Rollout Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 10},
+                  {"variation_id": "var-off", "weight": 90}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-006", "attributes": {}},
+      "expected": {"flag_key": "rollout-flag", "value": false, "variation_key": "off", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "rollout-flag user-001 outside 10% rollout",
+      "description": "rollout-flag:user-001 -> bucket=16, which is >= 10, user is outside the 10% rollout",
+      "hash_seed": {"flag_key": "rollout-flag", "user_id": "user-001", "expected_bucket": 16},
+      "flags": {
+        "rollout-flag": {
+          "id": "flag-rollout-10pct",
+          "key": "rollout-flag",
+          "name": "10 Percent Rollout Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 10},
+                  {"variation_id": "var-off", "weight": 90}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-001", "attributes": {}},
+      "expected": {"flag_key": "rollout-flag", "value": false, "variation_key": "off", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "rollout determinism — same user always gets same bucket",
+      "description": "Verifying same user+flag always produces the same result regardless of call order",
+      "hash_seed": {"flag_key": "rollout-50", "user_id": "user-010", "expected_bucket": 3},
+      "flags": {
+        "rollout-50": {
+          "id": "flag-rollout-50",
+          "key": "rollout-50",
+          "name": "50 Percent Rollout",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {"id": "var-on", "key": "on", "name": "On", "value": true},
+            {"id": "var-off", "key": "off", "name": "Off", "value": false}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-on", "weight": 50},
+                  {"variation_id": "var-off", "weight": 50}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-010", "attributes": {}},
+      "expected": {"flag_key": "rollout-50", "value": true, "variation_key": "on", "reason": "percentage_rollout"}
+    },
+    {
+      "name": "rollout flag with JSON value variation",
+      "description": "Rollout to a variation with a JSON config value",
+      "flags": {
+        "config-rollout": {
+          "id": "flag-config-rollout",
+          "key": "config-rollout",
+          "name": "Config Rollout",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-default-config",
+          "variations": [
+            {"id": "var-new-config", "key": "new_config", "name": "New Config", "value": {"theme": "dark", "sidebar": false}},
+            {"id": "var-default-config", "key": "default_config", "name": "Default Config", "value": {"theme": "light", "sidebar": true}}
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {"variation_id": "var-new-config", "weight": 100}
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {"user_id": "user-010", "attributes": {}},
+      "expected": {"flag_key": "config-rollout", "value": {"theme": "dark", "sidebar": false}, "variation_key": "new_config", "reason": "percentage_rollout"}
+    }
+  ]
+}

@@ -151,7 +151,7 @@ PHASEFLAG_JWT_SECRET_KEY=<strong-secret>
 PHASEFLAG_API_SECRET_KEY=<strong-secret>
 PHASEFLAG_DEPLOYMENT_MODE=oss|saas|enterprise
 PHASEFLAG_LICENSE_KEY=<enterprise-license>
-PHASEFLAG_CORS_ORIGINS=https://app.phaseflag.io,https://portal.phaseflag.io
+PHASEFLAG_CORS_ORIGINS=https://app.phaseflag.com,https://portal.phaseflag.com
 PHASEFLAG_LOG_LEVEL=INFO
 PHASEFLAG_RELAY_API_KEY=<relay-key>
 ```
@@ -162,12 +162,12 @@ PHASEFLAG_RELAY_API_KEY=<relay-key>
 
 ```
 # Domains
-API_DOMAIN=api.phaseflag.io
-DASHBOARD_DOMAIN=app.phaseflag.io
-PORTAL_DOMAIN=portal.phaseflag.io
-MARKETING_DOMAIN=phaseflag.io
-RELAY_DOMAIN=relay.phaseflag.io
-DOCS_DOMAIN=docs.phaseflag.io
+API_DOMAIN=api.phaseflag.com
+DASHBOARD_DOMAIN=app.phaseflag.com
+PORTAL_DOMAIN=portal.phaseflag.com
+MARKETING_DOMAIN=phaseflag.com
+RELAY_DOMAIN=relay.phaseflag.com
+DOCS_DOMAIN=docs.phaseflag.com
 
 # Local development ports
 core/api:       8000  (uvicorn)

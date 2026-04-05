@@ -1,0 +1,90 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "description": "Phase Flag unified brand color palette — sourced from core/dashboard, portal, and marketing CSS.",
+
+  "brand": {
+    "primary": {
+      "value": "#34D399",
+      "comment": "Emerald green — canonical brand primary, used as accent in portal/marketing"
+    },
+    "mint": {
+      "DEFAULT": { "value": "#5BBAA7" },
+      "light":   { "value": "#7ED4C1" },
+      "pale":    { "value": "#E8F7F3" }
+    },
+    "navy": {
+      "DEFAULT": { "value": "#2B4C5C" },
+      "dark":    { "value": "#1E3A4A" }
+    }
+  },
+
+  "surface": {
+    "page":         { "value": "#0F1A20",  "comment": "Dark-mode page background (portal/marketing)" },
+    "card":         { "value": "#162029",  "comment": "Card background (portal)" },
+    "surface":      { "value": "#1C2D38",  "comment": "Raised surface (portal)" },
+    "surfaceLight": { "value": "#1E3A4A",  "comment": "Lighter surface (marketing)" },
+    "footer":       { "value": "#0A1218",  "comment": "Footer strip" }
+  },
+
+  "text": {
+    "primary": { "value": "#E8F0F2" },
+    "muted":   { "value": "#8FA3AD" },
+    "white":   { "value": "#FFFFFF" }
+  },
+
+  "border": {
+    "mint":    { "value": "rgba(91, 186, 167, 0.15)" },
+    "mintDim": { "value": "rgba(91, 186, 167, 0.10)" }
+  },
+
+  "gray": {
+    "50":  { "value": "#F8FAFB" },
+    "100": { "value": "#EDF1F3" },
+    "200": { "value": "#E5E7EB" },
+    "300": { "value": "#D1D5DB" },
+    "500": { "value": "#6B7F8A" },
+    "600": { "value": "#4B5563" },
+    "700": { "value": "#374151" },
+    "800": { "value": "#1F2937" },
+    "900": { "value": "#111827" }
+  },
+
+  "semantic": {
+    "success": {
+      "50":  { "value": "#f0fdf4" },
+      "100": { "value": "#dcfce7" },
+      "200": { "value": "#bbf7d0" },
+      "300": { "value": "#86efac" },
+      "400": { "value": "#4ade80" },
+      "500": { "value": "#22c55e" },
+      "600": { "value": "#16a34a" },
+      "700": { "value": "#15803d" },
+      "800": { "value": "#166534" },
+      "900": { "value": "#14532d" }
+    },
+    "warning": {
+      "50":  { "value": "#fffbeb" },
+      "100": { "value": "#fef3c7" },
+      "200": { "value": "#fde68a" },
+      "300": { "value": "#fcd34d" },
+      "400": { "value": "#fbbf24" },
+      "500": { "value": "#f59e0b" },
+      "600": { "value": "#d97706" },
+      "700": { "value": "#b45309" },
+      "800": { "value": "#92400e" },
+      "900": { "value": "#78350f" }
+    },
+    "danger": {
+      "50":  { "value": "#fef2f2" },
+      "100": { "value": "#fee2e2" },
+      "200": { "value": "#fecaca" },
+      "300": { "value": "#fca5a5" },
+      "400": { "value": "#f87171" },
+      "500": { "value": "#ef4444" },
+      "600": { "value": "#dc2626" },
+      "700": { "value": "#b91c1c" },
+      "800": { "value": "#991b1b" },
+      "900": { "value": "#7f1d1d" }
+    }
+  }
+}

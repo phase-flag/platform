@@ -19,7 +19,7 @@ features:
   - title: Every Language
     details: Official SDKs for JavaScript, Python, Go, React, Java, .NET, and more — with OpenFeature support.
   - title: Deploy Anywhere
-    details: OSS Docker Compose, self-hosted VPS, Kubernetes/Helm, or our managed cloud at phaseflag.io.
+    details: OSS Docker Compose, self-hosted VPS, Kubernetes/Helm, or our managed cloud at phaseflag.com.
   - title: SaaS-Ready
     details: Multi-tenant organizations, Stripe billing integration, role-based access control, audit log.
 ---

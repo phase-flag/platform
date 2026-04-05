@@ -1,0 +1,32 @@
+Phase Flag Platform
+Copyright (c) 2024-2026 Hextrot
+
+This product includes software developed by Hextrot (https://phaseflag.io).
+
+==========================================================================
+License Summary
+==========================================================================
+
+Component                    License
+---------                    -------
+Core API (core/api/)         Apache License 2.0
+Dashboard (core/dashboard/)  Apache License 2.0
+Portal (portal/)             Apache License 2.0
+Marketing (marketing/)       Apache License 2.0
+Infrastructure (infra/)      Apache License 2.0
+Documentation (docs/)        Apache License 2.0
+
+CLI (core/cli/)              MIT License
+Relay Proxy (core/relay/)    MIT License
+All SDKs (sdks/*)            MIT License
+
+Enterprise Modules           Business Source License 1.1
+(enterprise/*)               (converts to Apache 2.0 on 2029-04-04)
+
+==========================================================================
+Third-Party Notices
+==========================================================================
+
+This software depends on third-party open-source packages. See the
+respective package managers (pyproject.toml, package.json, go.mod) for
+full dependency lists and their licenses.

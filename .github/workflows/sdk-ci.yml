@@ -194,9 +194,37 @@ jobs:
       - name: Build and publish
         run: |
           cd sdks/python
-          pip install hatch twine
-          hatch build
+          pip install build twine
+          python -m build
           twine upload dist/*
         env:
           TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+  publish-go-sdk:
+    name: Publish Go SDK (tag push)
+    runs-on: ubuntu-latest
+    needs: [go]
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Verify Go SDK builds
+        run: |
+          cd sdks/go
+          go vet ./...
+          go build ./...
+
+      - name: Tag Go module
+        # Go modules are published via git tags. The tag pushed to the repo
+        # (e.g. v0.1.0) makes the module available at pkg.go.dev automatically.
+        # Use sdks/go/ subdirectory tagging (sdks/go/v0.x.x) for monorepo setup.
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "Go module github.com/phaseflag/go-sdk published at tag: $TAG"
+          echo "Available at: https://pkg.go.dev/github.com/phaseflag/go-sdk@${TAG}"

@@ -1,0 +1,1233 @@
+{
+  "suite": "defaults",
+  "description": "Default value fallback scenarios \u2014 when no targeting rule matches, the default_variation_id is returned",
+  "cases": [
+    {
+      "name": "no rules \u2014 returns default variation",
+      "description": "Flag with no targeting rules always returns the default variation",
+      "flags": {
+        "no-rules-flag": {
+          "id": "flag-no-rules",
+          "key": "no-rules-flag",
+          "name": "No Rules Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {
+        "user_id": "user-1",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "no-rules-flag",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "all rules fail \u2014 returns default variation",
+      "description": "Flag has rules but none match \u2014 falls back to default",
+      "flags": {
+        "rules-fail-flag": {
+          "id": "flag-rules-fail",
+          "key": "rules-fail-flag",
+          "name": "Rules Fail Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "plan",
+                  "operator": "is",
+                  "value": "enterprise"
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-2",
+        "attributes": {
+          "plan": "free"
+        }
+      },
+      "expected": {
+        "flag_key": "rules-fail-flag",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default variation is true boolean",
+      "description": "Default variation value is true (flag on by default, off for specific users)",
+      "flags": {
+        "default-true-flag": {
+          "id": "flag-default-true",
+          "key": "default-true-flag",
+          "name": "Default True Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-on",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "beta_opt_out",
+                  "operator": "is",
+                  "value": "true"
+                }
+              ],
+              "variation_id": "var-off"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-3",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "default-true-flag",
+        "value": true,
+        "variation_key": "on",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default variation is a string value",
+      "description": "Flag with string type and default string variation",
+      "flags": {
+        "default-string-flag": {
+          "id": "flag-default-string",
+          "key": "default-string-flag",
+          "name": "Default String Flag",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-standard",
+          "variations": [
+            {
+              "id": "var-premium",
+              "key": "premium",
+              "name": "Premium",
+              "value": "premium-layout"
+            },
+            {
+              "id": "var-standard",
+              "key": "standard",
+              "name": "Standard",
+              "value": "standard-layout"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "plan",
+                  "operator": "is",
+                  "value": "premium"
+                }
+              ],
+              "variation_id": "var-premium"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-4",
+        "attributes": {
+          "plan": "free"
+        }
+      },
+      "expected": {
+        "flag_key": "default-string-flag",
+        "value": "standard-layout",
+        "variation_key": "standard",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default variation is a number",
+      "description": "Flag with number type default variation",
+      "flags": {
+        "default-number-flag": {
+          "id": "flag-default-number",
+          "key": "default-number-flag",
+          "name": "Default Number Flag",
+          "flag_type": "number",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-limit-5",
+          "variations": [
+            {
+              "id": "var-limit-100",
+              "key": "enterprise-limit",
+              "name": "Enterprise Limit",
+              "value": 100
+            },
+            {
+              "id": "var-limit-5",
+              "key": "free-limit",
+              "name": "Free Limit",
+              "value": 5
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "plan",
+                  "operator": "is",
+                  "value": "enterprise"
+                }
+              ],
+              "variation_id": "var-limit-100"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-5",
+        "attributes": {
+          "plan": "free"
+        }
+      },
+      "expected": {
+        "flag_key": "default-number-flag",
+        "value": 5,
+        "variation_key": "free-limit",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default variation is a JSON object",
+      "description": "Flag with JSON type default variation containing config object",
+      "flags": {
+        "default-json-flag": {
+          "id": "flag-default-json",
+          "key": "default-json-flag",
+          "name": "Default JSON Flag",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-default-cfg",
+          "variations": [
+            {
+              "id": "var-new-cfg",
+              "key": "new_config",
+              "name": "New Config",
+              "value": {
+                "version": 2,
+                "features": [
+                  "a",
+                  "b",
+                  "c"
+                ]
+              }
+            },
+            {
+              "id": "var-default-cfg",
+              "key": "default_config",
+              "name": "Default Config",
+              "value": {
+                "version": 1,
+                "features": [
+                  "a"
+                ]
+              }
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "beta",
+                  "operator": "is",
+                  "value": "true"
+                }
+              ],
+              "variation_id": "var-new-cfg"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-6",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "default-json-flag",
+        "value": {
+          "version": 1,
+          "features": [
+            "a"
+          ]
+        },
+        "variation_key": "default_config",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "empty targeting_rules list returns default",
+      "description": "An explicit empty array of targeting_rules falls back to default",
+      "flags": {
+        "empty-rules-flag": {
+          "id": "flag-empty-rules",
+          "key": "empty-rules-flag",
+          "name": "Empty Rules Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {
+        "user_id": "user-7",
+        "attributes": {
+          "everything": "present"
+        }
+      },
+      "expected": {
+        "flag_key": "empty-rules-flag",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default with complex context \u2014 no rules match",
+      "description": "Rich context but no rules defined returns default",
+      "flags": {
+        "complex-ctx-default": {
+          "id": "flag-complex-ctx",
+          "key": "complex-ctx-default",
+          "name": "Complex Context Default",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": []
+        }
+      },
+      "context": {
+        "user_id": "user-8",
+        "attributes": {
+          "country": "US",
+          "plan": "enterprise",
+          "role": "admin",
+          "age": 30,
+          "email": "admin@company.com"
+        }
+      },
+      "expected": {
+        "flag_key": "complex-ctx-default",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "condition is present but empty conditions array \u2014 matches all users (no conditions = always match)",
+      "description": "A rule with empty conditions array should match ALL users (all conditions pass trivially)",
+      "flags": {
+        "empty-conditions-flag": {
+          "id": "flag-empty-cond",
+          "key": "empty-conditions-flag",
+          "name": "Empty Conditions Flag",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-9",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "empty-conditions-flag",
+        "value": true,
+        "variation_key": "on",
+        "reason": "targeting_match"
+      }
+    },
+    {
+      "name": "multiple rules all fail \u2014 first rule tried, returns default",
+      "description": "Three rules all fail their conditions, default is returned",
+      "flags": {
+        "three-rules-fail": {
+          "id": "flag-three-rules-fail",
+          "key": "three-rules-fail",
+          "name": "Three Rules Fail",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-c",
+          "variations": [
+            {
+              "id": "var-a",
+              "key": "tier-a",
+              "name": "Tier A",
+              "value": "tier_a"
+            },
+            {
+              "id": "var-b",
+              "key": "tier-b",
+              "name": "Tier B",
+              "value": "tier_b"
+            },
+            {
+              "id": "var-c",
+              "key": "tier-c",
+              "name": "Tier C",
+              "value": "tier_c"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "tier",
+                  "operator": "is",
+                  "value": "gold"
+                }
+              ],
+              "variation_id": "var-a"
+            },
+            {
+              "priority": 2,
+              "conditions": [
+                {
+                  "attribute": "tier",
+                  "operator": "is",
+                  "value": "silver"
+                }
+              ],
+              "variation_id": "var-b"
+            },
+            {
+              "priority": 3,
+              "conditions": [
+                {
+                  "attribute": "tier",
+                  "operator": "is",
+                  "value": "bronze"
+                }
+              ],
+              "variation_id": "var-c"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-10",
+        "attributes": {
+          "tier": "platinum"
+        }
+      },
+      "expected": {
+        "flag_key": "three-rules-fail",
+        "value": "tier_c",
+        "variation_key": "tier-c",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default when rollout variation_id is invalid",
+      "description": "Rollout references a non-existent variation_id, resolve fails, falls to default",
+      "flags": {
+        "bad-rollout-id": {
+          "id": "flag-bad-rollout",
+          "key": "bad-rollout-id",
+          "name": "Bad Rollout ID",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [],
+              "percentage_rollout": {
+                "variations": [
+                  {
+                    "variation_id": "does-not-exist",
+                    "weight": 100
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-xx1",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "bad-rollout-id",
+        "value": null,
+        "variation_key": null,
+        "reason": "percentage_rollout"
+      }
+    },
+    {
+      "name": "default \u2014 every possible targeting rule fails for admin user",
+      "description": "Admin user doesn't match any rule because rules are for specific non-admin attributes",
+      "flags": {
+        "admin-no-rule": {
+          "id": "flag-admin-no-rule",
+          "key": "admin-no-rule",
+          "name": "Admin No Rule",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-standard",
+          "variations": [
+            {
+              "id": "var-special",
+              "key": "special",
+              "name": "Special",
+              "value": "special_treatment"
+            },
+            {
+              "id": "var-standard",
+              "key": "standard",
+              "name": "Standard",
+              "value": "standard_treatment"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "partner_id",
+                  "operator": "is",
+                  "value": "partner-001"
+                }
+              ],
+              "variation_id": "var-special"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "admin-user-def",
+        "attributes": {
+          "role": "admin"
+        }
+      },
+      "expected": {
+        "flag_key": "admin-no-rule",
+        "value": "standard_treatment",
+        "variation_key": "standard",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 flag with boolean true default",
+      "description": "Flag default is true variation \u2014 used as feature-on-by-default pattern",
+      "flags": {
+        "on-by-default": {
+          "id": "flag-on-by-default",
+          "key": "on-by-default",
+          "name": "On By Default",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-true",
+          "variations": [
+            {
+              "id": "var-true",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-false",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "legacy",
+                  "operator": "is",
+                  "value": "true"
+                }
+              ],
+              "variation_id": "var-false"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "modern-user",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "on-by-default",
+        "value": true,
+        "variation_key": "on",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 session_id user gets default when no rules match",
+      "description": "User with only session_id (no user_id) gets default variation for non-rollout flag",
+      "flags": {
+        "session-default": {
+          "id": "flag-session-default",
+          "key": "session-default",
+          "name": "Session Default",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "authenticated",
+                  "operator": "is",
+                  "value": "true"
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "session_id": "anon-session-xyz",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "session-default",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 priority 10 rule fails, falls to default (no lower-priority catch-all)",
+      "description": "Single high-priority rule that fails means default is returned",
+      "flags": {
+        "hi-priority-fail": {
+          "id": "flag-hi-priority-fail",
+          "key": "hi-priority-fail",
+          "name": "Hi Priority Fail",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 10,
+              "conditions": [
+                {
+                  "attribute": "special",
+                  "operator": "is",
+                  "value": "yes"
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-plain",
+        "attributes": {
+          "special": "no"
+        }
+      },
+      "expected": {
+        "flag_key": "hi-priority-fail",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 JSON flag with empty object as default value",
+      "description": "Empty JSON object {} as default variation value",
+      "flags": {
+        "empty-obj-default": {
+          "id": "flag-empty-obj-default",
+          "key": "empty-obj-default",
+          "name": "Empty Obj Default",
+          "flag_type": "json",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-empty-obj",
+          "variations": [
+            {
+              "id": "var-full-obj",
+              "key": "full",
+              "name": "Full",
+              "value": {
+                "key": "value"
+              }
+            },
+            {
+              "id": "var-empty-obj",
+              "key": "empty",
+              "name": "Empty",
+              "value": {}
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "loaded",
+                  "operator": "is",
+                  "value": "true"
+                }
+              ],
+              "variation_id": "var-full-obj"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-empty",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "empty-obj-default",
+        "value": {},
+        "variation_key": "empty",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 gt condition fails because missing attribute, rule not matched",
+      "description": "numeric gt condition with completely absent attribute returns default (not targeting_match)",
+      "flags": {
+        "gt-missing-default": {
+          "id": "flag-gt-missing-default",
+          "key": "gt-missing-default",
+          "name": "GT Missing Default",
+          "flag_type": "string",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-basic",
+          "variations": [
+            {
+              "id": "var-premium",
+              "key": "premium",
+              "name": "Premium",
+              "value": "premium"
+            },
+            {
+              "id": "var-basic",
+              "key": "basic",
+              "name": "Basic",
+              "value": "basic"
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "spend",
+                  "operator": "gt",
+                  "value": 500
+                }
+              ],
+              "variation_id": "var-premium"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-no-spend",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "gt-missing-default",
+        "value": "basic",
+        "variation_key": "basic",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 lt condition fails because missing attribute, rule not matched",
+      "description": "numeric lt condition with absent attribute returns default",
+      "flags": {
+        "lt-missing-default": {
+          "id": "flag-lt-missing-default",
+          "key": "lt-missing-default",
+          "name": "LT Missing Default",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "latency",
+                  "operator": "lt",
+                  "value": 100
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-no-latency",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "lt-missing-default",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 version_gt condition missing attribute returns default",
+      "description": "version_gt operator with missing app_version returns default",
+      "flags": {
+        "version-missing-default": {
+          "id": "flag-version-missing-default",
+          "key": "version-missing-default",
+          "name": "Version Missing Default",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "app_version",
+                  "operator": "version_gt",
+                  "value": "1.0.0"
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-no-version",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "version-missing-default",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 regex condition with missing attribute returns default",
+      "description": "matches_regex with missing attribute returns default (missing is not a negation op)",
+      "flags": {
+        "regex-missing-default": {
+          "id": "flag-regex-missing-default",
+          "key": "regex-missing-default",
+          "name": "Regex Missing Default",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "email",
+                  "operator": "matches_regex",
+                  "value": ".*@.+\\.com"
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-no-email",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "regex-missing-default",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 contains condition with missing attribute returns default",
+      "description": "contains operator with absent attribute returns false \u2192 default",
+      "flags": {
+        "contains-missing-default": {
+          "id": "flag-contains-missing-default",
+          "key": "contains-missing-default",
+          "name": "Contains Missing Default",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "tags",
+                  "operator": "contains",
+                  "value": "beta"
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-no-tags",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "contains-missing-default",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 one_of condition with missing attribute returns default",
+      "description": "one_of operator with absent attribute returns false \u2192 default",
+      "flags": {
+        "one-of-missing-default": {
+          "id": "flag-one-of-missing-default",
+          "key": "one-of-missing-default",
+          "name": "One Of Missing Default",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "plan",
+                  "operator": "one_of",
+                  "value": [
+                    "pro",
+                    "enterprise"
+                  ]
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-no-plan",
+        "attributes": {}
+      },
+      "expected": {
+        "flag_key": "one-of-missing-default",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    },
+    {
+      "name": "default \u2014 is condition with attribute present but wrong case",
+      "description": "is operator is case-sensitive: 'US' != 'us', so rule fails and default is returned",
+      "flags": {
+        "is-case-miss": {
+          "id": "flag-is-case-miss",
+          "key": "is-case-miss",
+          "name": "Is Case Miss",
+          "flag_type": "boolean",
+          "status": "active",
+          "environment": "test",
+          "default_variation_id": "var-off",
+          "variations": [
+            {
+              "id": "var-on",
+              "key": "on",
+              "name": "On",
+              "value": true
+            },
+            {
+              "id": "var-off",
+              "key": "off",
+              "name": "Off",
+              "value": false
+            }
+          ],
+          "targeting_rules": [
+            {
+              "priority": 1,
+              "conditions": [
+                {
+                  "attribute": "country",
+                  "operator": "is",
+                  "value": "US"
+                }
+              ],
+              "variation_id": "var-on"
+            }
+          ]
+        }
+      },
+      "context": {
+        "user_id": "user-lower",
+        "attributes": {
+          "country": "us"
+        }
+      },
+      "expected": {
+        "flag_key": "is-case-miss",
+        "value": false,
+        "variation_key": "off",
+        "reason": "default"
+      }
+    }
+  ]
+}

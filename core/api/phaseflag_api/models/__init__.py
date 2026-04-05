@@ -22,3 +22,6 @@ from phaseflag_api.models.experiments import (
 )  # noqa: F401
 from phaseflag_api.models.migrations import MigrationFlagDB  # noqa: F401
 from phaseflag_api.models.assignments import StickyAssignmentDB  # noqa: F401
+from phaseflag_api.models.usage import UsageRecordDB  # noqa: F401
+from phaseflag_api.models.notifications import NotificationConfigDB  # noqa: F401
+from phaseflag_api.models.integrations import IntegrationConfigDB  # noqa: F401

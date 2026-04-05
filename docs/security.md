@@ -100,7 +100,7 @@ All request bodies are validated by Pydantic models before reaching route handle
 
 ```bash
 # Verify security headers on production
-curl -I https://api.phaseflag.io/health
+curl -I https://api.phaseflag.com/health
 
 # Run integration tests that cover security scenarios
 cd core/api

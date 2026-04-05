@@ -17,7 +17,17 @@
     "build": "tsup src/index.tsx --format cjs,esm --dts --external react",
     "dev": "tsup src/index.tsx --format cjs,esm --dts --external react --watch"
   },
-  "keywords": ["feature-flags", "phaseflag", "phase-flag", "sdk", "react", "hooks"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phaseflag/phaseflag.git",
+    "directory": "sdks/react"
+  },
+  "homepage": "https://docs.phaseflag.dev/sdks/react",
+  "bugs": {
+    "url": "https://github.com/phaseflag/phaseflag/issues"
+  },
+  "author": "Phase Flag <support@phaseflag.com>",
+  "keywords": ["feature-flags", "phaseflag", "phase-flag", "sdk", "react", "hooks", "feature-management"],
   "license": "Apache-2.0",
   "peerDependencies": {
     "react": ">=18.0.0",
