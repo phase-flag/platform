@@ -88,21 +88,21 @@ export default function FlagSimulator() {
       </div>
 
       {showCreate && (
-        <div className="bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-xl p-4 animate-fade-in-up">
+        <div className="bg-[#111827] border border-[rgba(99,102,241,0.15)] rounded-xl p-4 animate-fade-in-up">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
             <input
               type="text"
               placeholder="Flag key (e.g. new_feature)"
               value={newFlagKey}
               onChange={(e) => setNewFlagKey(e.target.value)}
-              className="px-3 py-2 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-primary/50 focus:border-pf-primary placeholder-[#8FA3AD]"
+              className="px-3 py-2 text-sm bg-[#1E1B4B] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-primary/50 focus:border-pf-primary placeholder-[#8FA3AD]"
             />
             <input
               type="text"
               placeholder="Display name"
               value={newFlagName}
               onChange={(e) => setNewFlagName(e.target.value)}
-              className="px-3 py-2 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-primary/50 focus:border-pf-primary placeholder-[#8FA3AD]"
+              className="px-3 py-2 text-sm bg-[#1E1B4B] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-primary/50 focus:border-pf-primary placeholder-[#8FA3AD]"
             />
           </div>
           <div className="flex gap-2">
@@ -114,7 +114,7 @@ export default function FlagSimulator() {
             </button>
             <button
               onClick={() => setShowCreate(false)}
-              className="px-4 py-2 text-sm font-medium text-[#8FA3AD] bg-[#1C2D38] border border-[rgba(99,102,241,0.15)] rounded-lg hover:bg-[#243845] transition-colors"
+              className="px-4 py-2 text-sm font-medium text-[#8FA3AD] bg-[#1E1B4B] border border-[rgba(99,102,241,0.15)] rounded-lg hover:bg-[#252B4B] transition-colors"
             >
               Cancel
             </button>
@@ -126,13 +126,13 @@ export default function FlagSimulator() {
         {flags.map((flag) => (
           <div
             key={flag.key}
-            className="bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-xl p-4 hover:border-pf-primary/30 transition-all"
+            className="bg-[#111827] border border-[rgba(99,102,241,0.15)] rounded-xl p-4 hover:border-pf-primary/30 transition-all"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h4 className="font-medium text-[#E8F0F2] truncate">{flag.name}</h4>
-                  <code className="text-xs bg-[#1C2D38] text-[#8FA3AD] px-1.5 py-0.5 rounded">
+                  <code className="text-xs bg-[#1E1B4B] text-[#8FA3AD] px-1.5 py-0.5 rounded">
                     {flag.key}
                   </code>
                 </div>
@@ -148,7 +148,7 @@ export default function FlagSimulator() {
                     {flag.type}
                   </span>
                   {flag.tags.map((tag) => (
-                    <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-[#1C2D38] text-[#8FA3AD]">
+                    <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-[#1E1B4B] text-[#8FA3AD]">
                       {tag}
                     </span>
                   ))}
@@ -159,7 +159,7 @@ export default function FlagSimulator() {
                 <button
                   onClick={() => toggleFlag(flag.key)}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors toggle-track ${
-                    flag.enabled ? 'bg-pf-success' : 'bg-[#1C2D38]'
+                    flag.enabled ? 'bg-pf-success' : 'bg-[#1E1B4B]'
                   }`}
                   role="switch"
                   aria-checked={flag.enabled}

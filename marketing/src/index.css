@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --color-pf-navy: #2B4C5C;
-  --color-pf-dark: #1E3A4A;
+  --color-pf-navy: #1E293B;
+  --color-pf-dark: #1E1B4B;
   --color-pf-primary: #6366F1;
   --color-pf-primary-light: #818CF8;
   --color-pf-primary-pale: #EEF2FF;
@@ -15,9 +15,9 @@
   --color-pf-danger: #EF4444;
 
   /* Dark mode palette */
-  --color-pf-page: #0F1A20;
-  --color-pf-surface: #162029;
-  --color-pf-surface-light: #1E3A4A;
+  --color-pf-page: #0B0F1A;
+  --color-pf-surface: #111827;
+  --color-pf-surface-light: #1E1B4B;
   --color-pf-text: #E8F0F2;
   --color-pf-text-muted: #8FA3AD;
   --color-pf-border: rgba(99, 102, 241, 0.15);
@@ -30,7 +30,7 @@
 body {
   font-family: var(--font-body);
   color: #E8F0F2;
-  background: #0F1A20;
+  background: #0B0F1A;
 }
 
 h1, h2, h3, h4, h5, h6 {

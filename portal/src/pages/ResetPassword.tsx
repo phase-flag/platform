@@ -86,7 +86,7 @@ export default function ResetPassword() {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0F1A20] px-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#0B0F1A] px-4">
         <div className="w-full max-w-md text-center space-y-4">
           <p className="text-red-400">Invalid or expired reset link.</p>
           <Link to="/forgot-password" className="text-pf-primary hover:underline text-sm">
@@ -98,7 +98,7 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0F1A20] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#0B0F1A] px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">Set new password</h1>

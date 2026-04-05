@@ -13,17 +13,17 @@
       "pale":    { "value": "#E8F7F3" }
     },
     "navy": {
-      "DEFAULT": { "value": "#2B4C5C" },
-      "dark":    { "value": "#1E3A4A" }
+      "DEFAULT": { "value": "#1E293B" },
+      "dark":    { "value": "#1E1B4B" }
     }
   },
 
   "surface": {
-    "page":         { "value": "#0F1A20",  "comment": "Dark-mode page background (portal/marketing)" },
-    "card":         { "value": "#162029",  "comment": "Card background (portal)" },
-    "surface":      { "value": "#1C2D38",  "comment": "Raised surface (portal)" },
-    "surfaceLight": { "value": "#1E3A4A",  "comment": "Lighter surface (marketing)" },
-    "footer":       { "value": "#0A1218",  "comment": "Footer strip" }
+    "page":         { "value": "#0B0F1A",  "comment": "Dark-mode page background (portal/marketing)" },
+    "card":         { "value": "#111827",  "comment": "Card background (portal)" },
+    "surface":      { "value": "#1E1B4B",  "comment": "Raised surface (portal)" },
+    "surfaceLight": { "value": "#1E1B4B",  "comment": "Lighter surface (marketing)" },
+    "footer":       { "value": "#060911",  "comment": "Footer strip" }
   },
 
   "text": {

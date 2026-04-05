@@ -35,7 +35,7 @@ export default function RolloutDemo() {
 // The same user always gets the same bucket for a given flag`}</pre>
       </div>
 
-      <div className="mt-6 bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6">
+      <div className="mt-6 bg-[#111827] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6">
         <h3 className="font-heading text-sm font-medium uppercase tracking-wider text-[#E8F0F2] mb-4">
           Why Deterministic Hashing?
         </h3>

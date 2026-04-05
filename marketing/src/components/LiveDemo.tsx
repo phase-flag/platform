@@ -13,7 +13,7 @@ export default function LiveDemo() {
   ];
 
   const typeBadge: Record<string, string> = {
-    boolean: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
+    boolean: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20',
     string: 'bg-violet-500/15 text-violet-400 border-violet-500/20',
     number: 'bg-amber-500/15 text-amber-400 border-amber-500/20',
     json: 'bg-sky-500/15 text-sky-400 border-sky-500/20',
@@ -47,7 +47,7 @@ export default function LiveDemo() {
 
             <div className="space-y-4 flex-1">
               {/* Demo App Link */}
-              <div className="bg-[#0F1A20] rounded-xl p-5 border border-white/5">
+              <div className="bg-[#0B0F1A] rounded-xl p-5 border border-white/5">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-9 h-9 rounded-lg bg-pf-primary/15 flex items-center justify-center">
                     <svg className="w-5 h-5 text-pf-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,7 +61,7 @@ export default function LiveDemo() {
                   </div>
                 </div>
                 <a
-                  href="http://localhost:5176"
+                  href="https://app.phaseflag.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full text-center px-4 py-2.5 text-sm font-medium text-white bg-pf-primary rounded-lg hover:bg-pf-primary-light transition-colors"
@@ -71,7 +71,7 @@ export default function LiveDemo() {
               </div>
 
               {/* Dashboard Link */}
-              <div className="bg-[#0F1A20] rounded-xl p-5 border border-white/5">
+              <div className="bg-[#0B0F1A] rounded-xl p-5 border border-white/5">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-9 h-9 rounded-lg bg-violet-500/15 flex items-center justify-center">
                     <svg className="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +85,7 @@ export default function LiveDemo() {
                   </div>
                 </div>
                 <a
-                  href="http://localhost:5173/flags"
+                  href="https://app.phaseflag.com/flags"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full text-center px-4 py-2.5 text-sm font-medium text-white bg-violet-500/80 rounded-lg hover:bg-violet-500 transition-colors"
@@ -96,7 +96,7 @@ export default function LiveDemo() {
             </div>
 
             {/* Credentials */}
-            <div className="mt-6 bg-[#0F1A20] rounded-xl p-5 border border-white/5">
+            <div className="mt-6 bg-[#0B0F1A] rounded-xl p-5 border border-white/5">
               <div className="flex items-center gap-2 mb-3">
                 <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />

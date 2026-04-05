@@ -190,7 +190,7 @@ export default function Billing() {
       ];
 
   return (
-    <div className="min-h-screen bg-[#0F1A20] px-6 py-8">
+    <div className="min-h-screen bg-[#0B0F1A] px-6 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-white">Billing</h1>

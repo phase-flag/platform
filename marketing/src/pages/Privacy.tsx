@@ -1,6 +1,6 @@
 export default function Privacy() {
   return (
-    <div className="bg-[#0F1A20] min-h-screen pt-24 pb-20">
+    <div className="bg-[#0B0F1A] min-h-screen pt-24 pb-20">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10">
           <a

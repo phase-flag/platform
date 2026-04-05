@@ -1,28 +1,101 @@
-import CompareTable from './CompareTable';
-import { phaseAdvantages, competitors, comparisonCategories } from '../data/comparisons';
+import { phaseAdvantages } from '../data/comparisons';
 
-// ─── Individual competitor summary cards ─────────────────────────────────────
+// ─── Competitor card data ─────────────────────────────────────────────────────
 
-function CompetitorCard({ competitor }: { competitor: typeof competitors[number] }) {
-  if (competitor.isSelf) return null;
+interface CompetitorDiff {
+  competitor: string;
+  tagline: string;
+  differences: Array<{ label: string; phaseflag: string; them: string; pfWins: boolean }>;
+}
 
-  // Count features where Phase Flag wins (true and competitor is false or fewer)
-  // We'll just link to the relevant section anchor instead of computing dynamically.
+const competitorDiffs: CompetitorDiff[] = [
+  {
+    competitor: 'LaunchDarkly',
+    tagline: 'Enterprise SaaS, per-seat pricing',
+    differences: [
+      { label: 'Pricing model', phaseflag: 'MAU-based, no per-seat', them: 'Per-seat billing', pfWins: true },
+      { label: 'Open source', phaseflag: 'Apache 2.0 core', them: 'Proprietary', pfWins: true },
+      { label: 'Self-hosting', phaseflag: 'Free self-host option', them: 'SaaS only', pfWins: true },
+      { label: 'Bayesian statistics', phaseflag: 'Built in', them: 'Not available', pfWins: true },
+      { label: 'Free tier', phaseflag: 'Unlimited flags', them: '1,000 MAU limit', pfWins: true },
+      { label: 'Flag verification', phaseflag: 'Formal Z3-based', them: 'Not available', pfWins: true },
+    ],
+  },
+  {
+    competitor: 'Unleash',
+    tagline: 'Open-source core, limited experimentation',
+    differences: [
+      { label: 'Built-in A/B testing', phaseflag: 'Full Bayesian + frequentist', them: 'Not available', pfWins: true },
+      { label: 'Edge relay proxy', phaseflag: 'Open-source Go relay', them: 'Not included', pfWins: true },
+      { label: 'SDK breadth', phaseflag: '15+ incl. Rust, Svelte, Edge', them: '10+ mainstream only', pfWins: true },
+      { label: 'Enterprise AI', phaseflag: 'Autonomous optimization', them: 'Not available', pfWins: true },
+      { label: 'FinOps attribution', phaseflag: 'Cost per flag', them: 'Not available', pfWins: true },
+      { label: 'OpenFeature support', phaseflag: 'Python + TypeScript', them: 'Available', pfWins: false },
+    ],
+  },
+  {
+    competitor: 'Flagsmith',
+    tagline: 'Open-source, limited SDK breadth',
+    differences: [
+      { label: 'Local evaluation', phaseflag: 'Sub-millisecond, in-process', them: 'No local eval', pfWins: true },
+      { label: 'A/B testing', phaseflag: 'Full built-in experiments', them: 'Not available', pfWins: true },
+      { label: 'Rust / Svelte / Solid SDKs', phaseflag: 'Included', them: 'Not available', pfWins: true },
+      { label: 'Flag dependency graph', phaseflag: 'Full interaction graph', them: 'Not available', pfWins: true },
+      { label: 'Approval workflows', phaseflag: 'Change requests + freezes', them: 'Not available', pfWins: true },
+      { label: 'OpenFeature support', phaseflag: 'Available', them: 'Available', pfWins: false },
+    ],
+  },
+  {
+    competitor: 'Split.io',
+    tagline: 'Experiment-first, proprietary, per-seat',
+    differences: [
+      { label: 'Open source', phaseflag: 'Apache 2.0 core', them: 'Proprietary', pfWins: true },
+      { label: 'Self-hosting', phaseflag: 'Free self-host option', them: 'SaaS only', pfWins: true },
+      { label: 'Pricing model', phaseflag: 'MAU-based', them: 'Per-seat billing', pfWins: true },
+      { label: 'Counterfactual analysis', phaseflag: 'Built in', them: 'Not available', pfWins: true },
+      { label: 'OpenFeature support', phaseflag: 'Available', them: 'Not available', pfWins: true },
+      { label: 'Free tier', phaseflag: 'Unlimited flags', them: '10 seats only', pfWins: true },
+    ],
+  },
+];
+
+// ─── Competitor Card ──────────────────────────────────────────────────────────
+
+function CompetitorCard({ data }: { data: CompetitorDiff }) {
   return (
-    <a
-      href={`#compare-${competitor.id}`}
-      className="block p-5 rounded-xl bg-white/[0.03] border border-[rgba(99,102,241,0.12)] hover:border-pf-primary/30 hover:bg-white/[0.06] transition-all group"
-    >
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <h3 className="font-heading text-sm font-medium uppercase tracking-wider text-white group-hover:text-pf-primary transition-colors">
-          Phase Flag vs {competitor.name}
+    <div className="bg-pf-surface border border-[rgba(99,102,241,0.15)] rounded-2xl p-6 flex flex-col">
+      {/* Header */}
+      <div className="mb-5">
+        <h3 className="font-heading text-base font-medium uppercase tracking-wider text-white mb-1">
+          vs {data.competitor}
         </h3>
-        <svg className="w-4 h-4 text-pf-text-muted group-hover:text-pf-primary transition-colors shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
+        <p className="text-xs text-pf-text-muted">{data.tagline}</p>
       </div>
-      <p className="text-xs text-pf-text-muted">{competitor.tagline}</p>
-    </a>
+
+      {/* Differences */}
+      <ul className="space-y-3 flex-1">
+        {data.differences.map((diff) => (
+          <li key={diff.label} className="flex items-start gap-3">
+            {diff.pfWins ? (
+              <svg className="w-4 h-4 text-pf-primary shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 text-white/30 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+            <div className="min-w-0">
+              <div className="text-xs font-medium text-white/70 mb-0.5">{diff.label}</div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-pf-primary">{diff.phaseflag}</span>
+                <span className="text-xs text-white/35 line-through decoration-white/20">{diff.them}</span>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -33,22 +106,21 @@ export default function Compare() {
     <section id="compare-full" className="py-20 lg:py-28">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-primary/10 text-pf-primary mb-4">
-            Detailed Comparison
+            Comparison
           </span>
           <h2 className="font-heading text-3xl sm:text-4xl font-light uppercase tracking-wider text-white mb-4">
             Phase Flag vs The Field
           </h2>
           <p className="text-pf-text-muted text-lg">
-            See exactly how Phase Flag compares to LaunchDarkly, Unleash, Flagsmith, and Split.io
-            across every dimension that matters.
+            See how Phase Flag stacks up against LaunchDarkly, Unleash, Flagsmith, and Split.io.
           </p>
         </div>
 
-        {/* ── Why Phase Flag — advantage bullets ── */}
-        <div className="mb-14 p-6 rounded-2xl bg-pf-primary/5 border border-pf-primary/20">
+        {/* Why Phase Flag — advantage bullets */}
+        <div className="mb-12 p-6 rounded-2xl bg-pf-primary/5 border border-pf-primary/20">
           <h3 className="font-heading text-sm font-medium uppercase tracking-wider text-pf-primary mb-4">
             Key Advantages
           </h3>
@@ -64,140 +136,14 @@ export default function Compare() {
           </ul>
         </div>
 
-        {/* ── Full interactive comparison table ── */}
-        <div className="mb-16">
-          <CompareTable />
+        {/* Competitor cards — 2 cols mobile, 4 cols desktop */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {competitorDiffs.map((data) => (
+            <CompetitorCard key={data.competitor} data={data} />
+          ))}
         </div>
 
-        {/* ── Per-competitor deep-dive sections ── */}
-        <div className="mb-14">
-          <h3 className="font-heading text-xl font-light uppercase tracking-wider text-white mb-6 text-center">
-            Head-to-Head Breakdowns
-          </h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            {competitors.filter((c) => !c.isSelf).map((c) => (
-              <CompetitorCard key={c.id} competitor={c} />
-            ))}
-          </div>
-
-          {/* Per-competitor focused tables */}
-          {competitors
-            .filter((c) => !c.isSelf)
-            .map((competitor) => (
-              <div
-                key={competitor.id}
-                id={`compare-${competitor.id}`}
-                className="mb-12 scroll-mt-24"
-              >
-                <div className="flex items-center gap-3 mb-5">
-                  <h4 className="font-heading text-base font-medium uppercase tracking-wider text-white">
-                    Phase Flag vs {competitor.name}
-                  </h4>
-                  <a
-                    href={competitor.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-pf-text-muted hover:text-pf-primary transition-colors"
-                  >
-                    {competitor.url.replace('https://', '')} ↗
-                  </a>
-                </div>
-                {/* Show a representative subset: core + that competitor's weaknesses */}
-                {comparisonCategories.map((cat) => {
-                  // Only show categories where there's at least one difference
-                  const hasDiff = cat.features.some(
-                    (f) => f.phaseflag !== f[competitor.id as keyof typeof f],
-                  );
-                  if (!hasDiff) return null;
-                  return (
-                    <div key={cat.id} className="mb-4">
-                      <p className="text-xs font-medium text-pf-text-muted uppercase tracking-wider mb-2 px-1">
-                        {cat.label}
-                      </p>
-                      <div className="overflow-x-auto rounded-xl border border-[rgba(99,102,241,0.12)]">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b border-[rgba(99,102,241,0.15)]">
-                              <th className="text-left px-4 py-3 text-xs text-pf-text-muted font-medium uppercase tracking-wider min-w-[180px]">
-                                Feature
-                              </th>
-                              <th className="px-4 py-3 text-center bg-pf-primary/5 text-xs font-heading font-medium uppercase tracking-wider text-pf-primary">
-                                Phase Flag
-                              </th>
-                              <th className="px-4 py-3 text-center text-xs font-heading font-medium uppercase tracking-wider text-pf-text-muted">
-                                {competitor.name}
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {cat.features
-                              .filter(
-                                (f) =>
-                                  f.phaseflag !== f[competitor.id as keyof typeof f],
-                              )
-                              .map((feature, i) => (
-                                <tr
-                                  key={feature.name}
-                                  className={`border-b border-[rgba(99,102,241,0.08)] ${
-                                    i % 2 === 0 ? 'bg-white/[0.01]' : ''
-                                  }`}
-                                >
-                                  <td className="px-4 py-3 text-pf-text font-medium">
-                                    {feature.name}
-                                  </td>
-                                  {/* Phase Flag cell */}
-                                  {typeof feature.phaseflag === 'string' ? (
-                                    <td className="px-4 py-3 text-center bg-pf-primary/5">
-                                      <span className="text-xs font-medium text-pf-primary">
-                                        {feature.phaseflag}
-                                      </span>
-                                    </td>
-                                  ) : (
-                                    <td className="px-4 py-3 text-center bg-pf-primary/5">
-                                      {feature.phaseflag ? (
-                                        <svg className="w-5 h-5 mx-auto text-pf-primary" fill="currentColor" viewBox="0 0 24 24">
-                                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                                        </svg>
-                                      ) : (
-                                        <svg className="w-4 h-4 mx-auto text-white/15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                                        </svg>
-                                      )}
-                                    </td>
-                                  )}
-                                  {/* Competitor cell */}
-                                  {typeof feature[competitor.id as keyof typeof feature] === 'string' ? (
-                                    <td className="px-4 py-3 text-center">
-                                      <span className="text-xs text-pf-text-muted">
-                                        {feature[competitor.id as keyof typeof feature] as string}
-                                      </span>
-                                    </td>
-                                  ) : (
-                                    <td className="px-4 py-3 text-center">
-                                      {feature[competitor.id as keyof typeof feature] ? (
-                                        <svg className="w-5 h-5 mx-auto text-white/40" fill="currentColor" viewBox="0 0 24 24">
-                                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                                        </svg>
-                                      ) : (
-                                        <svg className="w-4 h-4 mx-auto text-white/15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                                        </svg>
-                                      )}
-                                    </td>
-                                  )}
-                                </tr>
-                              ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-        </div>
-
-        {/* ── CTA ── */}
+        {/* CTA */}
         <div className="text-center">
           <p className="text-pf-text-muted mb-6">
             Ready to see Phase Flag in action?

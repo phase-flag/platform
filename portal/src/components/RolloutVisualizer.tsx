@@ -59,7 +59,7 @@ export default function RolloutVisualizer() {
           type="text"
           value={flagKey}
           onChange={(e) => setFlagKey(e.target.value)}
-          className="w-full px-3 py-2 text-sm bg-[#1C2D38] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-primary/50 focus:border-pf-primary placeholder-[#8FA3AD]"
+          className="w-full px-3 py-2 text-sm bg-[#1E1B4B] text-[#E8F0F2] border border-[rgba(99,102,241,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-primary/50 focus:border-pf-primary placeholder-[#8FA3AD]"
         />
       </div>
 
@@ -78,7 +78,7 @@ export default function RolloutVisualizer() {
           max="100"
           value={percentage}
           onChange={(e) => setPercentage(Number(e.target.value))}
-          className="w-full h-2 bg-[#1C2D38] rounded-lg appearance-none cursor-pointer accent-pf-primary"
+          className="w-full h-2 bg-[#1E1B4B] rounded-lg appearance-none cursor-pointer accent-pf-primary"
         />
         <div className="flex justify-between text-xs text-[#8FA3AD] mt-1">
           <span>0%</span>
@@ -90,9 +90,9 @@ export default function RolloutVisualizer() {
       </div>
 
       {/* Rollout bar */}
-      <div className="bg-[#162029] rounded-xl p-4">
+      <div className="bg-[#111827] rounded-xl p-4">
         <h4 className="text-sm font-medium text-[#E8F0F2] mb-3">Rollout Distribution</h4>
-        <div className="h-8 rounded-lg overflow-hidden flex bg-[#1C2D38]">
+        <div className="h-8 rounded-lg overflow-hidden flex bg-[#1E1B4B]">
           <div
             className="bg-pf-primary transition-all duration-500 flex items-center justify-center text-white text-xs font-medium"
             style={{ width: `${percentage}%` }}
@@ -106,7 +106,7 @@ export default function RolloutVisualizer() {
       </div>
 
       {/* Bucket histogram */}
-      <div className="bg-[#162029] rounded-xl p-4">
+      <div className="bg-[#111827] rounded-xl p-4">
         <h4 className="text-sm font-medium text-[#E8F0F2] mb-3">DJB2 Hash Bucket Distribution</h4>
         <div className="flex items-end gap-1 h-24">
           {bucketDistribution.map((count, i) => {
@@ -123,7 +123,7 @@ export default function RolloutVisualizer() {
                       ? 'bg-pf-primary'
                       : isPartial
                         ? 'bg-pf-primary/40'
-                        : 'bg-[#1C2D38]'
+                        : 'bg-[#1E1B4B]'
                   }`}
                   style={{ height: `${Math.max(count * 12, 4)}px` }}
                 />
@@ -135,7 +135,7 @@ export default function RolloutVisualizer() {
       </div>
 
       {/* User grid */}
-      <div className="bg-[#162029] rounded-xl p-4">
+      <div className="bg-[#111827] rounded-xl p-4">
         <h4 className="text-sm font-medium text-[#E8F0F2] mb-3">
           User Assignments ({included.length} included, {excluded.length} excluded)
         </h4>
@@ -148,12 +148,12 @@ export default function RolloutVisualizer() {
                 className={`flex flex-col items-center p-1.5 rounded-lg text-[10px] transition-all ${
                   isIn
                     ? 'bg-pf-primary/10 text-pf-primary border border-pf-primary/30'
-                    : 'bg-[#1C2D38] text-[#8FA3AD] border border-[rgba(99,102,241,0.15)]'
+                    : 'bg-[#1E1B4B] text-[#8FA3AD] border border-[rgba(99,102,241,0.15)]'
                 }`}
                 title={`${user.name}: bucket ${user.bucket}`}
               >
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium mb-0.5 ${
-                  isIn ? 'bg-pf-primary text-white' : 'bg-[#0F1A20] text-[#8FA3AD]'
+                  isIn ? 'bg-pf-primary text-white' : 'bg-[#0B0F1A] text-[#8FA3AD]'
                 }`}>
                   {user.name[0]}
                 </div>

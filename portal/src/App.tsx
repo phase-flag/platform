@@ -32,7 +32,7 @@ function NotFound() {
 
 function ShellLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#0F1A20]">
+    <div className="min-h-screen flex flex-col bg-[#0B0F1A]">
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />

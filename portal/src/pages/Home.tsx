@@ -74,7 +74,7 @@ export default function Home() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0F1A20] via-[#162029] to-[#0F1A20]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0B0F1A] via-[#111827] to-[#0B0F1A]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="text-center max-w-3xl mx-auto">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pf-primary/10 text-pf-primary border border-pf-primary/20 mb-6">
@@ -97,7 +97,7 @@ export default function Home() {
               </Link>
               <Link
                 to="/evaluation"
-                className="px-6 py-3 text-sm font-medium text-[#E8F0F2] bg-[#1C2D38] border border-[rgba(99,102,241,0.15)] rounded-xl hover:bg-[#243845] transition-colors"
+                className="px-6 py-3 text-sm font-medium text-[#E8F0F2] bg-[#1E1B4B] border border-[rgba(99,102,241,0.15)] rounded-xl hover:bg-[#252B4B] transition-colors"
               >
                 Try Evaluation Engine
               </Link>
@@ -122,7 +122,7 @@ export default function Home() {
             <Link
               key={feature.title}
               to={feature.link}
-              className="group bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6 hover:border-pf-primary/30 hover:shadow-lg hover:shadow-pf-primary/5 transition-all duration-300"
+              className="group bg-[#111827] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6 hover:border-pf-primary/30 hover:shadow-lg hover:shadow-pf-primary/5 transition-all duration-300"
             >
               <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl ${feature.color} mb-4 group-hover:scale-110 transition-transform`}>
                 {feature.icon}
@@ -145,7 +145,7 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section className="bg-[#162029] border-y border-[rgba(99,102,241,0.15)]">
+      <section className="bg-[#111827] border-y border-[rgba(99,102,241,0.15)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <h2 className="font-heading text-2xl sm:text-3xl font-light uppercase tracking-wider text-[#E8F0F2] text-center mb-12">
             How Evaluation Works

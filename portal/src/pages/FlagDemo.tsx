@@ -16,7 +16,7 @@ export default function FlagDemo() {
       <FlagSimulator />
 
       {/* Info panel */}
-      <div className="mt-10 bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6">
+      <div className="mt-10 bg-[#111827] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6">
         <h3 className="font-heading text-sm font-medium uppercase tracking-wider text-[#E8F0F2] mb-4">
           How Flags Work in Phase Flag
         </h3>

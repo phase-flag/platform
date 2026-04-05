@@ -21,8 +21,8 @@ export default {
                     900: '#312E81',
                 },
                 navy: {
-                    DEFAULT: '#2B4C5C',
-                    dark: '#1E3A4A',
+                    DEFAULT: '#1E293B',
+                    dark: '#1E1B4B',
                 },
                 indigo: {
                     DEFAULT: '#6366F1',

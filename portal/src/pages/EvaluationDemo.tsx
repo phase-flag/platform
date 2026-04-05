@@ -16,7 +16,7 @@ export default function EvaluationDemo() {
       <TargetingPlayground />
 
       {/* Operators reference */}
-      <div className="mt-10 bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6">
+      <div className="mt-10 bg-[#111827] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6">
         <h3 className="font-heading text-sm font-medium uppercase tracking-wider text-[#E8F0F2] mb-4">
           Supported Operators
         </h3>
@@ -31,7 +31,7 @@ export default function EvaluationDemo() {
             { op: 'lt', desc: 'Less than' },
             { op: 'matches_regex', desc: 'Regex match' },
           ].map((item) => (
-            <div key={item.op} className="bg-[#1C2D38] rounded-lg p-3 border border-[rgba(99,102,241,0.15)]">
+            <div key={item.op} className="bg-[#1E1B4B] rounded-lg p-3 border border-[rgba(99,102,241,0.15)]">
               <code className="text-xs font-mono text-pf-primary">{item.op}</code>
               <p className="text-xs text-[#8FA3AD] mt-1">{item.desc}</p>
             </div>

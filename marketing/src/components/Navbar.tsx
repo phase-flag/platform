@@ -24,7 +24,7 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-[#0F1A20]/95 backdrop-blur shadow-sm shadow-black/20'
+          ? 'bg-[#0B0F1A]/95 backdrop-blur shadow-sm shadow-black/20'
           : 'bg-transparent'
       }`}
     >
@@ -99,7 +99,7 @@ export default function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="lg:hidden bg-[#0F1A20] border-t border-[rgba(99,102,241,0.15)] shadow-lg">
+        <div className="lg:hidden bg-[#0B0F1A] border-t border-[rgba(99,102,241,0.15)] shadow-lg">
           <div className="px-4 py-4 space-y-1">
             {navLinks.map((link) => (
               <a

@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-    --pf-navy: #2B4C5C;
-    --pf-dark: #1E3A4A;
+    --pf-navy: #1E293B;
+    --pf-dark: #1E1B4B;
     --pf-primary: #6366F1;
     --pf-primary-light: #818CF8;
 }
 
 body {
-    background-color: #0F1A20;
+    background-color: #0B0F1A;
     color: #E8F0F2;
     font-family: 'Inter', system-ui, sans-serif;
 }

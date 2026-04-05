@@ -328,7 +328,7 @@ export default function SDKDemo() {
                 <span className={`inline-flex items-center justify-center w-7 h-7 rounded-md text-[10px] font-mono font-bold ${
                   activeSDK === s.id
                     ? 'bg-pf-primary text-white'
-                    : 'bg-[#1C2D38] text-[#8FA3AD]'
+                    : 'bg-[#1E1B4B] text-[#8FA3AD]'
                 }`}>
                   {s.icon}
                 </span>

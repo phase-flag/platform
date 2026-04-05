@@ -26,7 +26,7 @@ export default function CookieConsent() {
       aria-label="Cookie consent"
       className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 sm:pb-6 animate-slide-up"
     >
-      <div className="max-w-3xl mx-auto bg-[#162029] border border-[rgba(99,102,241,0.2)] rounded-2xl shadow-2xl shadow-black/50 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div className="max-w-3xl mx-auto bg-[#111827] border border-[rgba(99,102,241,0.2)] rounded-2xl shadow-2xl shadow-black/50 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         {/* Cookie icon */}
         <div className="shrink-0 w-9 h-9 rounded-xl bg-[rgba(99,102,241,0.1)] flex items-center justify-center">
           <svg

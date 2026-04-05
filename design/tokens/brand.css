@@ -19,15 +19,15 @@
   --pf-indigo:       #6366F1;   /* Indigo — UI accent, borders, icons         */
   --pf-indigo-light: #818CF8;   /* Indigo hover state                         */
   --pf-indigo-pale:  #EEF2FF;   /* Indigo tint — light-mode backgrounds       */
-  --pf-navy:         #2B4C5C;   /* Navy — favicon bg, dashboard primary shade */
-  --pf-dark:         #1E3A4A;   /* Darker navy — code backgrounds             */
+  --pf-navy:         #1E293B;   /* Navy — favicon bg, dashboard primary shade */
+  --pf-dark:         #1E1B4B;   /* Darker navy — code backgrounds             */
 
   /* ── Surface Palette (dark-mode default) ─────────────────────────── */
-  --pf-page:         #0F1A20;   /* Page background                            */
-  --pf-card:         #162029;   /* Card background (portal)                   */
-  --pf-surface:      #1C2D38;   /* Raised surface / panel                     */
-  --pf-surface-light:#1E3A4A;   /* Slightly lighter surface                   */
-  --pf-footer:       #0A1218;   /* Footer strip                               */
+  --pf-page:         #0B0F1A;   /* Page background                            */
+  --pf-card:         #111827;   /* Card background (portal)                   */
+  --pf-surface:      #1E1B4B;   /* Raised surface / panel                     */
+  --pf-surface-light:#1E1B4B;   /* Slightly lighter surface                   */
+  --pf-footer:       #060911;   /* Footer strip                               */
 
   /* ── Typography ──────────────────────────────────────────────────── */
   --pf-text:         #E8F0F2;   /* Primary body text                          */

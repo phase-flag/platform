@@ -25,7 +25,7 @@ export default function Layout() {
     }
 
     return (
-        <div className="min-h-screen flex bg-[#0F1A20]">
+        <div className="min-h-screen flex bg-[#0B0F1A]">
             {/* Sidebar */}
             <aside className="w-64 bg-surface border-r border-gray-800 flex flex-col">
                 {/* Logo */}

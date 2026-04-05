@@ -14,7 +14,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0F1A20] px-6 py-8">
+    <div className="min-h-screen bg-[#0B0F1A] px-6 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>

@@ -9,16 +9,16 @@ export default {
         extend: {
             colors: {
                 pf: {
-                    navy: '#2B4C5C',
-                    dark: '#1E3A4A',
+                    navy: '#1E293B',
+                    dark: '#1E1B4B',
                     primary: '#6366F1',
                     'primary-light': '#818CF8',
                     'primary-pale': '#EEF2FF',
                 },
                 surface: {
-                    DEFAULT: '#162029',
-                    light: '#1C2D38',
-                    lighter: '#243640',
+                    DEFAULT: '#111827',
+                    light: '#1E1B4B',
+                    lighter: '#252B4B',
                 },
             },
             fontFamily: {

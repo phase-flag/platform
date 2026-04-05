@@ -39,7 +39,7 @@ export default function Testimonials() {
           {testimonials.map((t) => (
             <div
               key={t.name}
-              className="bg-[#162029] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6 hover:shadow-lg hover:shadow-pf-primary/5 transition-shadow"
+              className="bg-[#111827] border border-[rgba(99,102,241,0.15)] rounded-2xl p-6 hover:shadow-lg hover:shadow-pf-primary/5 transition-shadow"
             >
               <svg className="w-8 h-8 text-pf-primary/30 mb-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151C7.563 6.068 6 8.789 6 11h4v10H0z" />

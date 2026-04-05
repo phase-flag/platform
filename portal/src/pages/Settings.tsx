@@ -176,7 +176,7 @@ export default function Settings() {
 
   if (pageLoading) {
     return (
-      <div className="min-h-screen bg-[#0F1A20] px-6 py-8">
+      <div className="min-h-screen bg-[#0B0F1A] px-6 py-8">
         <div className="max-w-2xl mx-auto">
           <Skeleton variant="card" count={2} />
         </div>
@@ -185,7 +185,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F1A20] px-6 py-8">
+    <div className="min-h-screen bg-[#0B0F1A] px-6 py-8">
       {showDeleteModal && <DeleteAccountModal onClose={() => setShowDeleteModal(false)} />}
 
       <div className="max-w-2xl mx-auto space-y-6">

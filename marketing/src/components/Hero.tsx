@@ -2,7 +2,7 @@ export default function Hero() {
   return (
     <section className="relative overflow-hidden pt-20 lg:pt-24">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0F1A20] via-[#162029] to-[#0F1A20]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0B0F1A] via-[#111827] to-[#0B0F1A]" />
       <div className="absolute top-20 right-0 w-96 h-96 bg-pf-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-pf-primary/5 rounded-full blur-3xl" />
 
