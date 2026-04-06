@@ -34,14 +34,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/phaseflag/api
+          images: ghcr.io/phase-flag/api
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
           labels: |
-            org.opencontainers.image.source=https://github.com/phaseflag/phaseflag
+            org.opencontainers.image.source=https://github.com/phase-flag/platform
             org.opencontainers.image.description=Phase Flag API — FastAPI feature flag management service
             org.opencontainers.image.licenses=MIT
             org.opencontainers.image.vendor=Phase Flag
@@ -80,14 +80,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/phaseflag/relay
+          images: ghcr.io/phase-flag/relay
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
           labels: |
-            org.opencontainers.image.source=https://github.com/phaseflag/phaseflag
+            org.opencontainers.image.source=https://github.com/phase-flag/platform
             org.opencontainers.image.description=Phase Flag Relay — Go edge evaluation proxy
             org.opencontainers.image.licenses=MIT
             org.opencontainers.image.vendor=Phase Flag
@@ -126,14 +126,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/phaseflag/dashboard
+          images: ghcr.io/phase-flag/dashboard
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
           labels: |
-            org.opencontainers.image.source=https://github.com/phaseflag/phaseflag
+            org.opencontainers.image.source=https://github.com/phase-flag/platform
             org.opencontainers.image.description=Phase Flag Dashboard — React admin UI served by nginx
             org.opencontainers.image.licenses=MIT
             org.opencontainers.image.vendor=Phase Flag
