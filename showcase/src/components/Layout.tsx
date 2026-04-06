@@ -1,7 +1,8 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Sparkles, Settings, Zap, Bell } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Sparkles, Settings, Zap, Bell, Info } from 'lucide-react'
 import UserSwitcher from './UserSwitcher'
 import FlagInspector from './FlagInspector'
+import Tooltip from './Tooltip'
 import { usePhaseFlagContext } from '@/hooks/usePhaseFlagContext'
 import clsx from 'clsx'
 
@@ -11,6 +12,14 @@ const NAV_ITEMS = [
     { name: 'Showcase', href: '/showcase', icon: Sparkles },
     { name: 'Settings', href: '/settings', icon: Settings },
 ]
+
+function InfoIcon({ tip }: { tip: string }) {
+    return (
+        <Tooltip text={tip}>
+            <Info className="w-3 h-3 text-gray-600 hover:text-indigo-400 cursor-help transition-colors" />
+        </Tooltip>
+    )
+}
 
 export default function Layout() {
     const location = useLocation()
@@ -63,8 +72,11 @@ export default function Layout() {
 
                 {/* Environment Switcher */}
                 <div className="px-4 py-4 border-t border-gray-800">
-                    <label className="text-[10px] text-gray-600 uppercase tracking-wider font-medium">Environment</label>
-                    <div className="flex space-x-1 mt-2">
+                    <div className="flex items-center space-x-1.5 mb-2">
+                        <label className="text-[10px] text-gray-600 uppercase tracking-wider font-medium">Environment</label>
+                        <InfoIcon tip="Flags can behave differently per environment (dev/staging/production)" />
+                    </div>
+                    <div className="flex space-x-1">
                         {['development', 'staging', 'production'].map(env => (
                             <button
                                 key={env}
@@ -92,19 +104,25 @@ export default function Layout() {
                         <span className={`inline-block w-2 h-2 rounded-full ${envColors[environment]}`} />
                         <span className="text-sm text-gray-400 capitalize">{environment}</span>
                         <span className="text-gray-700">|</span>
-                        <span className="text-xs text-gray-600">
-                            SSE: <span className={sseConnected ? 'text-green-400' : 'text-red-400'}>{sseConnected ? 'connected' : 'disconnected'}</span>
-                        </span>
+                        <div className="flex items-center space-x-1.5">
+                            <span className="text-xs text-gray-600">
+                                SSE: <span className={sseConnected ? 'text-green-400' : 'text-red-400'}>{sseConnected ? 'connected' : 'disconnected'}</span>
+                            </span>
+                            <InfoIcon tip="Real-time sync — flag changes in the Dashboard appear here within seconds" />
+                        </div>
                     </div>
 
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3">
                         {showNotifications && (
                             <button className="relative p-2 rounded-lg hover:bg-surface-light transition-colors text-gray-400 hover:text-gray-200">
                                 <Bell className="w-5 h-5" />
                                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
                             </button>
                         )}
-                        <UserSwitcher />
+                        <div className="flex items-center space-x-1.5">
+                            <InfoIcon tip="Switch personas to see how flags evaluate differently for each user type" />
+                            <UserSwitcher />
+                        </div>
                     </div>
                 </header>
 

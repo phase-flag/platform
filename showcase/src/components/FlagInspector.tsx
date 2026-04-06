@@ -1,6 +1,7 @@
 import { usePhaseFlagContext } from '@/hooks/usePhaseFlagContext'
 import { useState } from 'react'
 import { Flag, X, Eye } from 'lucide-react'
+import Tooltip from './Tooltip'
 
 export default function FlagInspector() {
     const { flagResults, currentUser } = usePhaseFlagContext()
@@ -16,13 +17,22 @@ export default function FlagInspector() {
     return (
         <>
             {/* Toggle Button */}
-            <button
-                onClick={() => setOpen(!open)}
-                className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-pf-primary text-pf-dark rounded-full shadow-lg flex items-center justify-center hover:bg-pf-primary-light transition-colors"
-                title="Flag Inspector"
-            >
-                {open ? <X className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </button>
+            <div className="fixed bottom-6 right-6 z-50 flex items-center space-x-2">
+                {!open && (
+                    <Tooltip text="Debug panel showing all flag evaluations for the current user and environment">
+                        <span className="flex items-center" />
+                    </Tooltip>
+                )}
+                <Tooltip text="Debug panel showing all flag evaluations for the current user and environment">
+                    <button
+                        onClick={() => setOpen(!open)}
+                        className="w-12 h-12 bg-pf-primary text-pf-dark rounded-full shadow-lg flex items-center justify-center hover:bg-pf-primary-light transition-colors"
+                        aria-label="Flag Inspector"
+                    >
+                        {open ? <X className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                </Tooltip>
+            </div>
 
             {/* Panel */}
             {open && (
