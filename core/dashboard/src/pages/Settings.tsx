@@ -68,10 +68,12 @@ export default function Settings() {
                                         value={apiKey}
                                         onChange={(e) => setApiKey(e.target.value)}
                                         placeholder="Enter your API key"
+                                        title="API key or JWT token used as Bearer token for API requests — stored in localStorage"
                                         className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                     />
                                     <button
                                         onClick={() => setShowKey(!showKey)}
+                                        title={showKey ? 'Hide API key' : 'Show API key'}
                                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
                                     >
                                         {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -79,6 +81,7 @@ export default function Settings() {
                                 </div>
                                 <button
                                     onClick={handleSaveKey}
+                                    title="Save API key to localStorage for future sessions"
                                     className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                                 >
                                     Save
@@ -98,6 +101,7 @@ export default function Settings() {
                         <button
                             onClick={handleTestConnection}
                             disabled={testStatus === 'loading'}
+                            title="Send a test request to the API health endpoint to verify connectivity"
                             className="btn btn-secondary flex items-center space-x-2 disabled:opacity-50"
                         >
                             {testStatus === 'loading' ? (

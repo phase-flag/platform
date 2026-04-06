@@ -69,7 +69,7 @@ export default function Environments() {
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Environments</h1>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">Manage environments per project, clone, freeze, and promote flags</p>
                 </div>
-                <button onClick={() => setShowCreate(true)} disabled={!selectedProject} className="btn btn-primary flex items-center space-x-2 disabled:opacity-50">
+                <button onClick={() => setShowCreate(true)} disabled={!selectedProject} title="Create a new deployment environment (e.g., staging)" className="btn btn-primary flex items-center space-x-2 disabled:opacity-50">
                     <Plus className="w-5 h-5" />
                     <span>New Environment</span>
                 </button>
@@ -130,22 +130,23 @@ export default function Environments() {
                             )}
                             <div className="flex items-center space-x-2 pt-3 border-t border-gray-200 dark:border-gray-700">
                                 {env.is_frozen ? (
-                                    <button onClick={() => unfreezeMutation.mutate(env.id)} className="text-sm text-amber-600 hover:text-amber-700 flex items-center space-x-1">
+                                    <button onClick={() => unfreezeMutation.mutate(env.id)} title="Unfreeze this environment to allow flag changes" className="text-sm text-amber-600 hover:text-amber-700 flex items-center space-x-1">
                                         <Unlock className="w-4 h-4" />
                                         <span>Unfreeze</span>
                                     </button>
                                 ) : (
-                                    <button onClick={() => handleFreeze(env)} className="text-sm text-gray-600 dark:text-gray-400 hover:text-amber-600 flex items-center space-x-1">
+                                    <button onClick={() => handleFreeze(env)} title="Freeze this environment — blocks all flag changes" className="text-sm text-gray-600 dark:text-gray-400 hover:text-amber-600 flex items-center space-x-1">
                                         <Lock className="w-4 h-4" />
                                         <span>Freeze</span>
                                     </button>
                                 )}
-                                <button onClick={() => setCloneEnv(env)} className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 flex items-center space-x-1">
+                                <button onClick={() => setCloneEnv(env)} title="Clone this environment's flag configuration to a new environment" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 flex items-center space-x-1">
                                     <Copy className="w-4 h-4" />
                                     <span>Clone</span>
                                 </button>
                                 <button
                                     onClick={() => { if (window.confirm(`Delete environment ${env.name}?`)) deleteMutation.mutate(env.id) }}
+                                    title="Delete this environment permanently"
                                     className="text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 flex items-center space-x-1 ml-auto"
                                 >
                                     <Trash2 className="w-4 h-4" />

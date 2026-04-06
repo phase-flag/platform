@@ -39,7 +39,7 @@ export default function Segments() {
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Segments</h1>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">Manage audience segments for targeting rules</p>
                 </div>
-                <button onClick={() => setShowCreateModal(true)} className="btn btn-primary flex items-center space-x-2">
+                <button onClick={() => setShowCreateModal(true)} title="Create a reusable audience segment" className="btn btn-primary flex items-center space-x-2">
                     <Plus className="w-5 h-5" />
                     <span>Create Segment</span>
                 </button>
@@ -51,6 +51,7 @@ export default function Segments() {
                     <Link
                         key={segment.id}
                         to={`/segments/${segment.key}`}
+                        title="Click to view and edit segment conditions"
                         className="card hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150 block"
                     >
                         <div className="flex items-center justify-between">
@@ -64,7 +65,7 @@ export default function Segments() {
                                 )}
                                 <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                                     <span className="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{segment.key}</span>
-                                    <span className="badge badge-info">
+                                    <span className="badge badge-info" title="Rules that define which users belong to this segment">
                                         {segment.conditions.length} condition{segment.conditions.length !== 1 ? 's' : ''}
                                     </span>
                                 </div>

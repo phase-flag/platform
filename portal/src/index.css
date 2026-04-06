@@ -1,105 +1,67 @@
 @import "tailwindcss";
 
 @theme {
-  --color-pf-navy: #1E293B;
-  --color-pf-dark: #1E1B4B;
-  --color-pf-primary: #6366F1;
-  --color-pf-primary-light: #818CF8;
-  --color-pf-primary-pale: #EEF2FF;
-  --color-pf-white: #FFFFFF;
-  --color-pf-gray-50: #F8FAFB;
-  --color-pf-gray-100: #EDF1F3;
-  --color-pf-gray-500: #6B7F8A;
-  --color-pf-success: #22C55E;
-  --color-pf-warning: #F59E0B;
-  --color-pf-danger: #EF4444;
-
-  --color-pf-page: #0B0F1A;
-  --color-pf-card: #111827;
-  --color-pf-surface: #1E1B4B;
-  --color-pf-text: #E8F0F2;
-  --color-pf-text-muted: #8FA3AD;
-  --color-pf-border: rgba(99, 102, 241, 0.15);
+  --color-pf-bg:         #0A0A0A;
+  --color-pf-surface:    #141414;
+  --color-pf-card:       #1C1C1C;
+  --color-pf-border:     rgba(255, 255, 255, 0.08);
+  --color-pf-text:       #EBEBEB;
+  --color-pf-text-muted: #888888;
+  --color-pf-accent:     #6366F1;
+  --color-pf-success:    #22C55E;
+  --color-pf-warning:    #F59E0B;
+  --color-pf-danger:     #EF4444;
 
   --font-heading: 'Josefin Sans', sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
 }
 
 body {
   font-family: var(--font-body);
-  color: #E8F0F2;
-  background: #0B0F1A;
+  color: var(--color-pf-text);
+  background: var(--color-pf-bg);
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
+code, pre { font-family: var(--font-mono); }
+html { scroll-behavior: smooth; }
+
+.card {
+  background: var(--color-pf-card);
+  border: 1px solid var(--color-pf-border);
+  border-radius: 12px;
 }
 
-code, pre {
-  font-family: var(--font-mono);
+.btn-primary {
+  background: #FFFFFF;
+  color: #0A0A0A;
+  font-weight: 500;
+  transition: background 0.15s ease;
+  border-radius: 8px;
+}
+.btn-primary:hover { background: #E5E5E5; }
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--color-pf-text);
+  transition: all 0.15s ease;
+  border-radius: 8px;
+}
+.btn-outline:hover {
+  border-color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.04);
 }
 
-/* Smooth scroll */
-html {
-  scroll-behavior: smooth;
-}
+.toggle-track { transition: background-color 0.2s ease; }
+.toggle-thumb { transition: transform 0.2s ease; }
 
-/* Custom toggle animation */
-.toggle-track {
-  transition: background-color 0.3s ease;
-}
-.toggle-thumb {
-  transition: transform 0.3s ease;
-}
-
-/* Code block styling */
-.code-block {
-  background: var(--color-pf-dark);
-  color: #e2e8f0;
-  border-radius: 0.75rem;
-  overflow-x: auto;
-}
-.code-block .keyword { color: #c792ea; }
-.code-block .string { color: #c3e88d; }
-.code-block .comment { color: #546e7a; }
-.code-block .function { color: #82aaff; }
-.code-block .variable { color: #f78c6c; }
-.code-block .type { color: #ffcb6b; }
-
-/* Skeleton shimmer animation */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 25%,
-    rgba(255, 255, 255, 0.10) 50%,
-    rgba(255, 255, 255, 0.05) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* Fade-in animation */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 .animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out forwards;
+  animation: fadeInUp 0.35s ease-out forwards;
 }

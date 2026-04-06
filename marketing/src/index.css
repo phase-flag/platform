@@ -1,74 +1,140 @@
 @import "tailwindcss";
 
 @theme {
-  --color-pf-navy: #1E293B;
-  --color-pf-dark: #1E1B4B;
-  --color-pf-primary: #6366F1;
-  --color-pf-primary-light: #818CF8;
-  --color-pf-primary-pale: #EEF2FF;
-  --color-pf-white: #FFFFFF;
-  --color-pf-gray-50: #F8FAFB;
-  --color-pf-gray-100: #EDF1F3;
-  --color-pf-gray-500: #6B7F8A;
+  /* ── Neutral palette — zinc-based, no color tint ── */
+  --color-pf-bg:         #0A0A0A;
+  --color-pf-surface:    #141414;
+  --color-pf-card:       #1C1C1C;
+  --color-pf-elevated:   #222222;
+  --color-pf-border:     rgba(255, 255, 255, 0.08);
+  --color-pf-border-mid: rgba(255, 255, 255, 0.12);
+
+  --color-pf-text:       #EBEBEB;
+  --color-pf-text-muted: #888888;
+  --color-pf-text-dim:   #555555;
+
+  /* Accent — indigo, used sparingly for CTAs only */
+  --color-pf-accent:     #6366F1;
+  --color-pf-accent-mid: #818CF8;
+
+  /* Semantic */
   --color-pf-success: #22C55E;
   --color-pf-warning: #F59E0B;
-  --color-pf-danger: #EF4444;
+  --color-pf-danger:  #EF4444;
 
-  /* Dark mode palette */
-  --color-pf-page: #0B0F1A;
-  --color-pf-surface: #111827;
-  --color-pf-surface-light: #1E1B4B;
-  --color-pf-text: #E8F0F2;
-  --color-pf-text-muted: #8FA3AD;
-  --color-pf-border: rgba(99, 102, 241, 0.15);
-
+  /* Typography */
   --font-heading: 'Josefin Sans', sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
 }
 
+/* ─── Base ──────────────────────────────────── */
 body {
   font-family: var(--font-body);
-  color: #E8F0F2;
-  background: #0B0F1A;
+  color: var(--color-pf-text);
+  background: var(--color-pf-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
+code, pre { font-family: var(--font-mono); }
+html { scroll-behavior: smooth; }
+
+/* ─── Neutral card ──────────────────────────── */
+.surface-card {
+  background: var(--color-pf-card);
+  border: 1px solid var(--color-pf-border);
 }
 
-code, pre {
-  font-family: var(--font-mono);
+.surface-card:hover {
+  border-color: var(--color-pf-border-mid);
+  background: var(--color-pf-elevated);
 }
 
-html {
-  scroll-behavior: smooth;
+/* ─── Nav glass ─────────────────────────────── */
+.glass-nav {
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--color-pf-border);
 }
 
+/* ─── Buttons ───────────────────────────────── */
+
+/* Primary = white bg, dark text — clean, neutral */
+.btn-primary {
+  background: #FFFFFF;
+  color: #0A0A0A;
+  font-weight: 500;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.btn-primary:hover {
+  background: #E5E5E5;
+  transform: translateY(-1px);
+}
+
+/* Secondary = subtle outline */
+.btn-secondary {
+  background: transparent;
+  color: var(--color-pf-text);
+  border: 1px solid var(--color-pf-border-mid);
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
+.btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+/* Accent (used only for key CTA) */
+.btn-accent {
+  background: var(--color-pf-accent);
+  color: #ffffff;
+  font-weight: 500;
+  transition: background 0.15s ease;
+}
+.btn-accent:hover {
+  background: var(--color-pf-accent-mid);
+}
+
+/* ─── Code block ────────────────────────────── */
+.code-block {
+  background: #0D0D0D;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+.code-block .keyword  { color: #c792ea; }
+.code-block .string   { color: #c3e88d; }
+.code-block .comment  { color: #4a5568; }
+.code-block .function { color: #82aaff; }
+.code-block .variable { color: #f78c6c; }
+.code-block .type     { color: #ffcb6b; }
+
+/* ─── Section separator ─────────────────────── */
+.section-border {
+  border-top: 1px solid var(--color-pf-border);
+  border-bottom: 1px solid var(--color-pf-border);
+}
+
+/* ─── Animations ────────────────────────────── */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
+  animation: fadeInUp 0.4s ease-out forwards;
 }
 
-.animate-delay-100 { animation-delay: 100ms; }
-.animate-delay-200 { animation-delay: 200ms; }
-.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-100 { animation-delay: 80ms; }
+.animate-delay-200 { animation-delay: 160ms; }
+.animate-delay-300 { animation-delay: 240ms; }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50%       { transform: translateY(-8px); }
 }
-
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }

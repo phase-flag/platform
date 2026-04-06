@@ -224,7 +224,7 @@ export default function FlagDetail() {
                             <Copy className="w-5 h-5" />
                             <span>Clone</span>
                         </button>
-                        <button onClick={() => setShowEditModal(true)} className="btn btn-secondary flex items-center space-x-2">
+                        <button onClick={() => setShowEditModal(true)} title="Modify flag name, description, and settings" className="btn btn-secondary flex items-center space-x-2">
                             <Edit className="w-5 h-5" />
                             <span>Edit</span>
                         </button>
@@ -242,6 +242,7 @@ export default function FlagDetail() {
                             <button
                                 onClick={() => setShowArchiveConfirm(true)}
                                 disabled={archiveMutation.isPending}
+                                title="Archive this flag — removes it from evaluation"
                                 className="btn btn-danger flex items-center space-x-2 disabled:opacity-50"
                             >
                                 <Trash2 className="w-5 h-5" />
@@ -272,21 +273,21 @@ export default function FlagDetail() {
 
             {/* Info Grid */}
             <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mb-8">
-                <div className="card">
+                <div className="card" title="Whether this flag is active, inactive, or archived">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Status</p>
                     <p className={`text-lg font-semibold ${isActive ? 'text-success-600' : isArchived ? 'text-yellow-600' : 'text-gray-600 dark:text-gray-400'}`}>
                         {flag.status}
                     </p>
                 </div>
-                <div className="card">
+                <div className="card" title="The data type this flag returns: boolean, string, number, or json">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Type</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{flag.flag_type}</p>
                 </div>
-                <div className="card">
+                <div className="card" title="The deployment environment this flag configuration applies to">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Environment</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{flag.environment}</p>
                 </div>
-                <div className="card">
+                <div className="card" title="The current lifecycle stage of this flag: development, testing, production, stale, or archived">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Lifecycle</p>
                     <p className={clsx('text-lg font-semibold', {
                         'text-blue-600': flag.lifecycle_stage === 'development',
@@ -299,11 +300,11 @@ export default function FlagDetail() {
                         {flag.lifecycle_stage === 'stale' && <AlertTriangle className="inline w-4 h-4 ml-1" />}
                     </p>
                 </div>
-                <div className="card">
+                <div className="card" title="Evaluation count and usage metrics for this flag">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Evaluations</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{flag.evaluation_count.toLocaleString()}</p>
                 </div>
-                <div className="card">
+                <div className="card" title="The most recent time this flag was evaluated by an SDK">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Last Evaluated</p>
                     <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                         {flag.last_evaluated_at ? new Date(flag.last_evaluated_at).toLocaleDateString() : 'Never'}
@@ -388,7 +389,7 @@ export default function FlagDetail() {
                 <>
                     {/* Variations */}
                     <div className="card mb-8">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Variations</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4" title="The possible values this flag can return">Variations</h2>
                         <div className="space-y-3">
                             {flag.variations.map((variation) => (
                                 <div key={variation.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
@@ -417,7 +418,7 @@ export default function FlagDetail() {
             {activeTab === 'analytics' && (
                 <div className="card">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Evaluation Analytics</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100" title="Evaluation count and usage metrics for this flag over time">Evaluation Analytics</h2>
                         <div className="flex items-center space-x-2">
                             {PERIOD_OPTIONS.map(opt => (
                                 <button

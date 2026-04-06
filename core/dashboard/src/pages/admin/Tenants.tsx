@@ -41,11 +41,15 @@ export default function Tenants() {
 
     const { data: rawTenants, isError } = useQuery({
         queryKey: ['admin', 'tenants'],
-        queryFn: () => adminApi.listTenants().then(r => r.data as Tenant[]),
+        queryFn: () => adminApi.listTenants().then(r => {
+            const d = r.data as { items?: Tenant[] } | Tenant[]
+            return Array.isArray(d) ? d : (d.items ?? [])
+        }),
         retry: false,
     })
 
-    const tenants = isError || !rawTenants ? MOCK_TENANTS : rawTenants
+    // Show mock data only on error; empty array from API is valid (no tenants yet)
+    const tenants = isError ? MOCK_TENANTS : (rawTenants ?? MOCK_TENANTS)
     const showBanner = isError || !rawTenants
 
     const suspendMutation = useMutation({
@@ -103,6 +107,7 @@ export default function Tenants() {
                         placeholder="Search tenants..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
+                        title="Search organizations by name or slug"
                         className="bg-transparent text-sm outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 w-48"
                     />
                 </div>
@@ -132,7 +137,7 @@ export default function Tenants() {
                                         idx % 2 === 1 && 'bg-gray-50/50 dark:bg-gray-800/20'
                                     )}
                                 >
-                                    <td className="px-4 py-3">
+                                    <td className="px-4 py-3" title="Organization using the Phase Flag platform">
                                         <div className="flex items-center space-x-3">
                                             <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 rounded">
                                                 <Building2 className="w-4 h-4 text-primary-600 dark:text-primary-400" />
@@ -163,6 +168,7 @@ export default function Tenants() {
                                             {tenant.status === 'active' ? (
                                                 <button
                                                     onClick={() => setConfirmAction({ type: 'suspend', tenant })}
+                                                    title="Suspend this tenant — blocks all access"
                                                     className="text-xs px-2 py-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                                                 >
                                                     Suspend
@@ -170,6 +176,7 @@ export default function Tenants() {
                                             ) : (
                                                 <button
                                                     onClick={() => setConfirmAction({ type: 'activate', tenant })}
+                                                    title="Reactivate this tenant's access"
                                                     className="text-xs px-2 py-1 text-success-600 hover:bg-success-50 dark:hover:bg-success-900/20 rounded transition-colors"
                                                 >
                                                     Activate

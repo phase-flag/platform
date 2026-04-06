@@ -124,6 +124,7 @@ export default function CreateFlagModal({ isOpen, onClose }: Props) {
                         value={key}
                         onChange={(e) => setKey(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))}
                         placeholder="my-feature-flag"
+                        title="Unique identifier used in SDK code (e.g., 'new-checkout'). Cannot be changed after creation."
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 dark:bg-gray-900 dark:text-gray-100"
                     />
                     {errors.key && <p className="mt-1 text-sm text-red-600">{errors.key}</p>}
@@ -136,6 +137,7 @@ export default function CreateFlagModal({ isOpen, onClose }: Props) {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="My Feature Flag"
+                        title="Human-readable name displayed in the dashboard"
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 dark:bg-gray-900 dark:text-gray-100"
                     />
                     {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
@@ -148,6 +150,7 @@ export default function CreateFlagModal({ isOpen, onClose }: Props) {
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="What does this flag control?"
                         rows={2}
+                        title="Describe what this flag controls and when it should be used"
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 dark:bg-gray-900 dark:text-gray-100"
                     />
                 </div>
@@ -158,6 +161,7 @@ export default function CreateFlagModal({ isOpen, onClose }: Props) {
                         <select
                             value={flagType}
                             onChange={(e) => setFlagType(e.target.value)}
+                            title="boolean = on/off, string = text variants, number = numeric values, json = structured data"
                             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 dark:bg-gray-900 dark:text-gray-100"
                         >
                             {FLAG_TYPES.map(t => (
@@ -194,7 +198,7 @@ export default function CreateFlagModal({ isOpen, onClose }: Props) {
                                     name="defaultVariation"
                                     checked={defaultVariationKey === v.key}
                                     onChange={() => setDefaultVariationKey(v.key)}
-                                    title="Set as default"
+                                    title="The variation returned when no targeting rules match"
                                     className="mt-0.5"
                                 />
                                 <input

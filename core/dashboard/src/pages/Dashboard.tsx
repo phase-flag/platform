@@ -82,7 +82,7 @@ export default function Dashboard() {
             <div className="card">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Feature Flags</h2>
-                    <Link to="/flags" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                    <Link to="/flags" title="View and manage all feature flags" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                         View all &rarr;
                     </Link>
                 </div>
@@ -91,6 +91,7 @@ export default function Dashboard() {
                         <Link
                             key={String(flag.id || flag.key)}
                             to={`/flags/${String(flag.key)}`}
+                            title="Click to view flag details and configuration"
                             className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
                         >
                             <div className="flex items-center space-x-3">

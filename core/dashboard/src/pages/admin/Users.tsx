@@ -40,11 +40,24 @@ export default function AdminUsers() {
 
     const { data: rawUsers, isError } = useQuery({
         queryKey: ['admin', 'users'],
-        queryFn: () => adminApi.listAllUsers().then(r => r.data as AdminUser[]),
+        queryFn: () => adminApi.listAllUsers().then(r => {
+            const d = r.data as { items?: Record<string, unknown>[] } | Record<string, unknown>[]
+            const items: Record<string, unknown>[] = Array.isArray(d) ? d : (d.items ?? [])
+            // Normalize each user to match AdminUser interface
+            return items.map((u): AdminUser => ({
+                id: String(u.id ?? ''),
+                name: String(u.name ?? u.email ?? ''),
+                email: String(u.email ?? ''),
+                role: String(u.role ?? 'viewer'),
+                organization: String(u.organization ?? u.org ?? '—'),
+                last_login: (u.last_login as string | null | undefined) ?? null,
+                created_at: String(u.created_at ?? ''),
+            }))
+        }),
         retry: false,
     })
 
-    const users = isError || !rawUsers ? MOCK_USERS : rawUsers
+    const users = isError ? MOCK_USERS : (rawUsers ?? MOCK_USERS)
     const showBanner = isError || !rawUsers
 
     const orgs = [...new Set(users.map(u => u.organization))].sort()
@@ -109,12 +122,14 @@ export default function AdminUsers() {
                         placeholder="Search name or email..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
+                        title="Search users by name or email address"
                         className="bg-transparent text-sm outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 w-48"
                     />
                 </div>
                 <select
                     value={filterRole}
                     onChange={e => setFilterRole(e.target.value)}
+                    title="Filter users by their assigned role"
                     className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 >
                     <option value="">All Roles</option>
@@ -123,6 +138,7 @@ export default function AdminUsers() {
                 <select
                     value={filterOrg}
                     onChange={e => setFilterOrg(e.target.value)}
+                    title="Filter users by their organization"
                     className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 >
                     <option value="">All Organizations</option>
@@ -180,6 +196,7 @@ export default function AdminUsers() {
                                         ) : (
                                             <button
                                                 onClick={() => setRoleEdit({ userId: user.id, role: user.role })}
+                                                title="Click to change this user's role"
                                                 className={clsx('text-xs px-2 py-1 rounded font-medium', roleBadgeClass(user.role))}
                                             >
                                                 {user.role}
@@ -193,6 +210,7 @@ export default function AdminUsers() {
                                     <td className="px-4 py-3 text-right">
                                         <button
                                             onClick={() => setDeleteTarget(user)}
+                                            title="Permanently delete this user's account"
                                             className="text-xs px-2 py-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                                         >
                                             Delete

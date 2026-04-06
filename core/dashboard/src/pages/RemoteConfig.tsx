@@ -100,6 +100,7 @@ export default function RemoteConfig() {
                 </div>
                 <button
                     onClick={() => setShowCreateModal(true)}
+                    title="Create a remote configuration value"
                     className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
                 >
                     <Plus className="w-4 h-4" />
@@ -116,6 +117,7 @@ export default function RemoteConfig() {
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder="Search by key, name, or description..."
+                        title="Search remote config entries by key, name, or description"
                         className="input pl-9"
                     />
                     {search && (
@@ -189,6 +191,7 @@ export default function RemoteConfig() {
                     {filteredEntries.map(entry => (
                         <div
                             key={entry.id}
+                            title="Click to edit value, view version history, and validate schema"
                             className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-black/20 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150"
                         >
                             <div className="flex items-center p-4">
@@ -198,7 +201,7 @@ export default function RemoteConfig() {
                                 >
                                     <div className="flex items-center space-x-3 mb-1.5">
                                         <code className="text-sm font-semibold text-primary-500">{entry.key}</code>
-                                        <span className="px-2 py-0.5 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                                        <span title="The data type of this configuration value" className="px-2 py-0.5 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
                                             {entry.config_type}
                                         </span>
                                         <span className="text-xs text-gray-400 dark:text-gray-500">v{entry.version}</span>

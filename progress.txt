@@ -651,3 +651,26 @@ Key values:
   - Seeded: 3 segments (beta-users, enterprise-customers, mobile-users), 2 webhooks (ci-cd-notifications, slack-flag-alerts)
   - Seeded: 1 experiment (ai-summaries-engagement-test, ID: 55382957-fcc0-4a4d-9364-49a15ef243f7)
 Notes: Root cause of experiment 500 error was TIMESTAMP WITHOUT TIME ZONE vs offset-aware Python datetime mismatch in PostgreSQL. Fixed by switching to datetime.utcnow() (naive UTC). Build confirmed: vite build ✓ 2164 modules transformed, 2.53s.
+
+## [2026-04-05T00:00:00Z] — Comprehensive dashboard tooltip pass — PASSED
+Changes:
+  - core/dashboard/src/components/Layout.tsx — enhanced environment selector, dark mode toggle, user area, sign-out button, admin nav link tooltips
+  - core/dashboard/src/pages/Dashboard.tsx — "View all" link, recent flag list items
+  - core/dashboard/src/pages/Flags.tsx — search, status/env/sort filters, bulk-action buttons, flag card, select checkbox, pagination prev/next
+  - core/dashboard/src/pages/FlagDetail.tsx — toggle, edit, archive buttons, info grid cards (status/type/env/lifecycle/evaluations/last-evaluated), variations header, analytics header
+  - core/dashboard/src/pages/Segments.tsx — Create Segment button, segment card link, conditions badge
+  - core/dashboard/src/pages/Projects.tsx — New Organization/New Project buttons, org/project cards, edit/delete buttons
+  - core/dashboard/src/pages/Environments.tsx — New Environment button, freeze/unfreeze/clone/delete buttons
+  - core/dashboard/src/pages/Governance.tsx — tab buttons (Change Requests/Freeze Windows/Service Accounts), New Change Request button, New Service Account button
+  - core/dashboard/src/pages/Experiments.tsx — New Experiment button, status badges, experiment cards, start/pause/conclude/stop/resume action buttons, detail link
+  - core/dashboard/src/pages/Webhooks.tsx — Create Webhook button, URL header, events container
+  - core/dashboard/src/pages/Pipelines.tsx — New Pipeline button, pipeline cards, stage progress bar
+  - core/dashboard/src/pages/RemoteConfig.tsx — New Config button, search input, config cards, type badge
+  - core/dashboard/src/pages/Observability.tsx — Refresh button, metrics grid, health status badges (stale/no-owner/errors/healthy)
+  - core/dashboard/src/pages/Integrations.tsx — active integration items, Slack save/test buttons
+  - core/dashboard/src/pages/Settings.tsx — API key input, show/hide toggle, save button, test connection button
+  - core/dashboard/src/components/CreateFlagModal.tsx — key/name/description/type fields, default variation radio
+  - core/dashboard/src/pages/admin/Overview.tsx — stats grid
+  - core/dashboard/src/pages/admin/Tenants.tsx — search input, tenant name cell, suspend/activate buttons
+  - core/dashboard/src/pages/admin/Users.tsx — search/role/org filters, role badge button, delete button
+Notes: Build passes cleanly (vite 7, ✓ 2164 modules transformed, built in ~2.6s). All tooltips use native title= attributes.

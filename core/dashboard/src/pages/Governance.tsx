@@ -153,13 +153,14 @@ export default function Governance() {
             {/* Tabs */}
             <div className="flex space-x-1 mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg p-1 w-fit">
                 {([
-                    { key: 'changes' as Tab, label: 'Change Requests', icon: Clock },
-                    { key: 'freezes' as Tab, label: 'Freeze Windows', icon: Snowflake },
-                    { key: 'accounts' as Tab, label: 'Service Accounts', icon: Key },
+                    { key: 'changes' as Tab, label: 'Change Requests', icon: Clock, tooltip: 'Pending changes that require approval before taking effect' },
+                    { key: 'freezes' as Tab, label: 'Freeze Windows', icon: Snowflake, tooltip: 'Time periods during which flag changes are blocked' },
+                    { key: 'accounts' as Tab, label: 'Service Accounts', icon: Key, tooltip: 'API keys for automated systems to manage flags' },
                 ]).map(t => (
                     <button
                         key={t.key}
                         onClick={() => setTab(t.key)}
+                        title={t.tooltip}
                         className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                             tab === t.key
                                 ? 'bg-white dark:bg-gray-700 text-primary-700 dark:text-gray-100 shadow-sm'
@@ -190,6 +191,7 @@ export default function Governance() {
                         </div>
                         <button
                             onClick={() => setShowCreateChange(true)}
+                            title="Create a new change request that requires approval before taking effect"
                             className="flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                         >
                             <Plus className="w-4 h-4 mr-2" /> New Change Request
@@ -344,6 +346,7 @@ export default function Governance() {
                     <div className="flex justify-end mb-4">
                         <button
                             onClick={() => setShowCreateAccount(true)}
+                            title="Create a new service account API key for automated systems to manage flags"
                             className="flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                         >
                             <Plus className="w-4 h-4 mr-2" /> New Service Account

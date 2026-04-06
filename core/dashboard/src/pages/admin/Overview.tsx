@@ -1,19 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { adminApi } from '@/lib/api'
 import { Building2, Users, Flag, Activity, Key, Server, Database, Clock } from 'lucide-react'
-import {
-    AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-} from 'recharts'
-
-/* Recharts 2.x class components have type issues with @types/react 18 */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const RXAxis = XAxis as any
-const RYAxis = YAxis as any
-const RTooltip = Tooltip as any
-const RArea = Area as any
-const RBar = Bar as any
-const RCartesianGrid = CartesianGrid as any
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 interface AdminOverviewData {
     total_organizations: number
@@ -71,10 +58,29 @@ function formatNumber(n: number) {
     return n.toString()
 }
 
+function normalizeOverview(raw: Record<string, unknown>): AdminOverviewData {
+    // The API returns a flat object; map it to AdminOverviewData
+    const evalsByDay = (raw.evaluations_by_day as Array<{ date: string; count: number }> | undefined) ?? []
+    return {
+        total_organizations: (raw.total_organizations as number | undefined) ?? 0,
+        total_users: (raw.total_users as number | undefined) ?? 0,
+        total_flags: (raw.total_flags as number | undefined) ?? 0,
+        total_evaluations: (raw.total_evaluations as number | undefined) ?? 0,
+        active_api_keys: (raw.active_api_keys as number | undefined) ?? 0,
+        evaluations_over_time: evalsByDay,
+        flags_created_over_time: (raw.flags_created_over_time as Array<{ date: string; count: number }> | undefined) ?? [],
+        system_health: {
+            api_version: String((raw.api_version as string | undefined) ?? ''),
+            uptime_seconds: (raw.uptime_seconds as number | undefined) ?? 0,
+            db_status: String((raw.database_status as string | undefined) ?? (raw.db_status as string | undefined) ?? 'unknown'),
+        },
+    }
+}
+
 export default function AdminOverview() {
     const { data: rawData, isError } = useQuery({
         queryKey: ['admin', 'overview'],
-        queryFn: () => adminApi.getOverview().then(r => r.data as AdminOverviewData),
+        queryFn: () => adminApi.getOverview().then(r => normalizeOverview(r.data as Record<string, unknown>)),
         retry: false,
     })
 
@@ -105,7 +111,7 @@ export default function AdminOverview() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-8" title="Platform-wide metrics across all tenants">
                 {stats.map(s => (
                     <div key={s.label} className="card relative overflow-hidden">
                         <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${s.gradient}`} />
@@ -122,43 +128,50 @@ export default function AdminOverview() {
                 ))}
             </div>
 
-            {/* Charts */}
+            {/* Evaluation trend — simple bar sparkline to avoid Recharts crashes */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <div className="card">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Evaluations (Last 30 Days)</h2>
-                    <ResponsiveContainer width="100%" height={280}>
-                        <AreaChart data={data.evaluations_over_time}>
-                            <RCartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.2} />
-                            <RXAxis dataKey="date" tick={{ fontSize: 11 }} />
-                            <RYAxis tickFormatter={formatNumber} tick={{ fontSize: 11 }} />
-                            <RTooltip
-                                formatter={(v: number) => [v.toLocaleString(), 'Evaluations']}
-                                contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#f3f4f6' }}
-                            />
-                            <defs>
-                                <linearGradient id="evalGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
-                                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <RArea type="monotone" dataKey="count" stroke="#6366F1" strokeWidth={2} fill="url(#evalGrad)" />
-                        </AreaChart>
-                    </ResponsiveContainer>
+                    {data.evaluations_over_time.length === 0 ? (
+                        <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">No evaluation data available</p>
+                    ) : (
+                        <div className="flex items-end gap-0.5 h-32">
+                            {data.evaluations_over_time.slice(-30).map((d, i) => {
+                                const max = Math.max(...data.evaluations_over_time.map(x => x.count), 1)
+                                const pct = Math.max((d.count / max) * 100, 2)
+                                return (
+                                    <div key={i} className="flex-1 flex flex-col items-center justify-end h-full" title={`${d.date}: ${d.count.toLocaleString()}`}>
+                                        <div className="w-full bg-primary-500 dark:bg-primary-400 rounded-t" style={{ height: `${pct}%` }} />
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    )}
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 text-right">
+                        Total: {formatNumber(data.evaluations_over_time.reduce((s, d) => s + d.count, 0))}
+                    </p>
                 </div>
 
                 <div className="card">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Flags Created (Last 30 Days)</h2>
-                    <ResponsiveContainer width="100%" height={280}>
-                        <BarChart data={data.flags_created_over_time}>
-                            <RCartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.2} />
-                            <RXAxis dataKey="date" tick={{ fontSize: 11 }} />
-                            <RYAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                            <RTooltip
-                                contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#f3f4f6' }}
-                            />
-                            <RBar dataKey="count" fill="#4338CA" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
+                    {data.flags_created_over_time.length === 0 ? (
+                        <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">No flag creation data available</p>
+                    ) : (
+                        <div className="flex items-end gap-0.5 h-32">
+                            {data.flags_created_over_time.slice(-30).map((d, i) => {
+                                const max = Math.max(...data.flags_created_over_time.map(x => x.count), 1)
+                                const pct = Math.max((d.count / max) * 100, 2)
+                                return (
+                                    <div key={i} className="flex-1 flex flex-col items-center justify-end h-full" title={`${d.date}: ${d.count}`}>
+                                        <div className="w-full bg-indigo-700 dark:bg-indigo-500 rounded-t" style={{ height: `${pct}%` }} />
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    )}
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 text-right">
+                        Total: {data.flags_created_over_time.reduce((s, d) => s + d.count, 0)} flags
+                    </p>
                 </div>
             </div>
 

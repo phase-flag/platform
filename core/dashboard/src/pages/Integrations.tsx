@@ -40,7 +40,7 @@ export default function Integrations() {
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Active Integrations</h2>
                     <div className="divide-y divide-gray-100 dark:divide-gray-700">
                         {integrations.map((integration) => (
-                            <div key={integration.id} className="flex items-center justify-between py-3">
+                            <div key={integration.id} title="Click to configure this third-party integration" className="flex items-center justify-between py-3">
                                 <div className="flex items-center space-x-3">
                                     {integration.active ? (
                                         <CheckCircle className="w-5 h-5 text-green-500" />
@@ -134,6 +134,7 @@ function SlackConfigSection() {
                     <button
                         onClick={() => configureMutation.mutate()}
                         disabled={!webhookUrl.trim() || configureMutation.isPending}
+                        title="Set up this Slack integration with your webhook URL"
                         className="btn btn-primary disabled:opacity-50"
                     >
                         {configureMutation.isPending ? 'Saving...' : 'Save'}
@@ -141,6 +142,7 @@ function SlackConfigSection() {
                     <button
                         onClick={() => testMutation.mutate()}
                         disabled={testMutation.isPending}
+                        title="Send a test message to verify your Slack integration"
                         className="btn btn-secondary disabled:opacity-50"
                     >
                         {testMutation.isPending ? 'Sending...' : 'Test'}

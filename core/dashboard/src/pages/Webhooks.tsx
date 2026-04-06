@@ -86,7 +86,7 @@ export default function Webhooks() {
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Webhooks</h1>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">Manage webhook endpoints for event notifications</p>
                 </div>
-                <button onClick={() => setShowCreateModal(true)} className="btn btn-primary flex items-center space-x-2">
+                <button onClick={() => setShowCreateModal(true)} title="Set up an HTTP callback for flag change events" className="btn btn-primary flex items-center space-x-2">
                     <Plus className="w-5 h-5" />
                     <span>Create Webhook</span>
                 </button>
@@ -100,7 +100,7 @@ export default function Webhooks() {
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center space-x-3 mb-2">
                                     <Globe className="w-5 h-5 text-primary-600 dark:text-primary-400 flex-shrink-0" />
-                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                                    <h3 title="The endpoint that will receive webhook POST requests" className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
                                         {webhook.url}
                                     </h3>
                                     <span className={clsx(
@@ -110,7 +110,7 @@ export default function Webhooks() {
                                         {webhook.active ? 'Active' : 'Inactive'}
                                     </span>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-2 mb-3">
+                                <div className="flex flex-wrap items-center gap-2 mb-3" title="Which flag events trigger this webhook">
                                     {webhook.events.map(event => (
                                         <span key={event} className="badge badge-info">
                                             {event}

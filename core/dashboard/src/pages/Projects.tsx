@@ -52,11 +52,11 @@ export default function Projects() {
                     <p className="mt-2 text-gray-600 dark:text-gray-400">Manage your organizational hierarchy and projects</p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button onClick={() => setShowCreateOrg(true)} className="btn btn-secondary flex items-center space-x-2">
+                    <button onClick={() => setShowCreateOrg(true)} title="Create a new organization to group projects" className="btn btn-secondary flex items-center space-x-2">
                         <Building2 className="w-5 h-5" />
                         <span>New Organization</span>
                     </button>
-                    <button onClick={() => setShowCreateProject(true)} className="btn btn-primary flex items-center space-x-2">
+                    <button onClick={() => setShowCreateProject(true)} title="Create a new project to organize flags" className="btn btn-primary flex items-center space-x-2">
                         <Plus className="w-5 h-5" />
                         <span>New Project</span>
                     </button>
@@ -71,7 +71,7 @@ export default function Projects() {
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Organizations</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {orgs.map((org: Organization) => (
-                            <div key={org.id} className="card">
+                            <div key={org.id} className="card" title="Click to manage this organization's settings and members">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center space-x-3">
                                         <Building2 className="w-5 h-5 text-primary-500" />
@@ -79,6 +79,7 @@ export default function Projects() {
                                     </div>
                                     <button
                                         onClick={() => { if (window.confirm(`Delete organization ${org.name}?`)) deleteOrgMutation.mutate(org.key) }}
+                                        title="Delete this organization"
                                         className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
                                     >
                                         <Trash2 className="w-4 h-4 text-red-500" />
@@ -107,18 +108,19 @@ export default function Projects() {
             {projects.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {projects.map((project: Project) => (
-                        <div key={project.id} className="card hover:shadow-md transition-shadow">
+                        <div key={project.id} title="Click to manage this project's settings and members" className="card hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center space-x-3">
                                     <FolderKanban className="w-5 h-5 text-primary-500" />
                                     <h3 className="font-semibold text-gray-900 dark:text-gray-100">{project.name}</h3>
                                 </div>
                                 <div className="flex items-center space-x-1">
-                                    <button onClick={() => setEditingProject(project)} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 dark:bg-gray-700 rounded">
+                                    <button onClick={() => setEditingProject(project)} title="Edit project name and description" className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 dark:bg-gray-700 rounded">
                                         <Edit className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                     </button>
                                     <button
                                         onClick={() => { if (window.confirm(`Delete project ${project.name}?`)) deleteProjectMutation.mutate(project.key) }}
+                                        title="Delete this project"
                                         className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
                                     >
                                         <Trash2 className="w-4 h-4 text-red-500" />

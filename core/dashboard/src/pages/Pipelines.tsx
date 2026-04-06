@@ -162,6 +162,7 @@ export default function Pipelines() {
                 </div>
                 <button
                     onClick={() => setShowCreate(true)}
+                    title="Create a progressive delivery pipeline to gradually roll out a feature flag"
                     className="flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
                 >
                     <Plus className="w-4 h-4 mr-2" /> New Pipeline
@@ -179,7 +180,7 @@ export default function Pipelines() {
             ) : (
                 <div className="space-y-4">
                     {pipelines.map(pipeline => (
-                        <div key={pipeline.id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+                        <div key={pipeline.id} title="Progressive delivery pipeline — gradually roll out changes" className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center space-x-3">
                                     {getStatusIcon(pipeline.status)}
@@ -238,7 +239,7 @@ export default function Pipelines() {
                             </div>
 
                             {/* Stage Progress Bar */}
-                            <div className="flex items-center space-x-1">
+                            <div className="flex items-center space-x-1" title="Each stage represents a step in the rollout process">
                                 {pipeline.stages.map((stage, i) => {
                                     let status = 'pending'
                                     if (i < pipeline.current_stage_index) status = 'completed'

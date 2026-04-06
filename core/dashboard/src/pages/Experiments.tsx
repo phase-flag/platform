@@ -68,6 +68,7 @@ export default function Experiments() {
                 </div>
                 <button
                     onClick={() => setShowCreate(true)}
+                    title="Set up an A/B test or multivariate experiment"
                     className="flex items-center space-x-2 px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                     <Plus className="w-4 h-4" />
@@ -161,13 +162,13 @@ function ExperimentCard({
     }
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-black/20 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150">
+        <div title="Click to view experiment results and statistical analysis" className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-black/20 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150">
             <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-3 mb-1">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">{exp.name}</h3>
-                            <span className={clsx('px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0', STATUS_STYLES[exp.status])}>
+                            <span title="draft = not started, running = collecting data, completed = results ready" className={clsx('px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0', STATUS_STYLES[exp.status])}>
                                 {exp.status}
                             </span>
                             {winner && (
@@ -196,18 +197,18 @@ function ExperimentCard({
                     {/* Action buttons */}
                     <div className="flex items-center space-x-2 ml-4 flex-shrink-0">
                         {exp.status === 'draft' && (
-                            <button onClick={onStart} className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <button onClick={onStart} title="Start this experiment and begin collecting data" className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700">
                                 <Play className="w-3 h-3" />
                                 <span>Start</span>
                             </button>
                         )}
                         {exp.status === 'running' && (
                             <>
-                                <button onClick={onPause} className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
+                                <button onClick={onPause} title="Pause data collection for this experiment" className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
                                     <Pause className="w-3 h-3" />
                                     <span>Pause</span>
                                 </button>
-                                <button onClick={onConclude} className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                                <button onClick={onConclude} title="Conclude this experiment and finalize results" className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                                     <CheckCircle className="w-3 h-3" />
                                     <span>Conclude</span>
                                 </button>
@@ -215,11 +216,11 @@ function ExperimentCard({
                         )}
                         {exp.status === 'paused' && (
                             <>
-                                <button onClick={onStart} className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                <button onClick={onStart} title="Resume data collection for this experiment" className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700">
                                     <Play className="w-3 h-3" />
                                     <span>Resume</span>
                                 </button>
-                                <button onClick={onStop} className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-red-600 text-white rounded-lg hover:bg-red-700">
+                                <button onClick={onStop} title="Stop this experiment permanently" className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-red-600 text-white rounded-lg hover:bg-red-700">
                                     <Square className="w-3 h-3" />
                                     <span>Stop</span>
                                 </button>
@@ -227,6 +228,7 @@ function ExperimentCard({
                         )}
                         <Link
                             to={`/experiments/${exp.key}`}
+                            title="View experiment results and statistical analysis"
                             className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                         >
                             <ChevronRight className="w-5 h-5" />

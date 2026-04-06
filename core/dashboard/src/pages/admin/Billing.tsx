@@ -1,16 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { adminApi } from '@/lib/api'
 import { DollarSign, TrendingUp, Users, CreditCard } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import clsx from 'clsx'
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const RXAxis = XAxis as any
-const RYAxis = YAxis as any
-const RTooltip = Tooltip as any
-const RBar = Bar as any
-const RCartesianGrid = CartesianGrid as any
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 interface TenantUsage {
     tenant_id: string
@@ -59,10 +50,19 @@ function formatCurrency(n: number) {
     return '$' + n.toLocaleString()
 }
 
+function normalizeBilling(raw: Record<string, unknown>): BillingOverview | null {
+    // The API /admin/usage returns evaluations_this_month, not a BillingOverview
+    // If the response doesn't have the expected BillingOverview shape, return null to use MOCK_DATA
+    if (typeof raw.mrr === 'number' && Array.isArray(raw.tenants)) {
+        return raw as unknown as BillingOverview
+    }
+    return null
+}
+
 export default function Billing() {
     const { data: rawUsage, isError: usageError } = useQuery({
         queryKey: ['admin', 'usage'],
-        queryFn: () => adminApi.getUsage().then(r => r.data as BillingOverview),
+        queryFn: () => adminApi.getUsage().then(r => normalizeBilling(r.data as Record<string, unknown>)),
         retry: false,
     })
 
@@ -134,21 +134,28 @@ export default function Billing() {
                 ))}
             </div>
 
-            {/* Usage Chart */}
+            {/* Usage Chart — horizontal bar list */}
             <div className="card mb-8">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Evaluation Volume by Tenant (Current Month)</h2>
-                <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={chartData} layout="vertical">
-                        <RCartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.2} />
-                        <RXAxis type="number" tickFormatter={formatNumber} tick={{ fontSize: 11 }} />
-                        <RYAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11 }} />
-                        <RTooltip
-                            formatter={(v: number) => [v.toLocaleString(), 'Evaluations']}
-                            contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: '#f3f4f6' }}
-                        />
-                        <RBar dataKey="evaluations" fill="#6366F1" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                </ResponsiveContainer>
+                {chartData.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">No usage data available</p>
+                ) : (
+                    <div className="space-y-3">
+                        {chartData.map((t, i) => {
+                            const max = chartData[0]?.evaluations ?? 1
+                            const pct = Math.max((t.evaluations / max) * 100, 2)
+                            return (
+                                <div key={i} className="flex items-center gap-3">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400 w-32 shrink-0 truncate">{t.name}</span>
+                                    <div className="flex-1 h-5 bg-gray-100 dark:bg-gray-800 rounded overflow-hidden">
+                                        <div className="h-full bg-primary-500 dark:bg-primary-400 rounded" style={{ width: `${pct}%` }} />
+                                    </div>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 w-14 text-right shrink-0">{formatNumber(t.evaluations)}</span>
+                                </div>
+                            )
+                        })}
+                    </div>
+                )}
             </div>
 
             {/* Tenant Usage Table */}

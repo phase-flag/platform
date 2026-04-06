@@ -197,11 +197,11 @@ export default function Flags() {
                         <span>Import</span>
                         <input type="file" accept=".json" onChange={handleImport} className="hidden" />
                     </label>
-                    <Link to="/flags/compare" className="btn btn-secondary flex items-center space-x-2">
+                    <Link to="/flags/compare" title="Compare flag configurations across environments" className="btn btn-secondary flex items-center space-x-2">
                         <GitCompare className="w-5 h-5" />
                         <span>Compare</span>
                     </Link>
-                    <button onClick={() => setShowCreateModal(true)} className="btn btn-primary flex items-center space-x-2">
+                    <button onClick={() => setShowCreateModal(true)} title="Create a new feature flag" className="btn btn-primary flex items-center space-x-2">
                         <Plus className="w-5 h-5" />
                         <span>Create Flag</span>
                     </button>
@@ -217,6 +217,7 @@ export default function Flags() {
                         value={search}
                         onChange={(e) => updateParam('search', e.target.value)}
                         placeholder="Search by key, name, or description..."
+                        title="Search flags by name or key"
                         className="input pl-10"
                     />
                     {search && (
@@ -231,6 +232,7 @@ export default function Flags() {
                 <select
                     value={statusFilter}
                     onChange={(e) => updateParam('status', e.target.value)}
+                    title="Filter flags by their current status"
                     className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                     {STATUS_OPTIONS.map(s => (
@@ -242,6 +244,7 @@ export default function Flags() {
                 <select
                     value={envFilter}
                     onChange={(e) => updateParam('env', e.target.value)}
+                    title="Show flags for a specific environment"
                     className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                     {ENV_OPTIONS.map(e => (
@@ -253,6 +256,7 @@ export default function Flags() {
                 <select
                     value={sortBy}
                     onChange={(e) => updateParam('sort', e.target.value)}
+                    title="Sort flags by this criterion"
                     className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                     {SORT_OPTIONS.map(o => (
@@ -286,6 +290,7 @@ export default function Flags() {
                         <button
                             onClick={() => bulkAction('toggle')}
                             disabled={!!bulkProgress}
+                            title="Toggle all selected flags on or off"
                             className="px-3 py-1.5 text-sm font-medium text-primary-700 dark:text-primary-200 bg-white dark:bg-gray-800 border border-primary-300 dark:border-primary-600 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 disabled:opacity-50 flex items-center space-x-1"
                         >
                             <ToggleRight className="w-4 h-4" />
@@ -294,6 +299,7 @@ export default function Flags() {
                         <button
                             onClick={() => bulkAction('archive')}
                             disabled={!!bulkProgress}
+                            title="Archive all selected flags — removes them from evaluation"
                             className="px-3 py-1.5 text-sm font-medium text-red-700 dark:text-red-300 bg-white dark:bg-gray-800 border border-red-300 dark:border-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50 flex items-center space-x-1"
                         >
                             <Archive className="w-4 h-4" />
@@ -327,11 +333,12 @@ export default function Flags() {
                 {filteredFlags.map((flag) => {
                     const isActive = flag.status === 'active'
                     return (
-                        <div key={flag.id} className="card hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/20 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150 flex items-start space-x-3">
+                        <div key={flag.id} title="Click to view flag details, targeting rules, and analytics" className="card hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/20 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-150 flex items-start space-x-3">
                             <input
                                 type="checkbox"
                                 checked={selectedKeys.has(flag.key)}
                                 onChange={() => toggleSelect(flag.key)}
+                                title="Select this flag for bulk actions"
                                 className="mt-1.5 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
                             />
                             <Link to={`/flags/${flag.key}`} className="flex-1 block">
@@ -339,9 +346,9 @@ export default function Flags() {
                                     <div className="flex-1">
                                         <div className="flex items-center space-x-3 mb-2">
                                             {isActive ? (
-                                                <ToggleRight className="w-6 h-6 text-success-500" title="This flag is enabled and serving traffic" />
+                                                <ToggleRight className="w-6 h-6 text-success-500" />
                                             ) : (
-                                                <ToggleLeft className="w-6 h-6 text-gray-400 dark:text-gray-500" title="This flag is disabled" />
+                                                <ToggleLeft className="w-6 h-6 text-gray-400 dark:text-gray-500" />
                                             )}
                                             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{flag.name}</h3>
                                             <span className={clsx(
@@ -383,6 +390,7 @@ export default function Flags() {
                         <button
                             onClick={() => updateParam('page', String(page - 1))}
                             disabled={page <= 1}
+                            title="Go to previous page"
                             className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <ChevronLeft className="w-4 h-4" />
@@ -416,6 +424,7 @@ export default function Flags() {
                         <button
                             onClick={() => updateParam('page', String(page + 1))}
                             disabled={page >= totalPages}
+                            title="Go to next page"
                             className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <ChevronRight className="w-4 h-4" />
