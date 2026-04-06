@@ -339,9 +339,9 @@ export default function Flags() {
                                     <div className="flex-1">
                                         <div className="flex items-center space-x-3 mb-2">
                                             {isActive ? (
-                                                <ToggleRight className="w-6 h-6 text-success-500" />
+                                                <ToggleRight className="w-6 h-6 text-success-500" title="This flag is enabled and serving traffic" />
                                             ) : (
-                                                <ToggleLeft className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+                                                <ToggleLeft className="w-6 h-6 text-gray-400 dark:text-gray-500" title="This flag is disabled" />
                                             )}
                                             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{flag.name}</h3>
                                             <span className={clsx(

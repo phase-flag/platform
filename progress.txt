@@ -625,3 +625,29 @@ Changes:
   - portal/src/components/RolloutVisualizer.tsx: all pf-mint → pf-primary, rgba borders updated
 Key values: Electric Indigo #6366F1 (primary), #818CF8 (primary-light)
 Notes: Semantic success colors (banners for password reset success, subscription activation, password strength) kept as green-400/green-500. Build: 65 modules, 661ms, no errors.
+
+## [2026-04-06T01:40:00Z] — Dashboard Audit & Fix Session — COMPLETED
+Changes:
+  - core/dashboard/src/components/Layout.tsx: tooltips added to all 19 sidebar nav items + environment selector
+  - core/dashboard/src/pages/Dashboard.tsx: tooltip property added to each stat card
+  - core/dashboard/src/pages/Flags.tsx: title attributes added to toggle icon components
+  - core/dashboard/src/pages/ExclusionGroups.tsx: React.Fragment key fix (was bare <> in map()); Skeleton loading state added
+  - core/dashboard/src/pages/HoldoutGroups.tsx: same React.Fragment key fix; Skeleton loading state added
+  - core/dashboard/src/pages/Pipelines.tsx: Skeleton loading state added
+  - core/dashboard/src/pages/Integrations.tsx: Skeleton loading state added
+  - core/dashboard/src/pages/Simulations.tsx: Skeleton loading; data shape normalization (array or {items:[]} shape)
+  - core/dashboard/src/pages/Approvals.tsx: Skeleton loading; data shape normalization
+  - core/dashboard/src/pages/Governance.tsx: Skeleton loading states (3 sections)
+  - core/dashboard/src/pages/Observability.tsx: Skeleton loading states (3 sections)
+  - core/dashboard/src/pages/RemoteConfig.tsx: Skeleton loading state added
+  - core/dashboard/src/pages/CodeRefs.tsx: Skeleton loading states (2 tabs)
+  - core/dashboard/src/pages/Migrations.tsx: Skeleton loading state added
+  - core/dashboard/src/pages/Projects.tsx: Skeleton loading state added
+  - core/dashboard/src/pages/Environments.tsx: Skeleton loading state added
+  - core/api/phaseflag_api/models/experiments.py: fixed timezone-aware datetime issue (datetime.now(UTC) -> datetime.utcnow()) for ExperimentDB created_at/updated_at and ExperimentResultDB computed_at columns
+  - core/api/phaseflag_api/services/experiment_service.py: same fix for all datetime.now(UTC) calls in start/stop/pause functions
+Key values:
+  - Admin credentials: admin@phaseflag.com / PhaseFlag2026!
+  - Seeded: 3 segments (beta-users, enterprise-customers, mobile-users), 2 webhooks (ci-cd-notifications, slack-flag-alerts)
+  - Seeded: 1 experiment (ai-summaries-engagement-test, ID: 55382957-fcc0-4a4d-9364-49a15ef243f7)
+Notes: Root cause of experiment 500 error was TIMESTAMP WITHOUT TIME ZONE vs offset-aware Python datetime mismatch in PostgreSQL. Fixed by switching to datetime.utcnow() (naive UTC). Build confirmed: vite build ✓ 2164 modules transformed, 2.53s.

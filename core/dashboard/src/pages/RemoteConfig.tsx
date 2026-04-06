@@ -6,6 +6,7 @@ import { useEnvironment } from '@/contexts/EnvironmentContext'
 import { Database, Plus, Trash2, Search, X, ChevronRight } from 'lucide-react'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { Link } from 'react-router-dom'
+import Skeleton from '@/components/Skeleton'
 
 const VALUE_TYPES = ['string', 'number', 'boolean', 'json'] as const
 const ENV_OPTIONS = ['all', 'development', 'staging', 'production'] as const
@@ -164,7 +165,7 @@ export default function RemoteConfig() {
 
             {/* Content */}
             {isLoading ? (
-                <div className="text-center py-16 text-gray-500 dark:text-gray-400">Loading remote config...</div>
+                <Skeleton variant="card" count={4} />
             ) : entries.length === 0 ? (
                 <div className="card text-center py-16">
                     <Database className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />

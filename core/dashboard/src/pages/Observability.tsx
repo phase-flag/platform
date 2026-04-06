@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { analyticsApi, type SystemMetrics, type FlagHealth } from '@/lib/api'
 import { Gauge, Activity, Zap, Server, Clock, AlertTriangle, CheckCircle, BarChart3, RefreshCw } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import Skeleton from '@/components/Skeleton'
 
 const HEALTH_COLORS = ['#6366F1', '#F59E0B', '#EF4444', '#6B7F8A']
 
@@ -80,7 +81,7 @@ export default function Observability() {
 
             {/* System Metrics Cards */}
             {metricsLoading ? (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading system metrics...</div>
+                <Skeleton variant="stat" count={4} className="mb-8" />
             ) : metrics ? (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                     <MetricCard
@@ -140,7 +141,7 @@ export default function Observability() {
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
                     <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Flag Health Overview</h2>
                     {healthLoading ? (
-                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</div>
+                        <Skeleton variant="card" count={1} />
                     ) : healthPieData.length > 0 ? (
                         <div className="flex items-center justify-center">
                             <ResponsiveContainer width="100%" height={250}>
@@ -172,7 +173,7 @@ export default function Observability() {
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
                     <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Flag Inventory</h2>
                     {inventoryLoading ? (
-                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</div>
+                        <Skeleton variant="card" count={1} />
                     ) : inventoryChartData.length > 0 ? (
                         <ResponsiveContainer width="100%" height={250}>
                             <BarChart data={inventoryChartData}>

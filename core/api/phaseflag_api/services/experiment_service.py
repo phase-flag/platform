@@ -2,7 +2,7 @@
 
 import logging
 import math
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 from fastapi import HTTPException
@@ -70,8 +70,8 @@ async def start_experiment(session: AsyncSession, exp: ExperimentDB) -> Experime
     if exp.status not in ("draft", "paused"):
         raise HTTPException(status_code=400, detail=f"Cannot start a '{exp.status}' experiment")
     exp.status = "running"
-    exp.start_date = exp.start_date or datetime.now(UTC)
-    exp.updated_at = datetime.now(UTC)
+    exp.start_date = exp.start_date or datetime.utcnow()
+    exp.updated_at = datetime.utcnow()
     await session.flush()
     await session.refresh(exp)
     return exp
@@ -81,8 +81,8 @@ async def stop_experiment(session: AsyncSession, exp: ExperimentDB) -> Experimen
     if exp.status != "running":
         raise HTTPException(status_code=400, detail="Can only stop a running experiment")
     exp.status = "completed"
-    exp.end_date = datetime.now(UTC)
-    exp.updated_at = datetime.now(UTC)
+    exp.end_date = datetime.utcnow()
+    exp.updated_at = datetime.utcnow()
     await session.flush()
     await session.refresh(exp)
     return exp
@@ -92,7 +92,7 @@ async def pause_experiment(session: AsyncSession, exp: ExperimentDB) -> Experime
     if exp.status != "running":
         raise HTTPException(status_code=400, detail="Can only pause a running experiment")
     exp.status = "paused"
-    exp.updated_at = datetime.now(UTC)
+    exp.updated_at = datetime.utcnow()
     await session.flush()
     await session.refresh(exp)
     return exp

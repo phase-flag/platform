@@ -4,6 +4,7 @@ import { governanceApi, type ChangeRequest, type FreezeWindow, type ServiceAccou
 import { useToast } from '@/contexts/ToastContext'
 import { Shield, Plus, Check, X, Snowflake, Key, Trash2, AlertTriangle, Clock, ChevronDown, ChevronUp, Copy } from 'lucide-react'
 import ConfirmDialog from '@/components/ConfirmDialog'
+import Skeleton from '@/components/Skeleton'
 
 type Tab = 'changes' | 'freezes' | 'accounts'
 
@@ -196,7 +197,7 @@ export default function Governance() {
                     </div>
 
                     {changesLoading ? (
-                        <div className="text-center py-12 text-gray-500 dark:text-gray-400">Loading change requests...</div>
+                        <Skeleton variant="card" count={3} />
                     ) : changes.length === 0 ? (
                         <div className="text-center py-12">
                             <Shield className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
@@ -291,7 +292,7 @@ export default function Governance() {
             {tab === 'freezes' && (
                 <div>
                     {freezesLoading ? (
-                        <div className="text-center py-12 text-gray-500 dark:text-gray-400">Loading freeze windows...</div>
+                        <Skeleton variant="row" count={3} />
                     ) : freezes.length === 0 ? (
                         <div className="text-center py-12">
                             <Snowflake className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
@@ -376,7 +377,7 @@ export default function Governance() {
                     )}
 
                     {accountsLoading ? (
-                        <div className="text-center py-12 text-gray-500 dark:text-gray-400">Loading service accounts...</div>
+                        <Skeleton variant="row" count={3} />
                     ) : accounts.length === 0 ? (
                         <div className="text-center py-12">
                             <Key className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />

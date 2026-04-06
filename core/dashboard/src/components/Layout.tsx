@@ -34,25 +34,25 @@ export default function Layout() {
     const [dark, toggleDark] = useDarkMode()
 
     const navigation = [
-        { name: 'Dashboard', href: '/dashboard', icon: Activity },
-        { name: 'Feature Flags', href: '/flags', icon: Flag },
-        { name: 'Segments', href: '/segments', icon: Users },
-        { name: 'Projects', href: '/projects', icon: FolderKanban },
-        { name: 'Environments', href: '/environments', icon: Globe },
-        { name: 'Pipelines', href: '/pipelines', icon: GitBranch },
-        { name: 'Webhooks', href: '/webhooks', icon: Webhook },
-        { name: 'Exclusion Groups', href: '/exclusion-groups', icon: Layers },
-        { name: 'Holdout Groups', href: '/holdout-groups', icon: ShieldCheck },
-        { name: 'Experiments', href: '/experiments', icon: FlaskConical },
-        { name: 'Simulations', href: '/simulations', icon: BarChart3 },
-        { name: 'Approvals', href: '/approvals', icon: Shield },
-        { name: 'Governance', href: '/governance', icon: Shield },
-        { name: 'Migrations', href: '/migrations', icon: ArrowRightLeft },
-        { name: 'Remote Config', href: '/remote-config', icon: Database },
-        { name: 'Code Refs', href: '/code-refs', icon: Code2 },
-        { name: 'Observability', href: '/observability', icon: Gauge },
-        { name: 'Integrations', href: '/integrations', icon: Plug },
-        { name: 'Settings', href: '/settings', icon: Settings },
+        { name: 'Dashboard', href: '/dashboard', icon: Activity, tooltip: 'Overview of your feature flags and recent activity' },
+        { name: 'Feature Flags', href: '/flags', icon: Flag, tooltip: 'Create, manage, and toggle feature flags' },
+        { name: 'Segments', href: '/segments', icon: Users, tooltip: 'Define user segments for targeted flag delivery' },
+        { name: 'Projects', href: '/projects', icon: FolderKanban, tooltip: 'Organize flags by project and organization' },
+        { name: 'Environments', href: '/environments', icon: Globe, tooltip: 'Manage deployment environments (dev, staging, prod)' },
+        { name: 'Pipelines', href: '/pipelines', icon: GitBranch, tooltip: 'Progressive rollout pipelines with staged deployments' },
+        { name: 'Webhooks', href: '/webhooks', icon: Webhook, tooltip: 'Receive event notifications via HTTP webhooks' },
+        { name: 'Exclusion Groups', href: '/exclusion-groups', icon: Layers, tooltip: 'Ensure users see at most one experiment per group' },
+        { name: 'Holdout Groups', href: '/holdout-groups', icon: ShieldCheck, tooltip: 'Reserve a control population across experiments' },
+        { name: 'Experiments', href: '/experiments', icon: FlaskConical, tooltip: 'A/B test flag variations with statistical analysis' },
+        { name: 'Simulations', href: '/simulations', icon: BarChart3, tooltip: 'Predict flag change impact before deploying' },
+        { name: 'Approvals', href: '/approvals', icon: Shield, tooltip: 'Review and approve flag changes for protected environments' },
+        { name: 'Governance', href: '/governance', icon: Shield, tooltip: 'Change requests, freeze windows, and service accounts' },
+        { name: 'Migrations', href: '/migrations', icon: ArrowRightLeft, tooltip: 'Manage phased system migrations using flag stages' },
+        { name: 'Remote Config', href: '/remote-config', icon: Database, tooltip: 'Typed configuration values fetched by SDKs at runtime' },
+        { name: 'Code Refs', href: '/code-refs', icon: Code2, tooltip: 'Track where flags are referenced in your codebase' },
+        { name: 'Observability', href: '/observability', icon: Gauge, tooltip: 'System metrics, flag health, and evaluation analytics' },
+        { name: 'Integrations', href: '/integrations', icon: Plug, tooltip: 'Connect Phase Flag with Slack, Datadog, and more' },
+        { name: 'Settings', href: '/settings', icon: Settings, tooltip: 'Configure API connection and authentication' },
     ]
 
     function closeMobile() {
@@ -89,6 +89,7 @@ export default function Layout() {
                             key={item.name}
                             to={item.href}
                             onClick={closeMobile}
+                            title={item.tooltip}
                             className={clsx(
                                 'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                                 isActive
@@ -185,6 +186,7 @@ export default function Layout() {
                         <select
                             value={environment}
                             onChange={(e) => setEnvironment(e.target.value as typeof environment)}
+                            title="Filter flags by deployment environment"
                             className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 dark:bg-gray-800 dark:text-gray-100"
                         >
                             {ENVIRONMENTS.map(env => (

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { holdoutGroupsApi, flagsApi, type HoldoutGroup } from '@/lib/api'
 import { Plus, Edit, Trash2, ChevronDown, ChevronRight, ShieldCheck } from 'lucide-react'
 import { useToast } from '@/contexts/ToastContext'
+import Skeleton from '@/components/Skeleton'
 
 export default function HoldoutGroups() {
     const queryClient = useQueryClient()
@@ -56,7 +57,7 @@ export default function HoldoutGroups() {
                 </button>
             </div>
 
-            {isLoading && <p className="text-gray-500 dark:text-gray-400">Loading...</p>}
+            {isLoading && <Skeleton variant="row" count={3} />}
 
             {!isLoading && groups.length === 0 && (
                 <div className="card text-center py-12">
@@ -83,8 +84,8 @@ export default function HoldoutGroups() {
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             {groups.map((group) => (
-                                <>
-                                    <tr key={group.key} className="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700/50">
+                                <React.Fragment key={group.key}>
+                                    <tr className="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700/50">
                                         <td className="px-4 py-3">
                                             <button onClick={() => toggleExpand(group.key)} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400">
                                                 {expandedKeys.has(group.key) ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -124,7 +125,7 @@ export default function HoldoutGroups() {
                                         </td>
                                     </tr>
                                     {expandedKeys.has(group.key) && (
-                                        <tr key={`${group.key}-expanded`}>
+                                        <tr>
                                             <td colSpan={7} className="px-12 py-3 bg-gray-50 dark:bg-gray-700/50">
                                                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Member Flags</p>
                                                 <div className="flex flex-wrap gap-2">
@@ -137,7 +138,7 @@ export default function HoldoutGroups() {
                                             </td>
                                         </tr>
                                     )}
-                                </>
+                                </React.Fragment>
                             ))}
                         </tbody>
                     </table>

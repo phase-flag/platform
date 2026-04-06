@@ -4,6 +4,7 @@ import { environmentsApi, projectsApi, type Environment, type Project } from '@/
 import { Globe, Plus, Trash2, Lock, Unlock, Copy, X } from 'lucide-react'
 import { useToast } from '@/contexts/ToastContext'
 import clsx from 'clsx'
+import Skeleton from '@/components/Skeleton'
 
 export default function Environments() {
     const queryClient = useQueryClient()
@@ -97,7 +98,7 @@ export default function Environments() {
                 </div>
             )}
 
-            {selectedProject && isLoading && <p className="text-gray-500 dark:text-gray-400">Loading environments...</p>}
+            {selectedProject && isLoading && <Skeleton variant="card" count={3} />}
 
             {selectedProject && !isLoading && environments.length === 0 && (
                 <div className="card text-center py-12">

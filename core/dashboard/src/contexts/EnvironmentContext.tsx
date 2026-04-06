@@ -15,7 +15,7 @@ const EnvironmentContext = createContext<EnvironmentContextValue>({
 export function EnvironmentProvider({ children }: { children: ReactNode }) {
     const [environment, setEnvironment] = useState<Environment>(() => {
         const stored = localStorage.getItem('phaseflag_environment')
-        return (stored as Environment) || 'production'
+        return (stored as Environment) || 'development'
     })
 
     const handleSetEnvironment = (env: Environment) => {

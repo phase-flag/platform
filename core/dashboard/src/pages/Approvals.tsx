@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { approvalsApi, type ApprovalRequest } from '@/lib/api'
 import { Shield, Check, X, Clock } from 'lucide-react'
 import clsx from 'clsx'
+import Skeleton from '@/components/Skeleton'
 
 const STATUS_STYLES: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
@@ -16,10 +17,11 @@ export default function Approvals() {
     const [rejectId, setRejectId] = useState<string | null>(null)
     const [rejectReason, setRejectReason] = useState('')
 
-    const { data: approvals = [], isLoading } = useQuery({
+    const { data: approvalsRaw, isLoading } = useQuery({
         queryKey: ['approvals', statusFilter],
         queryFn: () => approvalsApi.list(statusFilter ? { status: statusFilter } : undefined).then(r => r.data),
     })
+    const approvals: ApprovalRequest[] = Array.isArray(approvalsRaw) ? approvalsRaw : (approvalsRaw as any)?.items || []
 
     const approveMutation = useMutation({
         mutationFn: (id: string) => approvalsApi.approve(id),
@@ -60,7 +62,7 @@ export default function Approvals() {
             </div>
 
             {isLoading ? (
-                <div className="text-center py-12 text-gray-500 dark:text-gray-400">Loading approval requests...</div>
+                <Skeleton variant="card" count={3} />
             ) : approvals.length === 0 ? (
                 <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
                     <Shield className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />

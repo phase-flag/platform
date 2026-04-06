@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { simulationsApi, flagsApi, type SimulationResult } from '@/lib/api'
 import { Play, BarChart3, Clock, Plus, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Database } from 'lucide-react'
 import clsx from 'clsx'
+import Skeleton from '@/components/Skeleton'
 
 export default function Simulations() {
     const queryClient = useQueryClient()
@@ -10,10 +11,11 @@ export default function Simulations() {
     const [selectedSim, setSelectedSim] = useState<SimulationResult | null>(null)
     const [flagFilter, setFlagFilter] = useState('')
 
-    const { data: simulations = [], isLoading } = useQuery({
+    const { data: simRaw, isLoading } = useQuery({
         queryKey: ['simulations', flagFilter],
         queryFn: () => simulationsApi.list(flagFilter || undefined).then(r => r.data),
     })
+    const simulations: SimulationResult[] = Array.isArray(simRaw) ? simRaw : (simRaw as any)?.items || []
 
     return (
         <div className="p-6 max-w-7xl mx-auto">
@@ -45,7 +47,7 @@ export default function Simulations() {
             </div>
 
             {isLoading ? (
-                <div className="text-center py-12 text-gray-500 dark:text-gray-400">Loading simulations...</div>
+                <Skeleton variant="card" count={3} />
             ) : simulations.length === 0 ? (
                 <EmptyState onRun={() => setShowRunModal(true)} />
             ) : (

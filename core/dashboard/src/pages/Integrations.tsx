@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { integrationsApi, type IntegrationStatus } from '@/lib/api'
 import { Plug, Trash2, CheckCircle, XCircle, Send } from 'lucide-react'
 import { useToast } from '@/contexts/ToastContext'
+import Skeleton from '@/components/Skeleton'
 
 export default function Integrations() {
     const queryClient = useQueryClient()
@@ -32,7 +33,7 @@ export default function Integrations() {
             </div>
 
             {/* Active Integrations */}
-            {isLoading && <p className="text-gray-500 dark:text-gray-400">Loading...</p>}
+            {isLoading && <Skeleton variant="card" count={2} className="mb-8" />}
 
             {!isLoading && integrations.length > 0 && (
                 <div className="card mb-8">

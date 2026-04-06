@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { codeRefsApi, type CodeReference } from '@/lib/api'
 import { useToast } from '@/contexts/ToastContext'
 import { Code2, Search, Upload, AlertTriangle, FileCode, Plus, Trash2, ExternalLink } from 'lucide-react'
+import Skeleton from '@/components/Skeleton'
 
 export default function CodeRefs() {
     const queryClient = useQueryClient()
@@ -153,7 +154,7 @@ export default function CodeRefs() {
                     </div>
 
                     {(refsLoading || searchLoading) ? (
-                        <div className="text-center py-12 text-gray-500 dark:text-gray-400">Loading references...</div>
+                        <Skeleton variant="row" count={4} />
                     ) : refs.length === 0 ? (
                         <div className="text-center py-12">
                             <FileCode className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
@@ -281,7 +282,7 @@ export default function CodeRefs() {
             {tab === 'unused' && (
                 <div>
                     {unusedLoading ? (
-                        <div className="text-center py-12 text-gray-500 dark:text-gray-400">Loading unused flags...</div>
+                        <Skeleton variant="row" count={4} />
                     ) : unusedFlags.length === 0 ? (
                         <div className="text-center py-12">
                             <AlertTriangle className="w-12 h-12 mx-auto text-green-300 mb-3" />

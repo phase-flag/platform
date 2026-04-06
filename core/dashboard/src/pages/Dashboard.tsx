@@ -2,15 +2,13 @@ import { useQuery } from '@tanstack/react-query'
 import { flagsApi } from '@/lib/api'
 import { Flag, ToggleRight, Archive, Power } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useEnvironment } from '@/contexts/EnvironmentContext'
+// Environment context available but dashboard shows all flags
 import Skeleton from '@/components/Skeleton'
 
 export default function Dashboard() {
-    const { environment } = useEnvironment()
-
     const { data, isLoading, error } = useQuery({
-        queryKey: ['flags', environment],
-        queryFn: () => flagsApi.list(environment).then(res => res.data),
+        queryKey: ['flags'],
+        queryFn: () => flagsApi.list().then(res => res.data),
         retry: false,
     })
 
@@ -52,10 +50,10 @@ export default function Dashboard() {
     const archivedFlags = flags.filter((f: any) => f.status === 'archived').length
 
     const stats = [
-        { name: 'Total Flags', value: totalFlags, icon: Flag, color: 'text-primary-600', bg: 'bg-primary-100 dark:bg-primary-900/40' },
-        { name: 'Active', value: activeFlags, icon: ToggleRight, color: 'text-success-600', bg: 'bg-success-100 dark:bg-success-900/40' },
-        { name: 'Inactive', value: inactiveFlags, icon: Power, color: 'text-gray-600 dark:text-gray-400', bg: 'bg-gray-100 dark:bg-gray-700' },
-        { name: 'Archived', value: archivedFlags, icon: Archive, color: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/40' },
+        { name: 'Total Flags', value: totalFlags, icon: Flag, color: 'text-primary-600', bg: 'bg-primary-100 dark:bg-primary-900/40', tooltip: 'Total number of feature flags across all environments' },
+        { name: 'Active', value: activeFlags, icon: ToggleRight, color: 'text-success-600', bg: 'bg-success-100 dark:bg-success-900/40', tooltip: 'Flags currently enabled and serving traffic' },
+        { name: 'Inactive', value: inactiveFlags, icon: Power, color: 'text-gray-600 dark:text-gray-400', bg: 'bg-gray-100 dark:bg-gray-700', tooltip: 'Flags that exist but are currently disabled' },
+        { name: 'Archived', value: archivedFlags, icon: Archive, color: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/40', tooltip: 'Flags that have been archived and removed from evaluation' },
     ]
 
     return (
@@ -67,7 +65,7 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-1 gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-4">
                 {stats.map((stat) => (
-                    <div key={stat.name} className="card">
+                    <div key={stat.name} className="card" title={stat.tooltip}>
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.name}</p>

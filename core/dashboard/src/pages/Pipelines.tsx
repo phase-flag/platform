@@ -5,6 +5,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { useEnvironment } from '@/contexts/EnvironmentContext'
 import { GitBranch, Plus, Play, Pause, SkipForward, RotateCcw, X, ChevronRight, Clock, CheckCircle, AlertCircle } from 'lucide-react'
 import ConfirmDialog from '@/components/ConfirmDialog'
+import Skeleton from '@/components/Skeleton'
 
 const STAGE_STATUS_COLORS: Record<string, string> = {
     completed: 'bg-green-500',
@@ -168,7 +169,7 @@ export default function Pipelines() {
             </div>
 
             {isLoading ? (
-                <div className="text-center py-12 text-gray-500 dark:text-gray-400">Loading pipelines...</div>
+                <Skeleton variant="card" count={3} />
             ) : pipelines.length === 0 ? (
                 <div className="text-center py-12">
                     <GitBranch className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />

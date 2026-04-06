@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { organizationsApi, projectsApi, type Organization, type Project } from '@/lib/api'
 import { FolderKanban, Plus, Trash2, Edit, Building2, X } from 'lucide-react'
 import { useToast } from '@/contexts/ToastContext'
+import Skeleton from '@/components/Skeleton'
 
 export default function Projects() {
     const queryClient = useQueryClient()
@@ -62,7 +63,7 @@ export default function Projects() {
                 </div>
             </div>
 
-            {isLoading && <p className="text-gray-500 dark:text-gray-400">Loading...</p>}
+            {isLoading && <Skeleton variant="card" count={3} className="mb-8" />}
 
             {/* Organizations */}
             {orgs.length > 0 && (

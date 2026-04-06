@@ -4,6 +4,7 @@ import { migrationsApi, type MigrationFlag } from '@/lib/api'
 import { useToast } from '@/contexts/ToastContext'
 import { ArrowRightLeft, Plus, ChevronRight, SkipForward, RotateCcw, Trash2, ArrowRight } from 'lucide-react'
 import ConfirmDialog from '@/components/ConfirmDialog'
+import Skeleton from '@/components/Skeleton'
 
 const STAGE_COLORS: Record<string, string> = {
     shadow: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
@@ -122,7 +123,7 @@ export default function Migrations() {
             </div>
 
             {isLoading ? (
-                <div className="text-center py-12 text-gray-500 dark:text-gray-400">Loading migrations...</div>
+                <Skeleton variant="card" count={3} />
             ) : migrations.length === 0 ? (
                 <div className="text-center py-12">
                     <ArrowRightLeft className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />

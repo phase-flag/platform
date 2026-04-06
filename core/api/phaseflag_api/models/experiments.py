@@ -1,6 +1,6 @@
 """Experimentation ORM models."""
 
-from datetime import UTC, datetime
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import (
@@ -40,12 +40,12 @@ class ExperimentDB(Base):
     end_date = Column(DateTime, nullable=True)
     winner_variation_id = Column(String(36), nullable=True)
     created_by = Column(String(255), nullable=False, default="system")
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )
 
     goals = relationship(
@@ -95,6 +95,6 @@ class ExperimentResultDB(Base):
     is_significant = Column(Boolean, nullable=False, default=False)
     is_winner = Column(Boolean, nullable=False, default=False)
     lift = Column(Float, nullable=True)  # Relative improvement over control
-    computed_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    computed_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
 
     experiment = relationship("ExperimentDB", back_populates="results")
