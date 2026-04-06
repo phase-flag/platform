@@ -1,7 +1,7 @@
 """Migration flag service — staged migration workflows."""
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 
 from fastapi import HTTPException
 from sqlalchemy import func, select
@@ -48,7 +48,7 @@ async def advance_stage(session: AsyncSession, mig: MigrationFlagDB) -> Migratio
     if current_idx >= len(VALID_STAGES) - 1:
         raise HTTPException(status_code=400, detail="Migration is already at final stage")
     mig.stage = VALID_STAGES[current_idx + 1]
-    mig.updated_at = datetime.now(UTC)
+    mig.updated_at = datetime.utcnow()
     await session.flush()
     await session.refresh(mig)
     return mig
@@ -59,7 +59,7 @@ async def rollback_stage(session: AsyncSession, mig: MigrationFlagDB) -> Migrati
     if current_idx <= 0:
         raise HTTPException(status_code=400, detail="Migration is already at initial stage")
     mig.stage = VALID_STAGES[current_idx - 1]
-    mig.updated_at = datetime.now(UTC)
+    mig.updated_at = datetime.utcnow()
     await session.flush()
     await session.refresh(mig)
     return mig
@@ -73,7 +73,7 @@ async def update_metrics(
 ) -> MigrationFlagDB:
     mig.success_count += success_count
     mig.error_count += error_count
-    mig.updated_at = datetime.now(UTC)
+    mig.updated_at = datetime.utcnow()
     # Auto-rollback check
     total = mig.success_count + mig.error_count
     if total > 0 and mig.rollback_threshold:

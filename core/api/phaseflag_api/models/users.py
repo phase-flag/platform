@@ -1,6 +1,6 @@
 """User ORM model."""
 
-from datetime import UTC, datetime
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import Column, DateTime, String
@@ -22,4 +22,4 @@ class UserDB(Base):
     password_hash = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
     role = Column(String(20), nullable=False, default="viewer")
-    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.utcnow())

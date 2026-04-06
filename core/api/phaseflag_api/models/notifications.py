@@ -1,7 +1,7 @@
 """Notification configuration ORM model."""
 
 import json
-from datetime import UTC, datetime
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import Column, DateTime, String, Text
@@ -25,7 +25,7 @@ class NotificationConfigDB(Base):
     # JSON list of event types this config is subscribed to, e.g.
     # ["flag.created", "flag.toggled", "flag.archived", "approval.requested", "freeze.activated"]
     events = Column(Text, nullable=False, default="[]")
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
 
     def get_events(self) -> list[str]:
         return json.loads(self.events) if self.events else []

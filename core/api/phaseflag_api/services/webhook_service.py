@@ -6,7 +6,7 @@ import hmac
 import ipaddress
 import json
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 from urllib.parse import urlparse
 
@@ -134,7 +134,7 @@ async def fire_webhooks(session: AsyncSession, event_type: str, flag_key: str, f
             "event_type": event_type,
             "flag_key": flag_key,
             "flag_data": flag_data,
-            "timestamp": datetime.now(UTC).isoformat(),
+            "timestamp": datetime.utcnow().isoformat(),
         }
     )
 

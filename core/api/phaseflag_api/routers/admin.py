@@ -6,7 +6,7 @@ All endpoints require the ``admin`` role.
 import os
 import sys
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
@@ -26,7 +26,7 @@ router = APIRouter(dependencies=[Depends(require_api_key)])
 
 # Track process start time for uptime calculation.
 _PROCESS_START = time.monotonic()
-_PROCESS_START_WALL = datetime.now(UTC)
+_PROCESS_START_WALL = datetime.utcnow()
 
 
 # ---------------------------------------------------------------------------
@@ -166,7 +166,7 @@ async def admin_overview(session: AsyncSession = Depends(get_session)):
     ).scalar_one()
 
     # Evaluations by day for the last 30 days.
-    thirty_days_ago = datetime.now(UTC) - timedelta(days=30)
+    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
     stmt = (
         select(
             cast(EvaluationEventDB.timestamp, Date).label("day"),
@@ -412,7 +412,7 @@ async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)
 @router.get("/admin/usage", response_model=UsageMetrics, dependencies=[require_role("admin")])
 async def admin_usage(session: AsyncSession = Depends(get_session)):
     """Usage metrics: per-flag evaluation counts and month-over-month totals."""
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     last_month_start = (this_month_start - timedelta(days=1)).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 

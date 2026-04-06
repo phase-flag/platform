@@ -3,7 +3,7 @@
 import json
 import logging
 import secrets
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -86,7 +86,7 @@ async def approve_change_request(
 
     if cr.approval_count >= cr.requires_approval_count:
         cr.status = "approved"
-        cr.resolved_at = datetime.now(UTC)
+        cr.resolved_at = datetime.utcnow()
 
     await session.flush()
     await session.refresh(cr)
@@ -117,7 +117,7 @@ async def reject_change_request(
     cr.status = "rejected"
     cr.reviewed_by = reviewer
     cr.review_comment = comment
-    cr.resolved_at = datetime.now(UTC)
+    cr.resolved_at = datetime.utcnow()
 
     await session.flush()
     await session.refresh(cr)
@@ -216,7 +216,7 @@ async def revoke_service_account(session: AsyncSession, sa: ServiceAccountDB) ->
 
 async def _check_freeze_windows(session: AsyncSession, environment: str | None) -> None:
     """Raise if there's an active freeze window covering the given environment."""
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     stmt = (
         select(FreezeWindowDB)
         .where(FreezeWindowDB.active == True)  # noqa: E712
@@ -306,7 +306,7 @@ async def break_glass(
         action=action,
         reason=reason,
         performed_by=performer,
-        expires_at=datetime.now(UTC) + timedelta(hours=expires_hours),
+        expires_at=datetime.utcnow() + timedelta(hours=expires_hours),
     )
     session.add(event)
     await session.flush()

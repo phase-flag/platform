@@ -1,6 +1,6 @@
 """Audit log and evaluation event ORM models."""
 
-from datetime import UTC, datetime
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import Column, DateTime, String, Text
@@ -24,7 +24,7 @@ class AuditLogDB(Base):
     entity_key = Column(String(255), nullable=False, index=True)
     actor = Column(String(255), nullable=False, default="system")
     changes = Column(Text, nullable=False, default="{}")
-    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
 
 
 class EvaluationEventDB(Base):
@@ -36,5 +36,5 @@ class EvaluationEventDB(Base):
     flag_key = Column(String(255), nullable=False, index=True)
     variation_key = Column(String(255), nullable=True)
     user_id = Column(String(255), nullable=True)
-    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), index=True)
+    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.utcnow(), index=True)
     event_metadata = Column("metadata", Text, nullable=False, default="{}")

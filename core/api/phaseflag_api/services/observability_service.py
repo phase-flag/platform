@@ -1,7 +1,7 @@
 """Observability service — metrics collection and flag evaluation statistics."""
 
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from sqlalchemy import func, select
@@ -43,7 +43,7 @@ def get_cache_metrics() -> dict:
 
 
 def record_sync(lag_ms: float) -> None:
-    _sync_metrics["last_sync"] = datetime.now(UTC).isoformat()
+    _sync_metrics["last_sync"] = datetime.utcnow().isoformat()
     _sync_metrics["sync_count"] += 1
     _sync_metrics["total_lag_ms"] += lag_ms
     _sync_metrics["avg_lag_ms"] = _sync_metrics["total_lag_ms"] / _sync_metrics["sync_count"]
@@ -90,7 +90,7 @@ def correlate_incident(flag_key: str, incident_id: str, description: str, timest
         "flag_key": flag_key,
         "incident_id": incident_id,
         "description": description,
-        "timestamp": timestamp or datetime.now(UTC).isoformat(),
+        "timestamp": timestamp or datetime.utcnow().isoformat(),
     }
     _incident_correlations.append(entry)
     return entry
@@ -131,13 +131,13 @@ async def get_system_metrics(session: AsyncSession) -> dict[str, Any]:
         flag_counts[s] = count
 
     # Total evaluations in last 24h
-    since_24h = datetime.now(UTC) - timedelta(hours=24)
+    since_24h = datetime.utcnow() - timedelta(hours=24)
     eval_count_24h = (
         await session.execute(select(func.count()).where(EvaluationEventDB.timestamp >= since_24h))
     ).scalar() or 0
 
     # Total evaluations in last 7d
-    since_7d = datetime.now(UTC) - timedelta(days=7)
+    since_7d = datetime.utcnow() - timedelta(days=7)
     eval_count_7d = (
         await session.execute(select(func.count()).where(EvaluationEventDB.timestamp >= since_7d))
     ).scalar() or 0
@@ -165,7 +165,7 @@ async def get_system_metrics(session: AsyncSession) -> dict[str, Any]:
     top_flags = (await session.execute(top_flags_stmt)).all()
 
     return {
-        "timestamp": datetime.now(UTC).isoformat(),
+        "timestamp": datetime.utcnow().isoformat(),
         "flags": {
             "total": sum(flag_counts.values()),
             "by_status": flag_counts,
@@ -184,8 +184,8 @@ async def get_system_metrics(session: AsyncSession) -> dict[str, Any]:
 
 async def get_flag_health(session: AsyncSession, flag_key: str) -> dict[str, Any]:
     """Return health metrics for a specific flag."""
-    since_24h = datetime.now(UTC) - timedelta(hours=24)
-    since_7d = datetime.now(UTC) - timedelta(days=7)
+    since_24h = datetime.utcnow() - timedelta(hours=24)
+    since_7d = datetime.utcnow() - timedelta(days=7)
 
     # Evaluation count
     eval_24h = (

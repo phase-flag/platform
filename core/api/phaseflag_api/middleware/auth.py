@@ -2,7 +2,7 @@
 
 import hmac
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 
 import jwt
 from fastapi import Depends, HTTPException, Security, status
@@ -37,7 +37,7 @@ def _decode_jwt(token: str) -> dict | None:
             options={"require": ["exp", "sub", "iat"]},
         )
         exp = payload.get("exp")
-        if exp and datetime.fromtimestamp(exp, tz=UTC) < datetime.now(UTC):
+        if exp and datetime.fromtimestamp(exp, tz=UTC) < datetime.utcnow():
             return None
         return payload
     except (jwt.InvalidTokenError, jwt.DecodeError, jwt.MissingRequiredClaimError):

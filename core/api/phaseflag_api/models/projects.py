@@ -1,6 +1,6 @@
 """Organization and project ORM models."""
 
-from datetime import UTC, datetime
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import Column, DateTime, ForeignKey, String, Text
@@ -23,12 +23,12 @@ class OrganizationDB(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     subscription_tier = Column(String(20), nullable=False, default="free")  # free/pro/enterprise
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )
 
     projects = relationship(
@@ -55,12 +55,12 @@ class ProjectDB(Base):
     slug = Column(String(255), nullable=False, index=True)
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )
 
     organization = relationship("OrganizationDB", back_populates="projects")
@@ -81,6 +81,6 @@ class OrgMemberDB(Base):
     organization_id = Column(String(36), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False)
     user_id = Column(String(36), nullable=False, index=True)
     role = Column(String(20), nullable=False, default="viewer")  # admin, editor, viewer
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
 
     organization = relationship("OrganizationDB", back_populates="members")

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,7 +30,7 @@ _DEFAULT_TIER = "free"
 
 def _current_month() -> str:
     """Return the current month as a string key, e.g. '2026-04'."""
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     return f"{now.year:04d}-{now.month:02d}"
 
 

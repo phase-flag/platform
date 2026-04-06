@@ -1,7 +1,7 @@
 """Authentication endpoints: register, login, current user, password reset, profile update."""
 
 import secrets
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -31,7 +31,7 @@ _reset_tokens: dict[str, tuple[str, datetime]] = {}
 
 def _purge_expired_tokens() -> None:
     """Remove tokens that have already expired."""
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     expired = [t for t, (_, exp) in _reset_tokens.items() if exp < now]
     for t in expired:
         _reset_tokens.pop(t, None)
@@ -214,7 +214,7 @@ async def forgot_password(
     # Always return 200 to avoid leaking whether the email exists
     if user:
         token = secrets.token_urlsafe(32)
-        expires_at = datetime.now(UTC) + timedelta(hours=1)
+        expires_at = datetime.utcnow() + timedelta(hours=1)
         _reset_tokens[token] = (user.id, expires_at)
 
         portal_origin = getattr(settings, "PORTAL_ORIGIN", "http://localhost:5174")
@@ -236,7 +236,7 @@ async def reset_password(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired reset link.")
 
     user_id, expires_at = entry
-    if datetime.now(UTC) > expires_at:
+    if datetime.utcnow() > expires_at:
         _reset_tokens.pop(body.token, None)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired reset link.")
 

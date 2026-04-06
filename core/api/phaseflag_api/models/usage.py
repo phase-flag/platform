@@ -1,6 +1,6 @@
 """Usage metering ORM model."""
 
-from datetime import UTC, datetime
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import Column, DateTime, Integer, String, Text
@@ -23,10 +23,10 @@ class UsageRecordDB(Base):
     # JSON array of unique user key strings seen this month
     unique_users = Column(Text, nullable=False, default="[]")
     count = Column(Integer, nullable=False, default=0)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )

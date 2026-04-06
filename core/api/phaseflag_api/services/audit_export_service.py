@@ -6,7 +6,7 @@ import csv
 import io
 import json
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any, Literal
 
 from sqlalchemy import select

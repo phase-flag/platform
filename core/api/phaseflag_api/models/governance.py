@@ -1,7 +1,7 @@
 """Governance models — change requests, service accounts, freeze windows."""
 
 import json
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
@@ -33,12 +33,12 @@ class ChangeRequestDB(Base):
     environment = Column(String(255), nullable=True)
     requires_approval_count = Column(Integer, nullable=False, default=1)
     approval_count = Column(Integer, nullable=False, default=0)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )
     resolved_at = Column(DateTime, nullable=True)
 
@@ -64,7 +64,7 @@ class ServiceAccountDB(Base):
     created_by = Column(String(255), nullable=False)
     last_used_at = Column(DateTime, nullable=True)
     expires_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
 
     def get_scopes(self) -> list[str]:
         return json.loads(self.scopes) if self.scopes else []
@@ -86,7 +86,7 @@ class FreezeWindowDB(Base):
     reason = Column(Text, nullable=True)
     created_by = Column(String(255), nullable=False)
     active = Column(Boolean, nullable=False, default=True)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
 
 
 class BreakGlassEventDB(Base):
@@ -104,4 +104,4 @@ class BreakGlassEventDB(Base):
     changes_json = Column(Text, nullable=True)
     expires_at = Column(DateTime, nullable=True)  # auto-revert time
     reverted = Column(Boolean, nullable=False, default=False)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())

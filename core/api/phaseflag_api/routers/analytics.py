@@ -1,6 +1,6 @@
 """Analytics endpoints for flag evaluation data."""
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
@@ -43,7 +43,7 @@ async def get_flag_evaluations(
     days: int = Query(7, ge=1, le=90),
     session: AsyncSession = Depends(get_session),
 ):
-    since = datetime.now(UTC) - timedelta(days=days)
+    since = datetime.utcnow() - timedelta(days=days)
     ts_col = EvaluationEventDB.timestamp
     bucket_expr = _date_trunc_expr(period, ts_col)
 
@@ -70,7 +70,7 @@ async def get_flag_summary(
     days: int = Query(7, ge=1, le=90),
     session: AsyncSession = Depends(get_session),
 ):
-    since = datetime.now(UTC) - timedelta(days=days)
+    since = datetime.utcnow() - timedelta(days=days)
 
     totals_stmt = (
         select(
@@ -105,7 +105,7 @@ async def cleanup_old_events(
 ):
     from sqlalchemy import delete
 
-    cutoff = datetime.now(UTC) - timedelta(days=days)
+    cutoff = datetime.utcnow() - timedelta(days=days)
     stmt = delete(EvaluationEventDB).where(EvaluationEventDB.timestamp < cutoff)
     result = await session.execute(stmt)
     await session.flush()

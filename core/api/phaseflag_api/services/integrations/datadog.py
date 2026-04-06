@@ -6,7 +6,7 @@ Reference: https://docs.datadoghq.com/api/latest/events/#post-an-event
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 import httpx
@@ -72,7 +72,7 @@ def build_datadog_event(event_type: str, flag_key: str, flag_data: dict[str, Any
             f"**Status**: `{status}`  \n"
             f"**Environment**: `{environment}`  \n"
             f"**Owner**: `{owner}`  \n"
-            f"**Timestamp**: `{datetime.now(UTC).isoformat()}`  \n"
+            f"**Timestamp**: `{datetime.utcnow().isoformat()}`  \n"
             f"\n %%%"
         ),
         "alert_type": alert_type,

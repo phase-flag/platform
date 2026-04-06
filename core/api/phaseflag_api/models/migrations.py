@@ -1,6 +1,6 @@
 """Migration flag ORM models."""
 
-from datetime import UTC, datetime
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import Column, DateTime, Float, Integer, String, Text
@@ -29,10 +29,10 @@ class MigrationFlagDB(Base):
     success_count = Column(Integer, nullable=False, default=0)
     rollback_threshold = Column(Float, nullable=True)  # Error rate threshold for auto-rollback
     created_by = Column(String(255), nullable=False, default="system")
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )

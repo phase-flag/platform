@@ -2,7 +2,7 @@
 
 import json
 import secrets
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
@@ -36,12 +36,12 @@ class EnvironmentDB(Base):
     frozen = Column(Boolean, nullable=False, default=False)
     frozen_reason = Column(Text, nullable=True)
     settings = Column(Text, nullable=False, default="{}")  # JSON blob for env-specific settings
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )
 
     project = relationship("ProjectDB", back_populates="environments")

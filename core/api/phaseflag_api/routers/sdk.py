@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -175,7 +175,7 @@ async def get_bootstrap(session: AsyncSession = Depends(get_session)):
         "flags": flags,
         "segments": segments,
         "version": version,
-        "generated_at": datetime.now(UTC).isoformat(),
+        "generated_at": datetime.utcnow().isoformat(),
     }
 
     # Sign the payload
@@ -269,7 +269,7 @@ async def evaluate_flag(body: EvaluateRequest, session: AsyncSession = Depends(g
         trace = None
 
     flag_db.evaluation_count = (flag_db.evaluation_count or 0) + 1
-    flag_db.last_evaluated_at = datetime.now(UTC)
+    flag_db.last_evaluated_at = datetime.utcnow()
     await flag_repository.update_flag(session, flag_db)
 
     # Track usage: record unique user for MTU metering.
@@ -339,7 +339,7 @@ async def ingest_events(batch: EventBatch, session: AsyncSession = Depends(get_s
     import json as _json
 
     for ev in batch.events:
-        ts = datetime.fromisoformat(ev.timestamp) if ev.timestamp else datetime.now(UTC)
+        ts = datetime.fromisoformat(ev.timestamp) if ev.timestamp else datetime.utcnow()
         row = EvaluationEventDB(
             flag_key=ev.flag_key,
             variation_key=ev.variation_key,

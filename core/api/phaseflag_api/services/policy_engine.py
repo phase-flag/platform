@@ -1,6 +1,6 @@
 """Policy engine for access control decisions."""
 
-from datetime import UTC, datetime
+from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,7 +23,7 @@ class PolicyEngine:
         Returns (allowed, reason).
         """
         # Check freeze windows
-        now = datetime.now(UTC)
+        now = datetime.utcnow()
         stmt = select(FreezeWindowDB).where(
             FreezeWindowDB.environment == environment,
             FreezeWindowDB.starts_at <= now,

@@ -9,7 +9,7 @@ events occur.  Formatting follows:
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 import httpx
@@ -242,7 +242,7 @@ async def send_slack_notification(
     actor: str,
 ) -> None:
     """Send a Slack Block Kit notification to the given incoming webhook URL."""
-    timestamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
+    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
     payload = _build_slack_blocks(event_type, flag_data, actor, timestamp)
     try:
         await _post_json(webhook_url, payload)
@@ -258,7 +258,7 @@ async def send_teams_notification(
     actor: str,
 ) -> None:
     """Send a Teams Adaptive Card notification to the given incoming webhook URL."""
-    timestamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
+    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
     payload = _build_teams_card(event_type, flag_data, actor, timestamp)
     try:
         await _post_json(webhook_url, payload)

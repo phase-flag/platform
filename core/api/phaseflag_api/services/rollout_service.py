@@ -1,7 +1,7 @@
 """Progressive rollout service — pipeline lifecycle and stage advancement."""
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 from fastapi import HTTPException
@@ -91,20 +91,20 @@ async def advance_pipeline(session: AsyncSession, pipeline: PipelineDB) -> Pipel
     # Complete current stage
     if current_idx < len(stages):
         stages[current_idx].status = "completed"
-        stages[current_idx].completed_at = datetime.now(UTC)
+        stages[current_idx].completed_at = datetime.utcnow()
 
     # Move to next stage
     next_idx = current_idx + 1
     if next_idx >= len(stages):
         pipeline.status = "completed"
-        pipeline.completed_at = datetime.now(UTC)
+        pipeline.completed_at = datetime.utcnow()
     else:
         pipeline.current_stage_index = next_idx
         pipeline.status = "running"
         stages[next_idx].status = "active"
-        stages[next_idx].started_at = datetime.now(UTC)
+        stages[next_idx].started_at = datetime.utcnow()
 
-    pipeline.updated_at = datetime.now(UTC)
+    pipeline.updated_at = datetime.utcnow()
     await session.flush()
     await session.refresh(pipeline)
     return pipeline
@@ -114,7 +114,7 @@ async def pause_pipeline(session: AsyncSession, pipeline: PipelineDB) -> Pipelin
     if pipeline.status != "running":
         raise HTTPException(status_code=400, detail="Can only pause a running pipeline")
     pipeline.status = "paused"
-    pipeline.updated_at = datetime.now(UTC)
+    pipeline.updated_at = datetime.utcnow()
     await session.flush()
     await session.refresh(pipeline)
     return pipeline
@@ -124,7 +124,7 @@ async def resume_pipeline(session: AsyncSession, pipeline: PipelineDB) -> Pipeli
     if pipeline.status != "paused":
         raise HTTPException(status_code=400, detail="Can only resume a paused pipeline")
     pipeline.status = "running"
-    pipeline.updated_at = datetime.now(UTC)
+    pipeline.updated_at = datetime.utcnow()
     await session.flush()
     await session.refresh(pipeline)
     return pipeline
@@ -134,7 +134,7 @@ async def rollback_pipeline(session: AsyncSession, pipeline: PipelineDB) -> Pipe
     if pipeline.status in ("completed", "rolled_back"):
         raise HTTPException(status_code=400, detail=f"Cannot rollback a '{pipeline.status}' pipeline")
     pipeline.status = "rolled_back"
-    pipeline.updated_at = datetime.now(UTC)
+    pipeline.updated_at = datetime.utcnow()
     # Mark remaining stages as skipped
     for stage in pipeline.stages:
         if stage.status in ("pending", "active"):
@@ -241,9 +241,9 @@ async def auto_advance_pipeline(session: AsyncSession, pipeline_id: str) -> dict
     if current_stage.started_at is None:
         # Stage hasn't started yet — start it
         current_stage.status = "active"
-        current_stage.started_at = datetime.now(UTC)
+        current_stage.started_at = datetime.utcnow()
         pipeline.status = "running"
-        pipeline.updated_at = datetime.now(UTC)
+        pipeline.updated_at = datetime.utcnow()
         await session.flush()
         await session.refresh(pipeline)
         return {
@@ -254,7 +254,7 @@ async def auto_advance_pipeline(session: AsyncSession, pipeline_id: str) -> dict
 
     from datetime import timedelta
 
-    elapsed = datetime.now(UTC) - current_stage.started_at
+    elapsed = datetime.utcnow() - current_stage.started_at
     required = timedelta(minutes=current_stage.duration_minutes)
 
     if elapsed < required:
@@ -332,7 +332,7 @@ async def check_rollback_triggers(
             should_trigger = True
 
         if should_trigger:
-            rule.last_triggered_at = datetime.now(UTC)
+            rule.last_triggered_at = datetime.utcnow()
             triggered.append(
                 {
                     "rule_id": rule.id,
@@ -365,7 +365,7 @@ async def check_rollback_triggers(
             flag_db = await flag_repository.get_flag_by_key(session, pipeline.flag_key)
             if flag_db and flag_db.status == "active":
                 flag_db.status = "inactive"
-                flag_db.updated_at = datetime.now(UTC)
+                flag_db.updated_at = datetime.utcnow()
                 await flag_repository.update_flag(session, flag_db)
             await rollback_pipeline(session, pipeline)
             await audit_repository.create_log(
@@ -402,7 +402,7 @@ async def emergency_kill(session: AsyncSession, flag_key: str) -> dict[str, Any]
 
     old_status = flag_db.status
     flag_db.status = "inactive"
-    flag_db.updated_at = datetime.now(UTC)
+    flag_db.updated_at = datetime.utcnow()
     await flag_repository.update_flag(session, flag_db)
 
     # Pause any active pipelines for this flag
@@ -411,7 +411,7 @@ async def emergency_kill(session: AsyncSession, flag_key: str) -> dict[str, Any]
     for pipeline in pipelines_list:
         if pipeline.status in ("running", "pending"):
             pipeline.status = "paused"
-            pipeline.updated_at = datetime.now(UTC)
+            pipeline.updated_at = datetime.utcnow()
             paused_pipelines.append(pipeline.id)
     await session.flush()
 

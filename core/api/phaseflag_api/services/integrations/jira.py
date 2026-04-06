@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import base64
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 import httpx
@@ -89,7 +89,7 @@ def build_jira_issue(
         _make_adf_paragraph(f"Owner: {owner}"),
         _make_adf_paragraph(f"Lifecycle Stage: {lifecycle_stage}"),
         _make_adf_paragraph(f"Created At: {created_at}"),
-        _make_adf_paragraph(f"Detected At: {datetime.now(UTC).isoformat()}"),
+        _make_adf_paragraph(f"Detected At: {datetime.utcnow().isoformat()}"),
         _make_adf_paragraph(
             "Action Required: Review this flag in the Phase Flag dashboard and remove it "
             "from all codebases before archiving and deleting it."
@@ -192,7 +192,7 @@ async def send_test_event(api_key: str, config: dict[str, Any] | None = None) ->
             "environment": "development",
             "owner": "system",
             "lifecycle_stage": "stale",
-            "created_at": datetime.now(UTC).isoformat(),
+            "created_at": datetime.utcnow().isoformat(),
         },
         config=config,
     )

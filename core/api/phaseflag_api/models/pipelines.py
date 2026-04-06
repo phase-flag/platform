@@ -1,6 +1,6 @@
 """Progressive delivery pipeline ORM models."""
 
-from datetime import UTC, datetime
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import (
@@ -36,12 +36,12 @@ class PipelineDB(Base):
     environment = Column(String(255), nullable=True)
     template = Column(String(50), nullable=True)  # canary, blue_green, linear, custom
     created_by = Column(String(255), nullable=False, default="system")
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )
     completed_at = Column(DateTime, nullable=True)
 
@@ -89,4 +89,4 @@ class RollbackRuleDB(Base):
     action = Column(String(20), nullable=False, default="disable")  # disable, rollback, alert
     active = Column(Boolean, nullable=False, default=True)
     last_triggered_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())

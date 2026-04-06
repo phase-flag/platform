@@ -1,6 +1,6 @@
 """Authentication service — password hashing and JWT token creation."""
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from hashlib import sha256
 import hmac
 
@@ -34,7 +34,7 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 def create_token(user: UserDB, org_id: str | None = None) -> str:
     """Create a JWT access token for the given user."""
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     payload = {
         "sub": user.id,
         "email": user.email,

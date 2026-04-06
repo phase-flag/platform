@@ -1,7 +1,7 @@
 """Audience segment ORM model."""
 
 import json
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
@@ -25,7 +25,7 @@ class SegmentDB(Base):
     description = Column(Text, nullable=True)
     conditions = Column(Text, nullable=False, default="[]")
     created_by = Column(String(255), nullable=False, default="system")
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
 
     def get_conditions(self) -> list[dict[str, Any]]:
         return json.loads(self.conditions) if self.conditions else []

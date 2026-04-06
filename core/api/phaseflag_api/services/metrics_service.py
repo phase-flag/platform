@@ -25,7 +25,7 @@ async def query_metric(
     """
     try:
         import httpx
-        from datetime import UTC, datetime, timedelta
+        from datetime import datetime, timedelta
 
         # Parse duration string to seconds
         _unit_map = {"s": 1, "m": 60, "h": 3600, "d": 86400}
@@ -33,7 +33,7 @@ async def query_metric(
         value = int(duration[:-1])
         seconds = value * _unit_map.get(unit, 60)
 
-        now = datetime.now(UTC)
+        now = datetime.utcnow()
         start = now - timedelta(seconds=seconds)
         step = max(15, seconds // 60)  # at most 60 data points
 

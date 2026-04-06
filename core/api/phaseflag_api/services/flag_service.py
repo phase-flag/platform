@@ -2,7 +2,7 @@
 
 import json
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
@@ -62,7 +62,7 @@ async def _notify_flag_change(
         {
             "flag_key": flag.key,
             "event": event_type,
-            "timestamp": datetime.now(UTC).isoformat(),
+            "timestamp": datetime.utcnow().isoformat(),
             **summary,
         },
     )
@@ -236,7 +236,7 @@ async def update_flag(
         if default_variation_id:
             existing.default_variation_id = default_variation_id
 
-    existing.updated_at = datetime.now(UTC)
+    existing.updated_at = datetime.utcnow()
     result = await flag_repository.update_flag(session, existing)
 
     if changes:
@@ -261,7 +261,7 @@ async def toggle_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFlag
         flag.status = "active"
         if flag.lifecycle_stage in ("development", "testing"):
             flag.lifecycle_stage = "production"
-    flag.updated_at = datetime.now(UTC)
+    flag.updated_at = datetime.utcnow()
     result = await flag_repository.update_flag(session, flag)
 
     await audit_repository.create_log(
@@ -279,7 +279,7 @@ async def toggle_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFlag
 async def archive_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFlagDB:
     old_status = flag.status
     flag.status = "archived"
-    flag.updated_at = datetime.now(UTC)
+    flag.updated_at = datetime.utcnow()
     result = await flag_repository.update_flag(session, flag)
 
     await audit_repository.create_log(
@@ -297,7 +297,7 @@ async def archive_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFla
 async def restore_flag(session: AsyncSession, flag: FeatureFlagDB) -> FeatureFlagDB:
     old_status = flag.status
     flag.status = "inactive"
-    flag.updated_at = datetime.now(UTC)
+    flag.updated_at = datetime.utcnow()
     result = await flag_repository.update_flag(session, flag)
 
     await audit_repository.create_log(

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from sqlalchemy import func, or_, select
@@ -23,7 +23,7 @@ async def detect_stale_flags(
 
     Returns a list of flag dicts describing the stale flags found.
     """
-    cutoff = datetime.now(UTC) - timedelta(days=threshold_days)
+    cutoff = datetime.utcnow() - timedelta(days=threshold_days)
     stmt = (
         select(FeatureFlagDB)
         .where(FeatureFlagDB.status == "active")
@@ -47,7 +47,7 @@ async def detect_stale_flags(
             "lifecycle_stage": f.lifecycle_stage,
             "last_evaluated_at": f.last_evaluated_at.isoformat() if f.last_evaluated_at else None,
             "days_since_evaluation": (
-                (datetime.now(UTC) - f.last_evaluated_at).days if f.last_evaluated_at else None
+                (datetime.utcnow() - f.last_evaluated_at).days if f.last_evaluated_at else None
             ),
             "created_at": f.created_at.isoformat() if f.created_at else None,
         }
@@ -62,7 +62,7 @@ async def auto_archive_expired(session: AsyncSession) -> list[dict[str, Any]]:
     Returns list of flags that were archived.
     """
     grace_period = timedelta(days=7)
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     cutoff = now - grace_period
 
     stmt = (
@@ -125,7 +125,7 @@ async def generate_cleanup_report(
 
     Returns a dict with stale_flags, team_scorecard, and trend data.
     """
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     cutoff_90 = now - timedelta(days=90)
     cutoff_30 = now - timedelta(days=30)
 
@@ -248,7 +248,7 @@ async def bulk_archive(
     archived: list[str] = []
     already_archived: list[str] = []
     not_found: list[str] = []
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
 
     for key in flag_keys:
         flag = await flag_repository.get_flag_by_key(session, key)

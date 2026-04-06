@@ -477,7 +477,7 @@ async def delete_flag(key: str, session: AsyncSession = Depends(get_session)):
     dependencies=[require_role("editor")],
 )
 async def schedule_flag(key: str, body: ScheduleRequest, session: AsyncSession = Depends(get_session)):
-    from datetime import UTC, datetime as dt
+    from datetime import datetime as dt
 
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:
@@ -536,7 +536,7 @@ async def kill_flag(key: str, session: AsyncSession = Depends(get_session)):
     dependencies=[require_role("editor")],
 )
 async def cancel_schedule(key: str, session: AsyncSession = Depends(get_session)):
-    from datetime import UTC, datetime as dt
+    from datetime import datetime as dt
 
     flag = await flag_repository.get_flag_by_key(session, key)
     if flag is None:

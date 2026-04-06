@@ -10,7 +10,7 @@ Special transitions:
 """
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -64,7 +64,7 @@ async def transition_lifecycle(
 
     old_stage = flag.lifecycle_stage
     flag.lifecycle_stage = target_stage
-    flag.updated_at = datetime.now(UTC)
+    flag.updated_at = datetime.utcnow()
 
     # Auto-deactivate when archiving
     if target_stage == "archived" and flag.status == "active":
@@ -89,7 +89,7 @@ async def check_expiring_flags(session: AsyncSession) -> list[dict[str, Any]]:
     """Find flags that are past their expiration date."""
     from sqlalchemy import select
 
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     stmt = (
         select(FeatureFlagDB)
         .where(FeatureFlagDB.expires_at != None)  # noqa: E711
@@ -117,7 +117,7 @@ async def check_stale_flags(
     """Find flags that haven't been evaluated recently."""
     from sqlalchemy import select, or_
 
-    cutoff = datetime.now(UTC) - __import__("datetime").timedelta(days=stale_days)
+    cutoff = datetime.utcnow() - __import__("datetime").timedelta(days=stale_days)
     stmt = (
         select(FeatureFlagDB)
         .where(FeatureFlagDB.status == "active")
@@ -152,7 +152,7 @@ async def run_stale_detection(session: AsyncSession) -> list[dict[str, Any]]:
     from datetime import timedelta
     from sqlalchemy import select, or_
 
-    cutoff = datetime.now(UTC) - timedelta(days=90)
+    cutoff = datetime.utcnow() - timedelta(days=90)
     stmt = (
         select(FeatureFlagDB)
         .where(FeatureFlagDB.status == "active")
@@ -170,7 +170,7 @@ async def run_stale_detection(session: AsyncSession) -> list[dict[str, Any]]:
     marked: list[dict[str, Any]] = []
     for flag in candidates:
         flag.lifecycle_stage = "stale"
-        flag.updated_at = datetime.now(UTC)
+        flag.updated_at = datetime.utcnow()
         await flag_repository.update_flag(session, flag)
         await audit_repository.create_log(
             session,
@@ -204,7 +204,7 @@ async def run_expiration_check(session: AsyncSession) -> list[dict[str, Any]]:
     """
     from sqlalchemy import select
 
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     stmt = (
         select(FeatureFlagDB)
         .where(FeatureFlagDB.expires_at != None)  # noqa: E711
@@ -219,7 +219,7 @@ async def run_expiration_check(session: AsyncSession) -> list[dict[str, Any]]:
         old_stage = flag.lifecycle_stage
         flag.status = "inactive"
         flag.lifecycle_stage = "archived"
-        flag.updated_at = datetime.now(UTC)
+        flag.updated_at = datetime.utcnow()
         await flag_repository.update_flag(session, flag)
         await audit_repository.create_log(
             session,
@@ -257,7 +257,7 @@ async def run_cleanup_scorecard(session: AsyncSession) -> list[dict[str, Any]]:
         func.count()
         .filter(
             (FeatureFlagDB.expires_at != None)  # noqa: E711
-            & (FeatureFlagDB.expires_at <= datetime.now(UTC))
+            & (FeatureFlagDB.expires_at <= datetime.utcnow())
         )
         .label("expired_count"),
         func.count().filter(FeatureFlagDB.lifecycle_stage == "archived").label("archived_count"),

@@ -1,7 +1,7 @@
 """Feature flag and variation ORM models."""
 
 import json
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
@@ -56,12 +56,12 @@ class FeatureFlagDB(Base):
     # Metadata
     created_by = Column(String(255), nullable=False, default="system")
     owner = Column(String(255), nullable=False, default="system")
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )
     last_evaluated_at = Column(DateTime, nullable=True)
     evaluation_count = Column(Integer, nullable=False, default=0)

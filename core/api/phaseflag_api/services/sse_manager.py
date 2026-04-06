@@ -3,7 +3,7 @@
 import asyncio
 import json
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ class SSEManager:
             event="connected",
             data={
                 "version": version,
-                "timestamp": datetime.now(UTC).isoformat(),
+                "timestamp": datetime.utcnow().isoformat(),
                 "message": "Connected to Phase Flag SSE stream",
             },
         )

@@ -2,7 +2,7 @@
 
 import json
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 from fastapi import HTTPException
@@ -78,7 +78,7 @@ async def update_config(
         config.is_server_only = data["is_server_only"]
     if "schema_definition" in data:
         config.schema_definition = json.dumps(data["schema_definition"]) if data["schema_definition"] else None
-    config.updated_at = datetime.now(UTC)
+    config.updated_at = datetime.utcnow()
     await session.flush()
     await session.refresh(config)
     return config

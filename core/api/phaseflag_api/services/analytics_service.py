@@ -1,7 +1,7 @@
 """Analytics service — flag inventory, health dashboards, reporting."""
 
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from sqlalchemy import func, or_, select
@@ -45,7 +45,7 @@ async def get_flag_inventory(session: AsyncSession) -> dict[str, Any]:
     ).scalar() or 0
 
     # Expired flags
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     expired = (
         await session.execute(
             select(func.count())
@@ -73,7 +73,7 @@ async def get_evaluation_trends(
     days: int = 7,
 ) -> list[dict[str, Any]]:
     """Return daily evaluation counts for trending."""
-    since = datetime.now(UTC) - timedelta(days=days)
+    since = datetime.utcnow() - timedelta(days=days)
     stmt = (
         select(
             func.strftime("%Y-%m-%d", EvaluationEventDB.timestamp).label("date"),
@@ -175,7 +175,7 @@ async def get_change_activity_timeline(session: AsyncSession, days: int = 30) ->
     """Timeline of flag changes over the past N days."""
     from phaseflag_api.models.audit import AuditLogDB
 
-    cutoff = datetime.now(UTC) - timedelta(days=days)
+    cutoff = datetime.utcnow() - timedelta(days=days)
     stmt = select(AuditLogDB).where(AuditLogDB.timestamp >= cutoff).order_by(AuditLogDB.timestamp.desc())
     result = await session.execute(stmt)
     logs = result.scalars().all()
@@ -220,7 +220,7 @@ async def get_flags_without_owners(session: AsyncSession) -> list[dict]:
 
 async def get_expired_flags(session: AsyncSession) -> list[dict]:
     """Flags past their expiration date."""
-    now = datetime.now(UTC)
+    now = datetime.utcnow()
     stmt = select(FeatureFlagDB).where(
         FeatureFlagDB.expires_at != None,  # noqa: E711
         FeatureFlagDB.expires_at < now,

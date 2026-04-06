@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 import socket
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 import httpx
@@ -61,7 +61,7 @@ def build_pagerduty_payload(
         "dedup_key": dedup_key,
         "payload": {
             "summary": f"[Phase Flag] {event_type}: flag '{flag_key}' in {environment}",
-            "timestamp": datetime.now(UTC).isoformat(),
+            "timestamp": datetime.utcnow().isoformat(),
             "severity": severity,
             "source": config.get("source", socket.gethostname()),
             "component": config.get("component", "feature-flags"),

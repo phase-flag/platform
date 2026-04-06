@@ -1,6 +1,6 @@
 """Sticky assignment ORM model."""
 
-from datetime import UTC, datetime
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import Column, DateTime, String, UniqueConstraint
@@ -20,6 +20,6 @@ class StickyAssignmentDB(Base):
     flag_key = Column(String(255), nullable=False, index=True)
     variation_key = Column(String(255), nullable=False)
     environment = Column(String(50), nullable=False, default="production")
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
 
     __table_args__ = (UniqueConstraint("user_id", "flag_key", "environment", name="uq_sticky_user_flag_env"),)

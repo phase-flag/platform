@@ -1,7 +1,7 @@
 """Code reference service — flag usage scanning and tracking."""
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 
@@ -21,7 +21,7 @@ def upload_references(flag_key: str, references: list[dict[str, Any]]) -> int:
             "branch": ref.get("branch", "main"),
             "language": ref.get("language", ""),
             "context": ref.get("context", ""),
-            "uploaded_at": datetime.now(UTC).isoformat(),
+            "uploaded_at": datetime.utcnow().isoformat(),
         }
         for ref in references
     ]

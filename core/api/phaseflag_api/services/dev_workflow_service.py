@@ -1,6 +1,6 @@
 """Developer workflow support — test users, overrides, debug tools."""
 
-from datetime import UTC, datetime
+from datetime import datetime
 
 # ---------------------------------------------------------------------------
 # In-memory stores
@@ -19,7 +19,7 @@ def create_test_user(user_id: str, name: str, attributes: dict | None = None) ->
         "user_id": user_id,
         "name": name,
         "attributes": attributes or {},
-        "created_at": datetime.now(UTC).isoformat(),
+        "created_at": datetime.utcnow().isoformat(),
     }
     return _test_users[user_id]
 

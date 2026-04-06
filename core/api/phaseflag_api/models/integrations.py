@@ -3,7 +3,7 @@
 import base64
 import json
 import os
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
@@ -51,12 +51,12 @@ class IntegrationConfigDB(Base):
     config = Column(Text, nullable=False, default="{}")  # JSON blob of provider-specific settings
     events = Column(Text, nullable=False, default="[]")  # JSON array of subscribed event types
     enabled = Column(Boolean, nullable=False, default=True)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.utcnow(),
+        onupdate=lambda: datetime.utcnow(),
     )
 
     # ------------------------------------------------------------------ #
