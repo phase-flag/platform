@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { segmentsApi } from '@/lib/api'
+import { useProject } from '@/contexts/ProjectContext'
 import { Users, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import SegmentModal from '@/components/SegmentModal'
@@ -9,10 +10,11 @@ import Skeleton from '@/components/Skeleton'
 
 export default function Segments() {
     const [showCreateModal, setShowCreateModal] = useState(false)
+    const { project } = useProject()
 
     const { data: paginatedData, isLoading } = useQuery({
-        queryKey: ['segments'],
-        queryFn: () => segmentsApi.list().then(res => res.data),
+        queryKey: ['segments', project?.key],
+        queryFn: () => segmentsApi.list({ project_key: project?.key ?? undefined }).then(res => res.data),
     })
 
     const segments = paginatedData?.items

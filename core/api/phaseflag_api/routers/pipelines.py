@@ -43,6 +43,7 @@ class PipelineCreate(BaseModel):
     template: str | None = Field(None, examples=["canary"])
     stages: list[StageIn] | None = None
     environment: str | None = None
+    project_key: str | None = None
 
 
 class StageOut(BaseModel):
@@ -68,6 +69,7 @@ class PipelineOut(BaseModel):
     created_by: str
     created_at: str
     completed_at: str | None
+    project_key: str | None = None
 
 
 class PaginatedPipelines(BaseModel):
@@ -87,6 +89,7 @@ def _pipeline_to_out(p) -> PipelineOut:
         created_by=p.created_by,
         created_at=p.created_at.isoformat(),
         completed_at=p.completed_at.isoformat() if p.completed_at else None,
+        project_key=getattr(p, "project_key", None),
         stages=[
             StageOut(
                 id=s.id,
@@ -124,6 +127,7 @@ async def create_pipeline(
         stages=stages,
         environment=body.environment,
         created_by=user.get("email", "system"),
+        project_key=body.project_key,
     )
     return _pipeline_to_out(pipeline)
 
@@ -131,11 +135,12 @@ async def create_pipeline(
 @router.get("/rollouts", response_model=PaginatedPipelines)
 async def list_pipelines(
     flag_key: str | None = Query(None),
+    project_key: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
-    items, total = await rollout_service.list_pipelines(session, flag_key, limit=limit, offset=offset)
+    items, total = await rollout_service.list_pipelines(session, flag_key, project_key=project_key, limit=limit, offset=offset)
     return PaginatedPipelines(items=[_pipeline_to_out(p) for p in items], total=total)
 
 

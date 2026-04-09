@@ -47,6 +47,7 @@ class ExperimentDB(Base):
         default=lambda: datetime.utcnow(),
         onupdate=lambda: datetime.utcnow(),
     )
+    project_key = Column(String(255), nullable=True, index=True)
 
     goals = relationship(
         "ExperimentGoalDB",

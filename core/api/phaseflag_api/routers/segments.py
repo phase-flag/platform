@@ -28,6 +28,7 @@ class SegmentCreate(BaseModel):
     description: str | None = None
     conditions: list[ConditionIn]
     created_by: str = "system"
+    project_key: str | None = None
 
 
 class SegmentUpdate(BaseModel):
@@ -50,6 +51,7 @@ class SegmentOut(BaseModel):
     conditions: list[ConditionOut]
     created_by: str
     created_at: str
+    project_key: str | None = None
 
 
 class PaginatedSegments(BaseModel):
@@ -69,16 +71,18 @@ def _segment_to_out(seg) -> SegmentOut:
         conditions=[ConditionOut(**c) for c in raw_conditions],
         created_by=seg.created_by,
         created_at=seg.created_at.isoformat(),
+        project_key=getattr(seg, "project_key", None),
     )
 
 
 @router.get("/segments", response_model=PaginatedSegments)
 async def list_segments(
+    project_key: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
-    segments, total = await segment_repository.list_segments(session, limit=limit, offset=offset)
+    segments, total = await segment_repository.list_segments(session, project_key=project_key, limit=limit, offset=offset)
     return PaginatedSegments(
         items=[_segment_to_out(s) for s in segments],
         total=total,
@@ -115,6 +119,7 @@ async def create_segment(body: SegmentCreate, session: AsyncSession = Depends(ge
         description=body.description,
         conditions=json.dumps([c.model_dump() for c in body.conditions]),
         created_by=body.created_by,
+        project_key=body.project_key,
     )
     created = await segment_repository.create_segment(session, seg)
     return _segment_to_out(created)

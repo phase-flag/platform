@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { pipelinesApi, flagsApi, type RolloutPipeline } from '@/lib/api'
 import { useToast } from '@/contexts/ToastContext'
 import { useEnvironment } from '@/contexts/EnvironmentContext'
+import { useProject } from '@/contexts/ProjectContext'
 import { GitBranch, Plus, Play, Pause, SkipForward, RotateCcw, X, ChevronRight, Clock, CheckCircle, AlertCircle } from 'lucide-react'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import Skeleton from '@/components/Skeleton'
@@ -17,6 +18,7 @@ export default function Pipelines() {
     const queryClient = useQueryClient()
     const { addToast } = useToast()
     const { environment } = useEnvironment()
+    const { project } = useProject()
     const [showCreate, setShowCreate] = useState(false)
     const [confirmAction, setConfirmAction] = useState<{ type: string; flagKey: string } | null>(null)
 
@@ -32,13 +34,13 @@ export default function Pipelines() {
     const [selectedTemplate, setSelectedTemplate] = useState(0)
 
     const { data: pipelinesData, isLoading } = useQuery({
-        queryKey: ['pipelines', environment],
-        queryFn: () => pipelinesApi.list({ limit: 100 }),
+        queryKey: ['pipelines', environment, project?.key],
+        queryFn: () => pipelinesApi.list({ limit: 100, project_key: project?.key ?? undefined }),
     })
 
     const { data: flagsData } = useQuery({
-        queryKey: ['flags', environment],
-        queryFn: () => flagsApi.list(environment, { limit: 200 }),
+        queryKey: ['flags', environment, project?.key],
+        queryFn: () => flagsApi.list(environment, { limit: 200, project_key: project?.key ?? undefined }),
         enabled: showCreate,
     })
 

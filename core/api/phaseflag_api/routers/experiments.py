@@ -33,6 +33,7 @@ class ExperimentCreate(BaseModel):
     experiment_type: str = Field("ab", examples=["ab"])
     traffic_percentage: int = Field(100, ge=1, le=100)
     goals: list[GoalIn] | None = None
+    project_key: str | None = None
 
 
 class GoalOut(BaseModel):
@@ -71,6 +72,7 @@ class ExperimentOut(BaseModel):
     results: list[ResultOut]
     created_by: str
     created_at: str
+    project_key: str | None = None
 
 
 class PaginatedExperiments(BaseModel):
@@ -177,6 +179,7 @@ def _exp_to_out(exp) -> ExperimentOut:
         ],
         created_by=exp.created_by,
         created_at=exp.created_at.isoformat(),
+        project_key=getattr(exp, "project_key", None),
     )
 
 
@@ -203,6 +206,7 @@ async def create_experiment(
         traffic_percentage=body.traffic_percentage,
         goals=goals,
         created_by=user.get("email", "system"),
+        project_key=body.project_key,
     )
     return _exp_to_out(exp)
 
@@ -211,6 +215,7 @@ async def create_experiment(
 async def list_experiments(
     status_filter: str | None = Query(None, alias="status"),
     flag_key: str | None = Query(None),
+    project_key: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
@@ -219,6 +224,7 @@ async def list_experiments(
         session,
         status_filter=status_filter,
         flag_key=flag_key,
+        project_key=project_key,
         limit=limit,
         offset=offset,
     )

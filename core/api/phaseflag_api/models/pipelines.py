@@ -35,6 +35,7 @@ class PipelineDB(Base):
     current_stage_index = Column(Integer, nullable=False, default=0)
     environment = Column(String(255), nullable=True)
     template = Column(String(50), nullable=True)  # canary, blue_green, linear, custom
+    project_key = Column(String(255), nullable=True, index=True)
     created_by = Column(String(255), nullable=False, default="system")
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(

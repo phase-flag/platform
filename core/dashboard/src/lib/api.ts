@@ -97,6 +97,7 @@ export interface FeatureFlag {
     expires_at?: string | null
     ticket_url?: string | null
     runbook_url?: string | null
+    project_key?: string | null
 }
 
 export interface Variation {
@@ -140,6 +141,7 @@ export interface FlagCreateInput {
     default_variation_key: string
     tags?: string[]
     targeting_rules?: TargetingRule[]
+    project_key?: string | null
 }
 
 export interface FlagUpdateInput {
@@ -153,6 +155,7 @@ export interface FlagUpdateInput {
     targeting_rules?: TargetingRule[]
     prerequisites?: Array<{ flag_key: string; variation_key: string }>
     lifecycle_stage?: string
+    project_key?: string | null
 }
 
 export interface Segment {
@@ -163,6 +166,7 @@ export interface Segment {
     conditions: Condition[]
     created_by: string
     created_at: string
+    project_key?: string | null
 }
 
 export interface Webhook {
@@ -244,6 +248,7 @@ export interface Experiment {
     concluded_at: string | null
     winner: string | null
     results: ExperimentResults | null
+    project_key?: string | null
 }
 
 export interface ExperimentVariation {
@@ -381,6 +386,7 @@ export interface RolloutPipeline {
     status: string
     stage_started_at: string
     created_at: string
+    project_key?: string | null
 }
 
 export interface ChangeRequest {
@@ -613,7 +619,7 @@ export interface FlagHealth {
 
 // API Functions
 export const flagsApi = {
-    list: (environment?: string, params?: { limit?: number; offset?: number }) =>
+    list: (environment?: string, params?: { limit?: number; offset?: number; project_key?: string }) =>
         api.get<PaginatedResponse<FeatureFlag>>('/flags', {
             params: { ...params, ...(environment ? { environment } : {}) },
         }),
@@ -654,7 +660,7 @@ export const flagsApi = {
 }
 
 export const segmentsApi = {
-    list: (params?: { limit?: number; offset?: number }) =>
+    list: (params?: { limit?: number; offset?: number; project_key?: string }) =>
         api.get<PaginatedResponse<Segment>>('/segments', { params }),
     get: (key: string) => api.get<Segment>(`/segments/${key}`),
     create: (data: { key: string; name: string; description?: string; conditions?: Condition[] }) =>
@@ -724,7 +730,7 @@ export const sseApi = {
 }
 
 export const experimentsApi = {
-    list: (params?: { flag_key?: string; status?: string }) =>
+    list: (params?: { flag_key?: string; status?: string; project_key?: string }) =>
         api.get<Experiment[]>('/enterprise/experiments', { params }),
     get: (id: string) =>
         api.get<Experiment>(`/enterprise/experiments/${id}`),
@@ -740,7 +746,7 @@ export const experimentsApi = {
 
 /** Full experiment API using the /enterprise/experiments backend with ExperimentV2 types */
 export const experimentsApi2 = {
-    list: (params?: { flag_key?: string; status?: string; limit?: number; offset?: number }) =>
+    list: (params?: { flag_key?: string; status?: string; limit?: number; offset?: number; project_key?: string }) =>
         api.get<{ items: ExperimentV2[]; total: number }>('/enterprise/experiments', { params }),
     get: (key: string) =>
         api.get<ExperimentV2>(`/enterprise/experiments/${key}`),
@@ -872,7 +878,7 @@ export const governanceApi = {
 }
 
 export const pipelinesApi = {
-    list: (params?: { limit?: number; offset?: number }) =>
+    list: (params?: { limit?: number; offset?: number; project_key?: string }) =>
         api.get<PaginatedResponse<RolloutPipeline>>('/rollouts', { params }),
     get: (flagKey: string) =>
         api.get<RolloutPipeline>(`/flags/${flagKey}/pipeline`),
@@ -908,7 +914,7 @@ export const migrationsApi = {
 }
 
 export const remoteConfigApi = {
-    list: (params?: { environment?: string; limit?: number; offset?: number }) =>
+    list: (params?: { environment?: string; limit?: number; offset?: number; project_key?: string }) =>
         api.get<PaginatedResponse<RemoteConfigEntry>>('/remote-config', { params }),
     get: (key: string, environment?: string) =>
         api.get<RemoteConfigEntry>(`/remote-config/${key}`, { params: environment ? { environment } : {} }),

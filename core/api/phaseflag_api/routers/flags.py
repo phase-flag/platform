@@ -100,6 +100,7 @@ class FlagCreate(BaseModel):
     runbook_url: str | None = None
     owner_team: str | None = None
     namespace: str | None = None
+    project_key: str | None = None
 
     @field_validator("key")
     @classmethod
@@ -155,6 +156,7 @@ class FlagUpdate(BaseModel):
     runbook_url: str | None = None
     owner_team: str | None = None
     namespace: str | None = None
+    project_key: str | None = None
 
 
 class ScheduleRequest(BaseModel):
@@ -196,6 +198,7 @@ class FlagOut(BaseModel):
     runbook_url: str | None = None
     owner_team: str | None = None
     namespace: str | None = None
+    project_key: str | None = None
     scheduled_on: str | None = None
     scheduled_status: str | None = None
     created_by: str
@@ -245,6 +248,7 @@ def _flag_to_out(flag) -> FlagOut:
         runbook_url=getattr(flag, "runbook_url", None),
         owner_team=getattr(flag, "owner_team", None),
         namespace=getattr(flag, "namespace", None),
+        project_key=getattr(flag, "project_key", None),
         scheduled_on=flag.scheduled_on.isoformat() if getattr(flag, "scheduled_on", None) else None,
         scheduled_status=getattr(flag, "scheduled_status", None),
         created_by=flag.created_by,
@@ -267,6 +271,7 @@ async def list_flags(
     flag_status: str | None = Query(None, alias="status"),
     lifecycle_stage: str | None = Query(None),
     namespace: str | None = Query(None),
+    project_key: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
@@ -277,6 +282,7 @@ async def list_flags(
         status=flag_status,
         lifecycle_stage=lifecycle_stage,
         namespace=namespace,
+        project_key=project_key,
         limit=limit,
         offset=offset,
     )
@@ -494,7 +500,7 @@ async def schedule_flag(key: str, body: ScheduleRequest, session: AsyncSession =
         )
 
     scheduled_on = dt.fromisoformat(body.scheduled_on.replace("Z", "+00:00"))
-    if scheduled_on <= dt.now(UTC):
+    if scheduled_on <= dt.utcnow():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="scheduled_on must be in the future",
@@ -502,7 +508,7 @@ async def schedule_flag(key: str, body: ScheduleRequest, session: AsyncSession =
 
     flag.scheduled_on = scheduled_on
     flag.scheduled_status = body.scheduled_status
-    flag.updated_at = dt.now(UTC)
+    flag.updated_at = dt.utcnow()
     await flag_repository.update_flag(session, flag)
 
     from phaseflag_api.repositories import audit_repository
@@ -549,7 +555,7 @@ async def cancel_schedule(key: str, session: AsyncSession = Depends(get_session)
 
     flag.scheduled_on = None
     flag.scheduled_status = None
-    flag.updated_at = dt.now(UTC)
+    flag.updated_at = dt.utcnow()
     await flag_repository.update_flag(session, flag)
 
     from phaseflag_api.repositories import audit_repository

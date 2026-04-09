@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { flagsApi } from '@/lib/api'
+import { useProject } from '@/contexts/ProjectContext'
 import { Plus, Trash2 } from 'lucide-react'
 import TagInput from '@/components/TagInput'
 import Modal from '@/components/Modal'
@@ -20,6 +21,7 @@ const ENVIRONMENTS = ['development', 'staging', 'production'] as const
 
 export default function CreateFlagModal({ isOpen, onClose }: Props) {
     const queryClient = useQueryClient()
+    const { project } = useProject()
 
     const [key, setKey] = useState('')
     const [name, setName] = useState('')
@@ -93,6 +95,7 @@ export default function CreateFlagModal({ isOpen, onClose }: Props) {
             variations: parsedVariations,
             default_variation_key: defaultVariationKey,
             tags,
+            project_key: project?.key ?? undefined,
         })
     }
 

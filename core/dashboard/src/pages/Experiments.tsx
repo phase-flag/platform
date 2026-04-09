@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { experimentsApi2, flagsApi, type ExperimentV2, type ExperimentResultV2 } from '@/lib/api'
 import { useToast } from '@/contexts/ToastContext'
+import { useProject } from '@/contexts/ProjectContext'
 import { Link } from 'react-router-dom'
 import {
     FlaskConical, Play, Pause, CheckCircle, Plus, TrendingUp, Users, Target,
@@ -24,12 +25,13 @@ const STATUS_TABS = ['', 'draft', 'running', 'paused', 'completed', 'cancelled']
 export default function Experiments() {
     const queryClient = useQueryClient()
     const { toast } = useToast()
+    const { project } = useProject()
     const [showCreate, setShowCreate] = useState(false)
     const [statusFilter, setStatusFilter] = useState<string>('')
 
     const { data: expData, isLoading } = useQuery({
-        queryKey: ['experiments', statusFilter],
-        queryFn: () => experimentsApi2.list(statusFilter ? { status: statusFilter } : undefined).then(r => r.data),
+        queryKey: ['experiments', statusFilter, project?.key],
+        queryFn: () => experimentsApi2.list({ ...(statusFilter ? { status: statusFilter } : {}), project_key: project?.key ?? undefined }).then(r => r.data),
     })
 
     const experiments: ExperimentV2[] = Array.isArray(expData) ? expData : (expData as any)?.items || []

@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Flag, Activity, Users, Settings, Menu, X, Sun, Moon, Webhook, LogOut, FlaskConical, Shield, BarChart3, Layers, ShieldCheck, Plug, FolderKanban, Globe, GitBranch, Gauge, Database, Code2, ArrowRightLeft, LayoutDashboard, Building2, CreditCard, HeartPulse } from 'lucide-react'
+import { Flag, Activity, Users, Settings, Menu, X, Sun, Moon, Webhook, LogOut, FlaskConical, Shield, BarChart3, Layers, ShieldCheck, Plug, FolderKanban, Globe, GitBranch, Gauge, Database, Code2, ArrowRightLeft, LayoutDashboard, Building2, CreditCard, HeartPulse, ChevronDown } from 'lucide-react'
 import clsx from 'clsx'
 import { useEnvironment } from '@/contexts/EnvironmentContext'
 import { useAuth } from '@/contexts/AuthContext'
+import { useProject } from '@/contexts/ProjectContext'
+import type { Project } from '@/contexts/ProjectContext'
+import { useQuery } from '@tanstack/react-query'
+import { projectsApi } from '@/lib/api'
 
 const ENVIRONMENTS = ['development', 'staging', 'production'] as const
 
@@ -30,8 +34,25 @@ export default function Layout() {
     const location = useLocation()
     const { environment, setEnvironment } = useEnvironment()
     const { logout, user } = useAuth()
+    const { project, setProject } = useProject()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [dark, toggleDark] = useDarkMode()
+    const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
+
+    const { data: projectsData } = useQuery({
+        queryKey: ['projects'],
+        queryFn: () => projectsApi.list().then(r => r.data),
+    })
+    const projects: Project[] = Array.isArray(projectsData)
+        ? projectsData
+        : (projectsData as any)?.items ?? []
+
+    useEffect(() => {
+        if (!projectDropdownOpen) return
+        function handleClick() { setProjectDropdownOpen(false) }
+        document.addEventListener('click', handleClick)
+        return () => document.removeEventListener('click', handleClick)
+    }, [projectDropdownOpen])
 
     const navigation = [
         { name: 'Dashboard', href: '/dashboard', icon: Activity, tooltip: 'Overview of your feature flags and recent activity' },
@@ -184,6 +205,39 @@ export default function Layout() {
             <div className="md:pl-56 lg:pl-64 pt-14 md:pt-0">
                 {/* Top header */}
                 <header className="sticky top-0 z-20 h-14 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-end px-6 gap-3">
+                    {/* Project Picker */}
+                    <div className="relative">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setProjectDropdownOpen(o => !o) }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors"
+                        >
+                            <FolderKanban className="w-3.5 h-3.5 text-gray-400" />
+                            <span className="max-w-[120px] truncate font-medium">
+                                {project?.name ?? 'All Projects'}
+                            </span>
+                            <ChevronDown className="w-3 h-3 text-gray-400" />
+                        </button>
+                        {projectDropdownOpen && (
+                            <div className="absolute top-full mt-1 left-0 z-50 w-52 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1">
+                                <button
+                                    onClick={() => { setProject(null); setProjectDropdownOpen(false) }}
+                                    className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 ${!project ? 'text-primary-600 font-medium' : 'text-gray-700 dark:text-gray-300'}`}
+                                >
+                                    All Projects
+                                </button>
+                                {projects.map(p => (
+                                    <button
+                                        key={p.key}
+                                        onClick={() => { setProject(p); setProjectDropdownOpen(false) }}
+                                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 ${project?.key === p.key ? 'text-primary-600 font-medium' : 'text-gray-700 dark:text-gray-300'}`}
+                                    >
+                                        {p.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
                     {/* Environment selector */}
                     <select
                         value={environment}

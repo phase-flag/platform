@@ -30,6 +30,7 @@ async def create_experiment(
     traffic_percentage: int = 100,
     goals: list[dict[str, Any]] | None = None,
     created_by: str = "system",
+    project_key: str | None = None,
 ) -> ExperimentDB:
     existing = await get_experiment_by_key(session, key)
     if existing:
@@ -44,6 +45,7 @@ async def create_experiment(
         experiment_type=experiment_type,
         traffic_percentage=traffic_percentage,
         created_by=created_by,
+        project_key=project_key,
     )
     session.add(exp)
     await session.flush()
@@ -113,6 +115,7 @@ async def list_experiments(
     *,
     status_filter: str | None = None,
     flag_key: str | None = None,
+    project_key: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> tuple[list[ExperimentDB], int]:
@@ -121,6 +124,8 @@ async def list_experiments(
         base = base.where(ExperimentDB.status == status_filter)
     if flag_key:
         base = base.where(ExperimentDB.flag_key == flag_key)
+    if project_key:
+        base = base.where(ExperimentDB.project_key == project_key)
     total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
     items = (
         (await session.execute(base.order_by(ExperimentDB.created_at.desc()).limit(limit).offset(offset)))

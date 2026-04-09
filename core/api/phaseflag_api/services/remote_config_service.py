@@ -27,6 +27,7 @@ async def create_config(
     schema_definition: dict | None = None,
     is_server_only: bool = False,
     owner: str = "system",
+    project_key: str | None = None,
 ) -> RemoteConfigDB:
     existing = await get_config_by_key(session, key, environment)
     if existing:
@@ -49,6 +50,7 @@ async def create_config(
         schema_definition=json.dumps(schema_definition) if schema_definition else None,
         is_server_only=is_server_only,
         owner=owner,
+        project_key=project_key,
     )
     session.add(config)
     await session.flush()
@@ -100,12 +102,15 @@ async def list_configs(
     session: AsyncSession,
     *,
     environment: str | None = None,
+    project_key: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> tuple[list[RemoteConfigDB], int]:
     base = select(RemoteConfigDB)
     if environment:
         base = base.where(RemoteConfigDB.environment == environment)
+    if project_key:
+        base = base.where(RemoteConfigDB.project_key == project_key)
     total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
     items = (
         (await session.execute(base.order_by(RemoteConfigDB.created_at.desc()).limit(limit).offset(offset)))

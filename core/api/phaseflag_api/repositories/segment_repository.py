@@ -11,10 +11,13 @@ from phaseflag_api.models.segments import SegmentDB
 async def list_segments(
     session: AsyncSession,
     *,
+    project_key: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> tuple[Sequence[SegmentDB], int]:
     base = select(SegmentDB)
+    if project_key:
+        base = base.where(SegmentDB.project_key == project_key)
     count_stmt = select(func.count()).select_from(base.subquery())
     total = (await session.execute(count_stmt)).scalar() or 0
 

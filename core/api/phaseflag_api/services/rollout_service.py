@@ -38,6 +38,7 @@ async def create_pipeline(
     stages: list[dict[str, Any]] | None = None,
     environment: str | None = None,
     created_by: str = "system",
+    project_key: str | None = None,
 ) -> PipelineDB:
     if template and template in PIPELINE_TEMPLATES:
         stages = PIPELINE_TEMPLATES[template]
@@ -51,6 +52,7 @@ async def create_pipeline(
         template=template,
         environment=environment,
         created_by=created_by,
+        project_key=project_key,
     )
     session.add(pipeline)
     await session.flush()
@@ -153,6 +155,7 @@ async def list_pipelines(
     session: AsyncSession,
     flag_key: str | None = None,
     *,
+    project_key: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> tuple[list[PipelineDB], int]:
@@ -161,6 +164,8 @@ async def list_pipelines(
     base = select(PipelineDB)
     if flag_key:
         base = base.where(PipelineDB.flag_key == flag_key)
+    if project_key:
+        base = base.where(PipelineDB.project_key == project_key)
     total = (await session.execute(select(func.count()).select_from(base.subquery()))).scalar() or 0
     items = (
         (await session.execute(base.order_by(PipelineDB.created_at.desc()).limit(limit).offset(offset))).scalars().all()

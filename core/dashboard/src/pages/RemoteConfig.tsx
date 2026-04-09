@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { remoteConfigApi } from '@/lib/api'
 import { useToast } from '@/contexts/ToastContext'
 import { useEnvironment } from '@/contexts/EnvironmentContext'
+import { useProject } from '@/contexts/ProjectContext'
 import { Database, Plus, Trash2, Search, X, ChevronRight } from 'lucide-react'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { Link } from 'react-router-dom'
@@ -31,6 +32,7 @@ export default function RemoteConfig() {
     const queryClient = useQueryClient()
     const { toast } = useToast()
     const { environment } = useEnvironment()
+    const { project } = useProject()
 
     const [showCreateModal, setShowCreateModal] = useState(false)
     const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -42,8 +44,8 @@ export default function RemoteConfig() {
     const [envFilter, setEnvFilter] = useState<string>('all')
 
     const { data: configData, isLoading } = useQuery({
-        queryKey: ['remote-config', environment],
-        queryFn: () => remoteConfigApi.list({ environment: environment || undefined, limit: 200 }).then(r => r.data),
+        queryKey: ['remote-config', environment, project?.key],
+        queryFn: () => remoteConfigApi.list({ environment: environment || undefined, limit: 200, project_key: project?.key ?? undefined }).then(r => r.data),
     })
 
     const rawEntries = configData as any

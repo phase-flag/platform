@@ -31,6 +31,7 @@ class RemoteConfigDB(Base):
     is_server_only = Column(Boolean, nullable=False, default=False)  # If true, not sent to client SDKs
     version = Column(Integer, nullable=False, default=1)
     owner = Column(String(255), nullable=False, default="system")
+    project_key = Column(String(255), nullable=True, index=True)
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
     updated_at = Column(
         DateTime,

@@ -10,6 +10,7 @@ import EmptyState from '@/components/EmptyState'
 import Skeleton from '@/components/Skeleton'
 import { useEnvironment } from '@/contexts/EnvironmentContext'
 import { useToast } from '@/contexts/ToastContext'
+import { useProject } from '@/contexts/ProjectContext'
 
 const STATUS_OPTIONS = ['all', 'active', 'inactive', 'archived'] as const
 const ENV_OPTIONS = ['all', 'development', 'staging', 'production'] as const
@@ -25,6 +26,7 @@ export default function Flags() {
     const [showCreateModal, setShowCreateModal] = useState(false)
     const [searchParams, setSearchParams] = useSearchParams()
     const { environment } = useEnvironment()
+    const { project } = useProject()
     const queryClient = useQueryClient()
     const { toast } = useToast()
 
@@ -83,8 +85,8 @@ export default function Flags() {
     const offset = (page - 1) * PAGE_SIZE
 
     const { data: paginatedData, isLoading } = useQuery({
-        queryKey: ['flags', environment, page],
-        queryFn: () => flagsApi.list(environment, { limit: PAGE_SIZE, offset }).then(res => res.data),
+        queryKey: ['flags', environment, page, project?.key],
+        queryFn: () => flagsApi.list(environment, { limit: PAGE_SIZE, offset, project_key: project?.key ?? undefined }).then(res => res.data),
     })
 
     const flags = paginatedData?.items
@@ -170,7 +172,9 @@ export default function Flags() {
             <div className="p-8">
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Feature Flags</h1>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Feature Flags{project && (
+                            <span className="text-sm text-gray-400 font-normal ml-2">/ {project.name}</span>
+                        )}</h1>
                         <p className="mt-2 text-gray-600 dark:text-gray-400">Manage feature flags and targeting rules</p>
                     </div>
                 </div>
@@ -184,7 +188,9 @@ export default function Flags() {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Feature Flags</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Feature Flags{project && (
+                            <span className="text-sm text-gray-400 font-normal ml-2">/ {project.name}</span>
+                        )}</h1>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">Manage feature flags and targeting rules</p>
                 </div>
                 <div className="flex items-center space-x-3">

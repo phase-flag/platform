@@ -23,6 +23,7 @@ class ConfigCreate(BaseModel):
     environment: str = Field("development", examples=["production"])
     schema_definition: dict | None = None
     is_server_only: bool = False
+    project_key: str | None = None
 
 
 class ConfigUpdate(BaseModel):
@@ -47,6 +48,7 @@ class ConfigOut(BaseModel):
     owner: str
     created_at: str
     updated_at: str
+    project_key: str | None = None
 
 
 class PaginatedConfigs(BaseModel):
@@ -69,6 +71,7 @@ def _config_to_out(c) -> ConfigOut:
         owner=c.owner,
         created_at=c.created_at.isoformat(),
         updated_at=c.updated_at.isoformat(),
+        project_key=getattr(c, "project_key", None),
     )
 
 
@@ -85,6 +88,7 @@ async def create_config(body: ConfigCreate, session: AsyncSession = Depends(get_
         environment=body.environment,
         schema_definition=body.schema_definition,
         is_server_only=body.is_server_only,
+        project_key=body.project_key,
     )
     return _config_to_out(config)
 
@@ -92,12 +96,13 @@ async def create_config(body: ConfigCreate, session: AsyncSession = Depends(get_
 @router.get("", response_model=PaginatedConfigs)
 async def list_configs(
     environment: str | None = Query(None),
+    project_key: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ):
     items, total = await remote_config_service.list_configs(
-        session, environment=environment, limit=limit, offset=offset
+        session, environment=environment, project_key=project_key, limit=limit, offset=offset
     )
     return PaginatedConfigs(items=[_config_to_out(c) for c in items], total=total)
 

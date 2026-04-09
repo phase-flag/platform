@@ -53,6 +53,9 @@ class FeatureFlagDB(Base):
     # Namespace/workspace partitioning
     namespace = Column(String(255), nullable=True, index=True)
 
+    # Project scoping
+    project_key = Column(String(255), nullable=True, index=True)
+
     # Metadata
     created_by = Column(String(255), nullable=False, default="system")
     owner = Column(String(255), nullable=False, default="system")

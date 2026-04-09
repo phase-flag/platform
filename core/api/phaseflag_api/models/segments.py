@@ -26,6 +26,7 @@ class SegmentDB(Base):
     conditions = Column(Text, nullable=False, default="[]")
     created_by = Column(String(255), nullable=False, default="system")
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow())
+    project_key = Column(String(255), nullable=True, index=True)
 
     def get_conditions(self) -> list[dict[str, Any]]:
         return json.loads(self.conditions) if self.conditions else []

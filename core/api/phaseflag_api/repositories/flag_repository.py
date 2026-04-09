@@ -15,6 +15,7 @@ async def list_flags(
     status: str | None = None,
     lifecycle_stage: str | None = None,
     namespace: str | None = None,
+    project_key: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> tuple[Sequence[FeatureFlagDB], int]:
@@ -28,6 +29,8 @@ async def list_flags(
         base = base.where(FeatureFlagDB.lifecycle_stage == lifecycle_stage)
     if namespace:
         base = base.where(FeatureFlagDB.namespace == namespace)
+    if project_key:
+        base = base.where(FeatureFlagDB.project_key == project_key)
 
     count_stmt = select(func.count()).select_from(base.subquery())
     total = (await session.execute(count_stmt)).scalar() or 0
